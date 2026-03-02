@@ -241,6 +241,13 @@ oh-my-gemini-cli/
 | 수동 온보딩 스크립트 | Gemini CLI의 네이티브 확장 로딩 |
 
 
+## 영감을 받은 프로젝트
+
+- [Gemini CLI](https://github.com/google-gemini/gemini-cli) - Google의 오픈소스 AI 터미널 에이전트
+- [oh-my-codex](https://github.com/Yeachan-Heo/oh-my-codex) - OpenAI Codex CLI 하네스
+- [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode) - OpenCode 에이전트 하네스
+- [Claude Code 프롬프트 캐싱 교훈](https://news.hada.io/topic?id=26835) - 컨텍스트 엔지니어링 원리
+
 ## 문서
 
 - [설치 가이드](./guide/installation.md)
