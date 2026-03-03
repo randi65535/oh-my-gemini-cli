@@ -546,10 +546,6 @@
         </thead>
         <tbody>
           <tr>
-            <td>Reasoning Control</td>
-            <td>Added <code>/omg:reasoning</code> and <code>$reasoning</code> for effort-level switching (<code>low</code>/<code>medium</code>/<code>high</code>/<code>xhigh</code>).</td>
-          </tr>
-          <tr>
             <td>Diagnostics</td>
             <td>Added <code>/omg:doctor</code> and <code>$doctor</code> for extension/team/hook readiness checks with remediation output.</td>
           </tr>
@@ -563,7 +559,7 @@
           </tr>
           <tr>
             <td>New Runtime State</td>
-            <td>Added <code>.omg/state/reasoning.json</code>, <code>.omg/state/approval.json</code>, and <code>.omg/state/doctor.md</code> conventions.</td>
+            <td>Added <code>.omg/state/approval.json</code> and <code>.omg/state/doctor.md</code> conventions.</td>
           </tr>
           <tr>
             <td>Hook Orchestration</td>
@@ -699,11 +695,6 @@ Structured Result
             <td><code>/omg:hud</code> profiles (<code>normal</code>, <code>compact</code>, <code>hidden</code>) adapt status readability</td>
           </tr>
           <tr>
-            <td>Reasoning effort posture</td>
-            <td>Implicit depth/cost behavior</td>
-            <td><code>/omg:reasoning</code> sets explicit effort profile and route guidance</td>
-          </tr>
-          <tr>
             <td>Approval policy posture</td>
             <td>Ad-hoc confirmation behavior</td>
             <td><code>/omg:approval</code> manages <code>suggest/auto/full-auto</code> with risk guardrails</td>
@@ -729,11 +720,11 @@ Structured Result
       <div class="cards" style="margin-bottom:10px;">
         <div class="card">
           <h3>Commands</h3>
-          <p>Fast control points for status, doctor diagnostics, approval/reasoning posture, hook policy, intent gating, memory workflows, and loop discipline.</p>
+          <p>Fast control points for status, doctor diagnostics, approval posture, hook policy, intent gating, memory workflows, and loop discipline.</p>
         </div>
         <div class="card">
           <h3>Skills</h3>
-          <p>Reusable packs for diagnostics, approval/reasoning posture, HUD/status control, hook tuning, intent routing, and conditional guardrails.</p>
+          <p>Reusable packs for diagnostics, approval posture, HUD/status control, hook tuning, intent routing, and conditional guardrails.</p>
         </div>
         <div class="card">
           <h3>Sub-agents</h3>
@@ -764,14 +755,12 @@ Structured Result
           <tr><td>Command</td><td><code>/omg:rules</code></td><td>Activate task-conditional guardrail rule packs</td></tr>
           <tr><td>Command</td><td><code>/omg:memory</code></td><td>Manage <code>MEMORY.md</code> index, topic notes, and rule packs</td></tr>
           <tr><td>Command</td><td><code>/omg:loop</code></td><td>Continue exec/verify/fix cycles until done or blocked</td></tr>
-          <tr><td>Command</td><td><code>/omg:reasoning</code></td><td>Switch reasoning effort (<code>low</code>/<code>medium</code>/<code>high</code>/<code>xhigh</code>)</td></tr>
           <tr><td>Command</td><td><code>/omg:approval</code></td><td>Switch approval posture (<code>suggest</code>/<code>auto</code>/<code>full-auto</code>)</td></tr>
           <tr><td>Command</td><td><code>/omg:team</code></td><td>Run full multi-agent delivery loop</td></tr>
           <tr><td>Command</td><td><code>/omg:cancel</code></td><td>Harness-style safe cancel alias with resume handoff</td></tr>
           <tr><td>Command</td><td><code>/omg:optimize</code></td><td>Tune prompt/context quality and cost profile</td></tr>
           <tr><td>Command</td><td><code>/omg:cache</code></td><td>Inspect cache/context behavior</td></tr>
           <tr><td>Skill</td><td><code>$doctor</code></td><td>Readiness diagnostics and remediation sequencing</td></tr>
-          <tr><td>Skill</td><td><code>$reasoning</code></td><td>Reasoning-effort posture control for depth/cost tuning</td></tr>
           <tr><td>Skill</td><td><code>$approval</code></td><td>Approval policy posture control with risk guardrails</td></tr>
           <tr><td>Skill</td><td><code>$intent</code></td><td>Intent routing and next-command recommendation</td></tr>
           <tr><td>Skill</td><td><code>$hud</code></td><td>HUD profile control for status readability</td></tr>
@@ -837,8 +826,8 @@ Structured Result
           </tr>
           <tr>
             <td>Set operator posture</td>
-            <td><code>/omg:reasoning high</code> then <code>/omg:approval auto</code></td>
-            <td>Explicit depth/cost and confirmation policy aligned to task risk</td>
+            <td><code>/omg:approval auto</code></td>
+            <td>Explicit confirmation policy aligned to task risk</td>
           </tr>
           <tr>
             <td>Start workflow</td>
