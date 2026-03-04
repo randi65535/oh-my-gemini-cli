@@ -304,7 +304,6 @@ Extension behavior is manifest-driven through Gemini CLI extension primitives.
 - [Installation Guide](docs/guide/installation.md)
 - [Context Engineering Guide](docs/guide/context-engineering.md)
 - [Agent Team Assembly Guide](docs/guide/agent-team-assembly.md)
-- [Korean Context Engineering Guide](docs/guide/context-engineering_ko.md)
 - [Memory Management Guide](docs/guide/memory-management.md)
 - [Hook Engineering Guide](docs/guide/hook-engineering.md)
 - [History](docs/history.md)
