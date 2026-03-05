@@ -263,6 +263,10 @@ oh-my-gemini-cli/
 - [한국어 컨텍스트 엔지니어링 가이드](./guide/context-engineering_ko.md)
 - [변경 이력](./history.md)
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Joonghyun-Lee-Frieren/oh-my-gemini-cli&type=Date)](https://www.star-history.com/#Joonghyun-Lee-Frieren/oh-my-gemini-cli&Date)
+
 ## 라이선스
 
 MIT

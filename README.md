@@ -308,6 +308,10 @@ Extension behavior is manifest-driven through Gemini CLI extension primitives.
 - [Hook Engineering Guide](docs/guide/hook-engineering.md)
 - [History](docs/history.md)
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Joonghyun-Lee-Frieren/oh-my-gemini-cli&type=Date)](https://www.star-history.com/#Joonghyun-Lee-Frieren/oh-my-gemini-cli&Date)
+
 ## License
 
 MIT
