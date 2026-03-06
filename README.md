@@ -159,6 +159,15 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
+## Gemini CLI Compatibility Notes (Reviewed: 2026-03-06)
+
+- Recommended runtime: Gemini CLI `v0.31.0+` for stable policy/plan-mode behavior in long sessions.
+- Policy engine migration: if your wrapper scripts still pass `--allowed-tools`, migrate to `--policy` profiles (`--allowed-tools` was deprecated in Gemini CLI `v0.30.0`).
+- Native `/plan` mode and OmG planning commands can coexist:
+  - native: `/plan`
+  - OmG staged flow: `/omg:team-plan`, `/omg:team-prd`
+- Preview-only features (for example extension manifest plan-directory support from preview channel) are not required for OmG and are intentionally not enabled by default.
+
 ## Interface Map
 
 ### Commands
@@ -278,6 +287,7 @@ oh-my-gemini-cli/
 | `/omg:*` command not found | Extension not loaded in current session | Run `gemini extensions list`, then restart Gemini CLI session |
 | Skill does not trigger | Skill frontmatter path mismatch | Confirm `skills/<name>/SKILL.md` exists and extension is reloaded |
 | Team assembly keeps proposing but does not execute | Approval token missing in request | Reply with explicit approval (`yes`, `approve`, `go`, or `run`) |
+| Existing launch scripts use `--allowed-tools` | Flag deprecated in newer Gemini CLI | Replace with policy profiles via `--policy` and re-run |
 | Autonomous flow confirms too often (or too little) | Approval posture not aligned to task risk | Run `/omg:approval suggest|auto|full-auto` and recheck guardrails |
 | Setup health is unclear before long run | State/config drift accumulated | Run `/omg:doctor` (or `/omg:doctor team`) and apply remediation list |
 

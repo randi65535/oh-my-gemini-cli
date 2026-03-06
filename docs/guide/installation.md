@@ -4,7 +4,7 @@ This guide follows the official Gemini CLI Extensions workflow.
 
 ## Prerequisites
 
-1. Gemini CLI installed
+1. Gemini CLI installed (recommended `v0.31.0+`)
 2. Gemini authentication completed
 3. Local clone of this repository
 
@@ -13,6 +13,11 @@ Check quickly:
 ```bash
 gemini --version
 ```
+
+Compatibility note:
+
+- If your existing scripts still use `--allowed-tools`, migrate to `--policy` profiles.
+- OmG does not require preview-channel-only manifest features to run.
 
 ## Step 1: Clone Repository
 
