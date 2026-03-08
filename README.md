@@ -40,15 +40,6 @@ OmG extends Gemini CLI from a single-session assistant into a structured, role-d
 - Added runtime-state convention for assembled roster:
   - `.omg/state/team-assembly.md`
 
-## Upstream Alignment (oh-my-codex, Reviewed: 2026-03-09)
-
-Applied extension-native updates from recent `oh-my-codex` releases (last 2 weeks):
-
-- Added role-aware reasoning posture support (global + teammate overrides) in OmG reasoning/team orchestration.
-- Added anti-slop quality gates in verification/editor/reviewer paths to reduce vague or repetitive output.
-- Preserved extension boundary:
-  - runtime worker/tmux bootstrap changes in `oh-my-codex` were not ported because OmG runs through Gemini Extensions primitives.
-
 ## At A Glance
 
 | Item | Summary |
