@@ -8,7 +8,8 @@ $ARGUMENTS
 Tasks:
 1. Evaluate prefix stability risks.
 2. Identify volatile instructions or tool changes causing misses.
-3. Recommend concrete fixes to improve cache hit consistency.
+3. Check whether `.omg/state/taskboard.md` and `.omg/state/workspace.json` are being used as compact state anchors.
+4. Recommend concrete fixes to improve cache hit consistency.
 
 Output format:
 ## Cache Audit

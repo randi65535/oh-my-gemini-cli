@@ -16,17 +16,20 @@ Protocol:
    - research
    - lifecycle
 2. Identify missing constraints or acceptance criteria needed before execution.
-3. Detect command-intent mismatch (for example, implementation request but planning stage is missing).
-4. Recommend the next OmG command and agent handoff.
-5. If filesystem tools are available, write/update `.omg/state/intent.md`.
+3. Detect when workspace/worktree setup is needed before execution or parallel delegation.
+4. Detect command-intent mismatch (for example, implementation request but planning stage is missing).
+5. Recommend the next OmG command and agent handoff.
+6. If filesystem tools are available, write/update `.omg/state/intent.md`.
 
 Routing hints:
+- multi-root or worktree-sensitive implementation -> `/omg:workspace`
 - dynamic multi-role team setup -> `/omg:team-assemble`
 - planning ambiguity -> `/omg:team-plan`
 - scope ambiguity -> `/omg:team-prd`
 - implementation-ready -> `/omg:team-exec`
 - validation request -> `/omg:team-verify`
 - defect-only fix -> `/omg:team-fix`
+- task drift or completion-proof drift -> `/omg:taskboard`
 - option research -> `$research`
 - mode/lifecycle operations -> `/omg:mode`, `/omg:launch`, `/omg:checkpoint`, `/omg:stop`
 

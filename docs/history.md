@@ -6,6 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.3.8` | 2026-03-11 | Workspace and taskboard control | Added extension-native workspace lane mapping and verifier-backed taskboard workflows for lighter long-session orchestration |
 | `v0.3.7` | 2026-03-10 | Load surface cleanup | Fixed root context wiring, removed mirrored control-plane skills, and slimmed repeated command boilerplate |
 | `v0.3.6` | 2026-03-10 | Notification routing | Added extension-native notification profiles, event routing, and safe external-delivery boundaries for long-running OmG sessions |
 | `v0.3.5` | 2026-03-04 | Dynamic Agent Team Assembly | Added approval-gated dynamic team composition with new director/consultant/editor roles and model-aware lane policy |
@@ -20,6 +21,33 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.2` | 2026-02-22 | Model/branding consistency | `gemini-3.1-*` naming and OmG branding normalized |
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
+
+## v0.3.8 - Workspace and Taskboard Control (2026-03-11)
+
+Added a lightweight control layer inspired by recent worktree-aware planning and stricter completion gates in related harnesses, adapted to OmG's extension-native command/state model.
+
+### Added
+
+- New workspace/taskboard commands:
+  - `/omg:workspace`
+  - `/omg:taskboard`
+- New runtime-state conventions:
+  - `.omg/state/workspace.json`
+  - `.omg/state/taskboard.md`
+
+### Changed
+
+- `team-plan` now emits stable task IDs, workspace lane hints, and taskboard sync guidance.
+- `team-prd`, `team-exec`, and `team-verify` now align acceptance criteria, implementation slices, and verifier evidence to shared task IDs.
+- `team`, `team-assemble`, `loop`, and `autopilot` now treat verifier-backed taskboard completion as part of done criteria.
+- `launch`, `status`, `checkpoint`, `stop`, `cancel`, `cache`, `optimize`, `intent`, and `doctor` now recognize workspace/taskboard state.
+- README, Korean README, and landing page updated with workspace/taskboard flows and cache-stability guidance.
+- Extension/package version bumped to `0.3.8`.
+
+### Structural Fit Note
+
+- OmG stays extension-native: no new runtime daemon, background worker, or git wrapper was added.
+- Workspace/taskboard state is intentionally compact so long sessions can resume from a stable file anchor instead of replaying verbose chat history.
 
 ## v0.3.7 - Load Surface Cleanup (2026-03-10)
 

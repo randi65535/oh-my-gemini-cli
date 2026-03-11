@@ -1,0 +1,39 @@
+description = "Inspect or update a compact task board with stable task IDs, owners, and verifier-backed completion."
+prompt = """
+Run OmG `taskboard`.
+
+Input:
+$ARGUMENTS
+
+Protocol:
+1. Parse requested action:
+   - `status`
+   - `sync`
+   - `next`
+   - `close <task-id>`
+   - `verify <task-id>`
+2. Maintain a compact task ledger for the active workflow:
+   - task id (stable, short, deterministic)
+   - summary
+   - owner / lane
+   - status (`todo`, `ready`, `in-progress`, `blocked`, `done`, `verified`)
+   - dependency
+   - worktree or path scope when relevant
+   - verification evidence pointer
+3. Prefer updating existing task IDs instead of inventing new ones mid-loop.
+4. Keep ordering stable and write only high-signal notes; avoid volatile chatter or duplicated diffs.
+5. If `team-plan` or `team-prd` output exists, align the board to those artifacts.
+6. Never mark a task `verified` without evidence from `team-verify`.
+7. If filesystem tools are available, write/update `.omg/state/taskboard.md`.
+8. If scope or evidence is unclear, call it out instead of fabricating a board.
+
+Suggested `taskboard.md` shape:
+# Taskboard
+| Task ID | Status | Owner | Dependency | Worktree | Summary | Evidence |
+| --- | --- | --- | --- | --- | --- | --- |
+| T1 | ready | omg-executor | - | root | add config parser | pending verify |
+
+Response:
+- Keep it concise and operator-facing.
+- Include `Board Summary`, `Ready Tasks`, `Blocked Tasks`, `Verification Queue`, and `Next Command`.
+"""

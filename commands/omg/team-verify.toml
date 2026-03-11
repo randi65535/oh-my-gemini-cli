@@ -6,22 +6,25 @@ Task:
 $ARGUMENTS
 
 Protocol:
-1. Delegate review to `omg-reviewer`.
-2. Delegate acceptance-gate checks to `omg-verifier`.
-3. Validate each acceptance criterion with evidence.
-4. Run anti-slop quality gate:
+1. Read `.omg/state/taskboard.md` when available and identify the active verification queue.
+2. Delegate review to `omg-reviewer`.
+3. Delegate acceptance-gate checks to `omg-verifier`.
+4. Validate each acceptance criterion with evidence.
+5. Mark tasks `verified` only when evidence is explicit and criterion coverage is complete.
+6. Run anti-slop quality gate:
    - detect generic filler, vague claims, and weak evidence phrasing
    - require concise, evidence-anchored language in final output
-5. Classify issues as blocker, major, or minor.
-6. Produce targeted fix list for `team-fix`.
+7. Classify issues as blocker, major, or minor.
+8. Produce targeted fix list for `team-fix`.
+9. If filesystem tools are available, update `.omg/state/taskboard.md`.
 
 Output format:
 ## Stage
 - team-verify
 
 ## Acceptance Matrix
-| Criterion | Status (pass/fail/unknown) | Evidence | Owner |
-| --- | --- | --- | --- |
+| Criterion | Task ID(s) | Status (pass/fail/unknown) | Evidence | Owner |
+| --- | --- | --- | --- | --- |
 
 ## Review Findings
 - ...
@@ -34,6 +37,10 @@ Output format:
 1. ...
 2. ...
 3. ...
+
+## Verifier Signoff
+- status:
+- verified task ids:
 
 ## Release Readiness
 - ...

@@ -20,21 +20,20 @@ This project started from that observation:
 
 OmG extends Gemini CLI from a single-session assistant into a structured, role-driven engineering workflow.
 
-## What's New in v0.3.7
+## What's New in v0.3.8
 
-- Fixed extension context wiring:
-  - added root `GEMINI.md`
-  - imported `context/omg-core.md` through the manifest entrypoint
-- Reduced always-on prompt weight:
-  - trimmed the shared OmG baseline to only stable runtime rules
-  - moved the control plane to slash commands first
-- Removed mirrored control-plane skills:
-  - retained deep-work skills only: `$plan`, `$execute`, `$prd`, `$ralplan`, `$research`, `$context-optimize`
-- Slimmed high-traffic `/omg:*` commands:
-  - shortened repeated output boilerplate in status/doctor/intent/team/hooks/notify and related control commands
-- Updated diagnostics:
-  - `/omg:doctor` now checks the real `GEMINI.md -> context/omg-core.md` chain
-  - doctor now validates the retained skill set instead of every mirrored command/skill pair
+- Added extension-native workspace/task tracking:
+  - new `/omg:workspace` command for primary-root and lane/worktree mapping
+  - new `/omg:taskboard` command for stable task IDs, owner lanes, and verifier-backed completion
+- Tightened done criteria without adding runtime weight:
+  - `team-plan` now emits stable task IDs and workspace hints
+  - `team-exec`, `team-verify`, `loop`, and `autopilot` now use the taskboard as a compact source of truth
+- Improved cache-safe long-session handoff:
+  - `checkpoint`, `status`, `cache`, and `optimize` now prefer `.omg/state/taskboard.md` and `.omg/state/workspace.json`
+  - long sessions can resume from compact state files instead of replaying verbose raw turns
+- Kept the extension lightweight:
+  - no new runtime daemon, background worker, or heavy always-on context
+  - command surface expanded only with two slash commands and compact state files
 
 ## At A Glance
 
@@ -52,6 +51,7 @@ OmG extends Gemini CLI from a single-session assistant into a structured, role-d
 | --- | --- |
 | Context gets mixed across planning and execution | Role-separated agents with focused responsibilities |
 | Hard to keep progress visible in long tasks | Explicit workflow stages and command-driven status checks |
+| Parallel lanes or worktrees drift out of sync | `workspace` + `taskboard` keep lane ownership, task IDs, and verification state compact and explicit |
 | Repetitive prompt engineering for common jobs | Slash commands for operational control plus retained deep-work skills (`$plan`, `$execute`, `$research`) |
 | Drift between "what was decided" and "what was changed" | Review and debugging roles inside the same orchestration loop |
 
@@ -129,6 +129,24 @@ Activation note:
 - No separate research-preview setting is required in OmG.
 - If the extension is loaded, `/omg:team-assemble` is immediately available.
 
+## Workspace and Taskboard Control
+
+Use `workspace` and `taskboard` when work spans multiple roots, multiple implementation lanes, or long verify/fix loops.
+
+- `/omg:workspace` keeps the primary root plus optional worktree/path lanes in `.omg/state/workspace.json`.
+- `/omg:taskboard` keeps stable task IDs, owners, dependencies, statuses (`todo`, `ready`, `in-progress`, `blocked`, `done`, `verified`), and evidence pointers in `.omg/state/taskboard.md`.
+- `team-plan` seeds stable task IDs, `team-exec` pulls the smallest ready slice, and `team-verify` marks tasks verified only with evidence.
+- `checkpoint` and `status` can reference these files instead of replaying the whole chat, which improves cache stability and reduces token waste.
+
+Example flow:
+
+```text
+/omg:workspace set .
+/omg:workspace add ../feature-auth omg-executor
+/omg:taskboard sync
+/omg:taskboard next
+```
+
 ## Notification Routing
 
 Use `notify` when a long-running OmG session needs explicit signals for approvals, verification outcomes, blockers, or idle drift.
@@ -184,7 +202,7 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## Gemini CLI Compatibility Notes (Reviewed: 2026-03-06)
+## Gemini CLI Compatibility Notes (Reviewed: 2026-03-11)
 
 - Recommended runtime: Gemini CLI `v0.31.0+` for stable policy/plan-mode behavior in long sessions.
 - Policy engine migration: if your wrapper scripts still pass `--allowed-tools`, migrate to `--policy` profiles (`--allowed-tools` was deprecated in Gemini CLI `v0.30.0`).
@@ -213,10 +231,12 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 | `/omg:intent` | Classify task intent and route to the correct stage/command | Before planning or coding when request intent is ambiguous |
 | `/omg:rules` | Activate task-conditional guardrail rule packs | Before implementation on migration/security/performance-sensitive work |
 | `/omg:memory` | Maintain MEMORY index, topic files, and path-aware rule packs | During long sessions or when decisions/rules drift |
+| `/omg:workspace` | Inspect or set primary root, worktree/path lanes, and collision boundaries | Before parallel implementation or multi-root work |
+| `/omg:taskboard` | Maintain a compact task ledger with stable IDs and verifier-backed completion state | After planning and throughout long exec/verify loops |
 | `/omg:reasoning` | Set global reasoning effort and teammate overrides (`low/medium/high/xhigh`) | Before expensive planning/review loops or when depth is role-dependent |
 | `/omg:deep-init` | Build deep project map and validation baseline for long sessions | At project kickoff or when onboarding into unfamiliar codebases |
 | `/omg:team-assemble` | Dynamically compose a role-fit team with approval gate and lane-specific reasoning map | Before `/omg:team` on cross-domain or non-standard tasks |
-| `/omg:team` | Execute full stage pipeline (`team-assemble? -> plan -> prd -> exec -> verify -> fix`) | Complex feature or refactor delivery |
+| `/omg:team` | Execute full stage pipeline (`team-assemble? -> plan -> prd -> taskboard -> exec -> verify -> fix`) | Complex feature or refactor delivery |
 | `/omg:team-plan` | Build dependency-aware execution plan | Before implementation |
 | `/omg:team-prd` | Lock measurable acceptance criteria and constraints | After planning, before coding |
 | `/omg:team-exec` | Implement a scoped delivery slice | Main implementation loop |
@@ -230,11 +250,11 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 | `/omg:ultrawork` | Throughput mode for batched independent tasks | Large backlogs |
 | `/omg:consensus` | Converge on one option from multiple designs | Decision-heavy moments |
 | `/omg:launch` | Initialize persistent lifecycle state for long tasks | Beginning of long sessions |
-| `/omg:checkpoint` | Save compact checkpoint and resume hint | Mid-session handoff |
+| `/omg:checkpoint` | Save compact checkpoint and resume hint with taskboard/workspace references | Mid-session handoff |
 | `/omg:stop` | Gracefully stop autonomous mode and preserve progress | Pause/interrupt moments |
 | `/omg:cancel` | Harness-style cancel alias that stops safely and returns resume handoff | When interrupting autonomous/team flow |
 | `/omg:optimize` | Improve prompts/context for quality and token efficiency | After a noisy or expensive session |
-| `/omg:cache` | Inspect cache and context behavior | Long-running context-heavy tasks |
+| `/omg:cache` | Inspect cache/context behavior and compact-state anchoring | Long-running context-heavy tasks |
 
 ### Skills
 
@@ -274,8 +294,8 @@ Retained skills are intentionally limited to non-overlapping deep-work workflows
 | 1 | System / runtime constraints | Keep behavior aligned with platform guarantees |
 | 2 | Project standards | Preserve team conventions and architecture intent |
 | 3 | Thin `GEMINI.md`, `MEMORY.md`, and shared context | Maintain stable long-session memory without carrying heavy procedure every turn |
-| 4 | Active task brief | Keep current objective and acceptance criteria visible |
-| 5 | Latest execution traces | Feed immediate iteration and review loops |
+| 4 | Active task brief + workspace/taskboard state | Keep current objective, active lanes, and acceptance criteria visible |
+| 5 | Latest execution traces | Feed immediate iteration and review loops without replaying full raw history |
 
 ## Project Structure
 
@@ -300,6 +320,8 @@ oh-my-gemini-cli/
 | `/omg:*` command not found | Extension not loaded in current session | Run `gemini extensions list`, then restart Gemini CLI session |
 | Skill does not trigger | Only the retained deep-work skills are still shipped, or extension metadata is stale | Recheck the retained skill list in the README and reload the extension/session |
 | Team assembly keeps proposing but does not execute | Approval token missing in request | Reply with explicit approval (`yes`, `approve`, `go`, or `run`) |
+| Parallel execution keeps colliding or re-planning the same files | Workspace lanes are not explicit | Run `/omg:workspace status` or set lane/path ownership with `/omg:workspace` |
+| Done status keeps drifting after long loops | No compact task source of truth or missing verifier signoff | Run `/omg:taskboard sync`, then rerun `/omg:team-verify` to close remaining IDs |
 | Output is verbose, generic, or repetitive | Reasoning/gate posture too weak for the target artifact | Raise `/omg:reasoning` effort (optionally teammate overrides) and rerun `/omg:team-verify` |
 | Existing launch scripts use `--allowed-tools` | Flag deprecated in newer Gemini CLI | Replace with policy profiles via `--policy` and re-run |
 | Autonomous flow confirms too often (or too little) | Approval posture not aligned to task risk | Run `/omg:approval suggest|auto|full-auto` and recheck guardrails |

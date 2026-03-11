@@ -30,6 +30,7 @@ Protocol:
    - use higher effort for reviewer/verifier lanes on high-risk tasks
 6. Define collaboration protocol:
    - explicit message flow between lanes
+   - workspace/worktree lane ownership when `.omg/state/workspace.json` exists
    - trigger conditions for verify/fix loops
    - anti-slop quality gate before final delivery
    - fallback path when evidence conflicts or execution fails
@@ -37,8 +38,8 @@ Protocol:
    - If input includes explicit approval tokens (`approve`, `approved`, `yes`, `go`, `run`), proceed to execution.
    - Otherwise stop after team proposal and ask: "Proceed with this team? (yes/no)"
 8. Approved execution path:
-   - Run `team-plan -> team-prd -> team-exec -> team-verify -> team-fix`.
-   - Repeat `team-exec -> team-verify -> team-fix` until criteria pass or blockers are explicit.
+   - Run `team-plan -> team-prd -> taskboard -> team-exec -> team-verify -> team-fix`.
+   - Repeat `team-exec -> team-verify -> team-fix` until criteria pass, tracked tasks are verified, or blockers are explicit.
 9. If filesystem tools are available, write/update:
    - `.omg/state/team-assembly.md`
    - `.omg/state/workflow.md`

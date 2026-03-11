@@ -10,7 +10,8 @@ Protocol:
 2. Convert user intent into measurable acceptance criteria.
 3. Explicitly define non-goals to prevent scope creep.
 4. Document constraints (compatibility, timeline, dependencies, risk limits).
-5. Produce a handoff contract for `team-exec` and `team-verify`.
+5. Map acceptance criteria to task IDs when a taskboard already exists.
+6. Produce a handoff contract for `team-exec` and `team-verify`.
 
 Output format:
 ## Stage
@@ -23,8 +24,8 @@ Output format:
 - ...
 
 ## Acceptance Criteria
-| Criterion | Evidence Needed | Owner |
-| --- | --- | --- |
+| Criterion | Task ID(s) | Evidence Needed | Owner |
+| --- | --- | --- | --- |
 
 ## Constraints
 - ...

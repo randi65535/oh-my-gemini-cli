@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>oh-my-gemini-cli | Extension-first workflow pack for Gemini CLI</title>
-  <meta name="description" content="oh-my-gemini-cli is an extension-first, context-engineering-powered multi-agent workflow pack for Gemini CLI.">
+  <meta name="description" content="oh-my-gemini-cli is an extension-first, context-engineering-powered multi-agent workflow pack for Gemini CLI with workspace-aware lanes and cache-stable taskboards.">
   <style>
     :root {
       --bg: #f4f8f6;
@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.3.7</span>
+        <span class="badge">Latest Update v0.3.8</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -531,7 +531,7 @@
       <div class="stats">
         <div class="stat"><div class="n">13</div><div class="l">Sub-agents</div></div>
         <div class="stat"><div class="n">6</div><div class="l">Retained skills</div></div>
-        <div class="stat"><div class="n">36</div><div class="l">Namespaced commands</div></div>
+        <div class="stat"><div class="n">38</div><div class="l">Namespaced commands</div></div>
         <div class="stat"><div class="n">5</div><div class="l">Context layers</div></div>
       </div>
     </div>
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (v0.3.7 Load Surface Cleanup)</h2>
-      <p class="sub">The extension now loads through a real root context entrypoint, keeps only a small deep-work skill surface, and trims repeated control-command boilerplate.</p>
+      <h2>Latest Update (v0.3.8 Workspace and Taskboard Control)</h2>
+      <p class="sub">OmG now adds workspace-aware lanes and a verifier-backed taskboard so long sessions can coordinate parallel work and resume from compact state files instead of replaying raw chat history.</p>
       <table>
         <thead>
           <tr>
@@ -550,32 +550,32 @@
         </thead>
         <tbody>
           <tr>
-            <td>Context Wiring</td>
-            <td>Added a real root <code>GEMINI.md</code> so the extension manifest now resolves to <code>GEMINI.md -&gt; context/omg-core.md</code> instead of a missing file.</td>
+            <td>Workspace Map</td>
+            <td>Added <code>/omg:workspace</code> to track the primary root plus optional worktree/path lanes for parallel execution and safer handoffs.</td>
           </tr>
           <tr>
-            <td>Always-on Context</td>
-            <td>Trimmed the shared OmG baseline so only stable runtime rules stay in always-loaded context.</td>
+            <td>Taskboard</td>
+            <td>Added <code>/omg:taskboard</code> with stable task IDs, owner lanes, dependency fields, and verifier-backed completion state.</td>
           </tr>
           <tr>
-            <td>Skill Surface</td>
-            <td>Removed mirrored control-plane skills and kept only 6 deep-work skills: <code>$plan</code>, <code>$execute</code>, <code>$prd</code>, <code>$ralplan</code>, <code>$research</code>, and <code>$context-optimize</code>.</td>
+            <td>Done Criteria</td>
+            <td><code>team-plan</code>, <code>team-exec</code>, <code>team-verify</code>, <code>loop</code>, and <code>autopilot</code> now treat taskboard coverage and verifier signoff as part of completion.</td>
           </tr>
           <tr>
-            <td>Slash-First Control</td>
-            <td>Operational workflows such as approval, hooks, HUD, memory, notify, and team coordination now resolve through <code>/omg:*</code> commands only.</td>
+            <td>Compact Handoff</td>
+            <td><code>checkpoint</code>, <code>status</code>, <code>cache</code>, and <code>optimize</code> now prefer <code>.omg/state/taskboard.md</code> and <code>.omg/state/workspace.json</code> over replaying long raw turns.</td>
           </tr>
           <tr>
-            <td>Command Slimming</td>
-            <td>Shortened repeated output-format boilerplate in high-traffic commands so each invocation carries less duplicated prompt text.</td>
+            <td>Weight Budget</td>
+            <td>The feature is extension-native and lightweight: two new slash commands plus compact state files, with no daemon or heavy always-on context.</td>
           </tr>
           <tr>
             <td>Doctor Checks</td>
-            <td><code>/omg:doctor</code> now validates the actual context import chain and the retained skill set.</td>
+            <td><code>/omg:doctor</code> now checks workspace/taskboard drift risks in addition to the existing extension readiness surface.</td>
           </tr>
           <tr>
             <td>Activation Path</td>
-            <td>No extra preview flag is required; once the extension is loaded, the slash-command surface is immediately available with a thinner startup footprint.</td>
+            <td>No extra runtime wrapper or preview flag is required; once the extension is loaded, the new slash commands are immediately available.</td>
           </tr>
         </tbody>
       </table>
@@ -651,6 +651,11 @@ Structured Result
             <td>Domain specialists + format specialists are selected dynamically with approval gate</td>
           </tr>
           <tr>
+            <td>Parallel lane or worktree coordination</td>
+            <td>Implicit branch/path assumptions and repeated restarts</td>
+            <td><code>/omg:workspace</code> keeps root/lane ownership explicit for multi-root or parallel execution</td>
+          </tr>
+          <tr>
             <td>Consistency in decisions</td>
             <td>High drift risk across long chats</td>
             <td>Shared baseline from a thin <code>GEMINI.md -&gt; context/omg-core.md</code> chain</td>
@@ -678,7 +683,7 @@ Structured Result
           <tr>
             <td>Done criteria discipline</td>
             <td>Premature completion risk</td>
-            <td><code>/omg:loop</code> enforces <code>exec -&gt; verify -&gt; fix</code> cycles</td>
+            <td><code>/omg:taskboard</code> + <code>/omg:team-verify</code> keep stable task IDs and verifier-backed completion evidence</td>
           </tr>
           <tr>
             <td>Task-specific guardrails</td>
@@ -742,7 +747,7 @@ Structured Result
             <tr><td>2. Build role lanes</td><td>Select domain specialists and format specialists separately.</td></tr>
             <tr><td>3. Assign models + reasoning</td><td>Map model profiles and teammate reasoning effort by lane risk.</td></tr>
             <tr><td>4. Ask approval</td><td>Pause and request explicit confirmation before autonomous team execution.</td></tr>
-            <tr><td>5. Run lifecycle</td><td>Execute <code>team-plan -&gt; team-prd -&gt; team-exec -&gt; team-verify -&gt; team-fix</code>.</td></tr>
+            <tr><td>5. Run lifecycle</td><td>Execute <code>team-plan -&gt; team-prd -&gt; taskboard -&gt; team-exec -&gt; team-verify -&gt; team-fix</code>.</td></tr>
           </tbody>
         </table>
       </div>
@@ -770,12 +775,45 @@ Structured Result
   </section>
 
   <section>
+    <div class="wrap two-col">
+      <div>
+        <h2>Workspace and Taskboard</h2>
+        <p class="sub">Compact state anchors for parallel lanes and long verify/fix loops.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>/omg:workspace</code></td><td>Track primary root, optional worktree/path lanes, and collision boundaries.</td></tr>
+            <tr><td><code>/omg:taskboard</code></td><td>Track stable task IDs, owners, dependencies, and verifier-backed completion.</td></tr>
+            <tr><td><code>/omg:checkpoint</code></td><td>Resume from compact state references instead of replaying full chat history.</td></tr>
+            <tr><td><code>/omg:cache</code></td><td>Audit whether compact state anchors are actually keeping cache prefixes stable.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h2>Example Flow</h2>
+        <p class="sub">Lightweight control without adding a runtime daemon.</p>
+        <pre class="diagram">/omg:workspace set .
+/omg:workspace add ../feature-auth omg-executor
+/omg:taskboard sync
+/omg:team Implement auth flow with tests
+/omg:taskboard next
+/omg:checkpoint</pre>
+      </div>
+    </div>
+  </section>
+
+  <section>
     <div class="wrap">
       <h2>Interface Catalog</h2>
       <div class="cards" style="margin-bottom:10px;">
         <div class="card">
           <h3>Commands</h3>
-          <p>Primary control plane for status, notification routing, intent routing, approval posture, and staged execution control.</p>
+          <p>Primary control plane for status, notification routing, intent routing, workspace/task tracking, approval posture, and staged execution control.</p>
         </div>
         <div class="card">
           <h3>Skills</h3>
@@ -807,6 +845,8 @@ Structured Result
           <tr><td>Command</td><td><code>/omg:hooks-test</code></td><td>Dry-run event sequences and estimate hook efficiency impact</td></tr>
           <tr><td>Command</td><td><code>/omg:notify</code></td><td>Configure approvals/blockers/verify/checkpoint/idle notification routing</td></tr>
           <tr><td>Command</td><td><code>/omg:intent</code></td><td>Classify request intent and route to the right stage</td></tr>
+          <tr><td>Command</td><td><code>/omg:workspace</code></td><td>Set primary root and worktree/path lane ownership</td></tr>
+          <tr><td>Command</td><td><code>/omg:taskboard</code></td><td>Maintain compact task ledger with stable IDs and verify state</td></tr>
           <tr><td>Command</td><td><code>/omg:team-assemble</code></td><td>Build a task-fit team roster and request execution approval</td></tr>
           <tr><td>Command</td><td><code>/omg:deep-init</code></td><td>Build project map and validation baseline before long sessions</td></tr>
           <tr><td>Command</td><td><code>/omg:rules</code></td><td>Activate task-conditional guardrail rule packs</td></tr>
@@ -814,10 +854,10 @@ Structured Result
           <tr><td>Command</td><td><code>/omg:reasoning</code></td><td>Set global/teammate reasoning effort profile for depth and cost control</td></tr>
           <tr><td>Command</td><td><code>/omg:loop</code></td><td>Continue exec/verify/fix cycles until done or blocked</td></tr>
           <tr><td>Command</td><td><code>/omg:approval</code></td><td>Switch approval posture (<code>suggest</code>/<code>auto</code>/<code>full-auto</code>)</td></tr>
-          <tr><td>Command</td><td><code>/omg:team</code></td><td>Run full multi-agent lifecycle with optional assembled roster</td></tr>
+          <tr><td>Command</td><td><code>/omg:team</code></td><td>Run full multi-agent lifecycle with optional assembled roster and compact taskboard sync</td></tr>
           <tr><td>Command</td><td><code>/omg:cancel</code></td><td>Harness-style safe cancel alias with resume handoff</td></tr>
           <tr><td>Command</td><td><code>/omg:optimize</code></td><td>Tune prompt/context quality and cost profile</td></tr>
-          <tr><td>Command</td><td><code>/omg:cache</code></td><td>Inspect cache/context behavior</td></tr>
+          <tr><td>Command</td><td><code>/omg:cache</code></td><td>Inspect cache/context behavior and compact-state anchoring</td></tr>
           <tr><td>Skill</td><td><code>$plan</code></td><td>Milestone-level decomposition</td></tr>
           <tr><td>Skill</td><td><code>$execute</code></td><td>Implementation pass for a scoped slice</td></tr>
           <tr><td>Skill</td><td><code>$prd</code></td><td>Measurable scope and acceptance-criteria drafting</td></tr>
@@ -896,9 +936,19 @@ Structured Result
             <td>Project map + stage-routed handoff before coding</td>
           </tr>
           <tr>
+            <td>Set workspace lanes</td>
+            <td><code>/omg:workspace set .</code> and optionally <code>/omg:workspace add &lt;path&gt; &lt;owner&gt;</code></td>
+            <td>Explicit root/lane ownership before parallel implementation</td>
+          </tr>
+          <tr>
             <td>Assemble team</td>
             <td><code>/omg:team-assemble &lt;task&gt;</code></td>
             <td>Role-fit roster proposal + approval gate before autonomous execution</td>
+          </tr>
+          <tr>
+            <td>Sync task ledger</td>
+            <td><code>/omg:taskboard sync</code></td>
+            <td>Compact source of truth for ready, blocked, done, and verified tasks</td>
           </tr>
           <tr>
             <td>Refresh memory</td>
@@ -918,12 +968,12 @@ Structured Result
           <tr>
             <td>Execute lifecycle</td>
             <td><code>/omg:team Implement feature X with tests (approved roster)</code></td>
-            <td>team-plan -> team-prd -> team-exec -> team-verify -> team-fix progression summary</td>
+            <td>team-plan -> team-prd -> taskboard -> team-exec -> team-verify -> team-fix progression summary</td>
           </tr>
           <tr>
             <td>Enforce completion loop</td>
             <td><code>/omg:loop Continue unresolved verify backlog</code></td>
-            <td>Explicit continue/done/blocked status with evidence</td>
+            <td>Explicit continue/done/blocked status with taskboard coverage and evidence</td>
           </tr>
           <tr>
             <td>Observe state</td>
@@ -938,7 +988,7 @@ Structured Result
           <tr>
             <td>Tune context</td>
             <td><code>/omg:optimize</code> or <code>$context-optimize</code></td>
-            <td>Cleaner context with lower drift and better focus</td>
+            <td>Cleaner context with lower drift, stable task anchors, and better cache reuse</td>
           </tr>
         </tbody>
       </table>
@@ -973,6 +1023,11 @@ Structured Result
             <td>Run <code>/omg:approval suggest|auto|full-auto</code> and re-check policy</td>
           </tr>
           <tr>
+            <td>Parallel execution keeps colliding or re-planning the same files</td>
+            <td>Workspace lanes are not explicit</td>
+            <td>Run <code>/omg:workspace status</code> or assign lane/path ownership with <code>/omg:workspace</code></td>
+          </tr>
+          <tr>
             <td>Legacy wrapper scripts use <code>--allowed-tools</code></td>
             <td>Deprecated flag in recent Gemini CLI versions</td>
             <td>Migrate wrappers to policy profiles using <code>--policy</code></td>
@@ -986,6 +1041,11 @@ Structured Result
             <td>Team assembly keeps proposing but not executing</td>
             <td>No explicit approval token after roster proposal</td>
             <td>Reply with <code>yes</code>, <code>approve</code>, <code>go</code>, or <code>run</code> and re-run <code>/omg:team-assemble</code></td>
+          </tr>
+          <tr>
+            <td>Done status keeps drifting after long loops</td>
+            <td>No compact task source of truth or missing verifier signoff</td>
+            <td>Run <code>/omg:taskboard sync</code>, then rerun <code>/omg:team-verify</code> to close remaining task IDs</td>
           </tr>
           <tr>
             <td>Setup health is unclear before a long run</td>

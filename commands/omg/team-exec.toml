@@ -7,23 +7,30 @@ $ARGUMENTS
 
 Protocol:
 1. Confirm current accepted scope from `team-prd`.
-2. Delegate implementation to `omg-executor`.
-3. Keep each execution slice small and reviewable.
-4. Record changed files and rationale.
-5. Include checks/tests performed for this slice.
+2. Read `.omg/state/taskboard.md` and `.omg/state/workspace.json` when available.
+3. Pull only the smallest ready task slice with a stable task ID.
+4. Delegate implementation to `omg-executor`.
+5. Keep each execution slice small and reviewable.
+6. Record changed files, workspace lane, and rationale.
+7. Include checks/tests performed for this slice.
+8. If filesystem tools are available, update `.omg/state/taskboard.md`.
 
 Output format:
 ## Stage
 - team-exec
 
 ## Scope Slice
+- task id:
 - ...
 
 ## Implementation Log
-| Change | File(s) | Reason |
-| --- | --- | --- |
+| Change | File(s) | Worktree | Reason |
+| --- | --- | --- | --- |
 
 ## Validation Signals
+- ...
+
+## Taskboard Update
 - ...
 
 ## Ready For team-verify

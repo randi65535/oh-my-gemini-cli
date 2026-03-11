@@ -1,0 +1,44 @@
+description = "Inspect or set the active workspace/worktree map for OmG execution lanes."
+prompt = """
+Run OmG `workspace` manager.
+
+Input:
+$ARGUMENTS
+
+Protocol:
+1. Parse requested action:
+   - `status`
+   - `set <root-or-path>`
+   - `add <path> <lane-or-owner>`
+   - `clear`
+2. Track the active execution surface:
+   - primary workspace root
+   - optional worktree/path lanes
+   - owner or lane affinity
+   - cross-lane safety notes
+3. Keep the structure minimal and cache-stable:
+   - use canonical relative paths when possible
+   - avoid volatile timestamps or shell/session metadata
+   - record only active lanes needed for the current task
+4. Recommend separate worktrees only when parallel implementation would otherwise conflict.
+5. If filesystem tools are available, write/update `.omg/state/workspace.json`.
+
+Suggested `workspace.json` shape:
+{
+  "primary_root": ".",
+  "lanes": [
+    {
+      "id": "main",
+      "path": ".",
+      "owner": "omg-director",
+      "purpose": "merge-ready baseline"
+    }
+  ],
+  "cross_lane_policy": "explicit-handoff",
+  "source": "omg:workspace"
+}
+
+Response:
+- Keep it concise and operator-facing.
+- Include `Workspace Status`, `Lane Map`, `Collision Risks`, and `Next Command`.
+"""

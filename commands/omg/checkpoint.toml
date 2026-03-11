@@ -9,14 +9,17 @@ Protocol:
 1. Summarize objective, active stage, and current mode.
 2. Capture completed work and remaining TODOs.
 3. Capture key decisions and open risks.
-4. Provide a one-command resume hint.
-5. If filesystem tools are available, write/update `.omg/state/checkpoint.md`.
+4. Reference `.omg/state/taskboard.md` and `.omg/state/workspace.json` when available instead of replaying long raw history.
+5. Provide a one-command resume hint.
+6. If filesystem tools are available, write/update `.omg/state/checkpoint.md`.
 
 Output format:
 ## Checkpoint
 - objective:
 - mode:
 - stage:
+- workspace:
+- taskboard:
 
 ## Completed
 - ...
