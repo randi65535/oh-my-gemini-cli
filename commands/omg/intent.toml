@@ -16,13 +16,13 @@ Protocol:
    - research
    - lifecycle
 2. Identify missing constraints or acceptance criteria needed before execution.
-3. Detect when workspace/worktree setup is needed before execution or parallel delegation.
+3. Detect when workspace/worktree setup or workspace audit is needed before execution or parallel delegation.
 4. Detect command-intent mismatch (for example, implementation request but planning stage is missing).
 5. Recommend the next OmG command and agent handoff.
 6. If filesystem tools are available, write/update `.omg/state/intent.md`.
 
 Routing hints:
-- multi-root or worktree-sensitive implementation -> `/omg:workspace`
+- multi-root, dirty-lane, or worktree-sensitive implementation -> `/omg:workspace` (use `/omg:workspace audit` when lane health or trust is unclear)
 - dynamic multi-role team setup -> `/omg:team-assemble`
 - planning ambiguity -> `/omg:team-plan`
 - scope ambiguity -> `/omg:team-prd`

@@ -8,6 +8,7 @@ $ARGUMENTS
 Supported scopes:
 - default (or `status`): quick extension health check
 - `team`: multi-agent/team-pipeline readiness diagnostics
+- `workspace`: lane/worktree hygiene and drift diagnostics
 - `hooks`: hook-policy safety and trigger-health diagnostics
 
 Diagnostic protocol:
@@ -17,14 +18,17 @@ Diagnostic protocol:
    - key manifest/context files (`gemini-extension.json`, `GEMINI.md`, `context/omg-core.md`)
 3. Verify command readiness for core flows (`team`, `intent`, `workspace`, `taskboard`, `loop`, `rules`, `memory`, `hooks`, `notify`, `reasoning`, `approval`).
 4. Verify retained deep-work skills (`plan`, `execute`, `prd`, `ralplan`, `research`, `context-optimize`).
-5. Check state artifacts and drift risks under `.omg/state/` when available.
+5. Check state artifacts and drift risks under `.omg/state/` when available, including lane health, trust notes, and hook lifecycle policy.
 6. Detect common failure patterns:
    - extension not loaded in current session
    - missing or stale root `GEMINI.md` import chain
    - command discovery mismatch
    - stale/missing state files
    - taskboard/workspace drift causing repeated replanning
+   - dirty shared worktree or untrusted lane being reused for review/autonomous flow
+   - missing lane/subagent handoff context causing approval or verification drift
    - hook safety policy gaps for autonomous loops
+   - hook lifecycle asymmetry (start without terminal outcome, blocked continuation skipping safety re-entry)
 7. Produce concrete remediation actions in priority order.
 8. If filesystem tools are available, write/update `.omg/state/doctor.md`.
 

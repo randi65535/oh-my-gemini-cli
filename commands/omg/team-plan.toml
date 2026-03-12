@@ -6,11 +6,11 @@ Task:
 $ARGUMENTS
 
 Protocol:
-1. Load `.omg/state/workspace.json` when available and respect active lane/path scope.
+1. Load `.omg/state/workspace.json` when available and respect active lane/path scope plus lane health/trust notes.
 2. Delegate decomposition to `omg-planner`.
 3. Delegate architecture-sensitive risks to `omg-architect`.
-4. Build a phased task graph with stable task IDs, owners, dependencies, and workspace lanes.
-5. Mark tasks as sequential or parallelizable.
+4. Build a phased task graph with stable task IDs, owners, dependencies, workspace lanes, and lane-health assumptions.
+5. Mark tasks as sequential or parallelizable, and note when isolated worktrees or explicit handoffs are required.
 6. Define verification checkpoints per phase.
 7. If filesystem tools are available, seed/update `.omg/state/taskboard.md`.
 
@@ -22,8 +22,8 @@ Output format:
 - ...
 
 ## Task Graph
-| Task ID | Task | Owner | Dependency | Parallelizable | Worktree | Validation |
-| --- | --- | --- | --- | --- | --- | --- |
+| Task ID | Task | Owner | Dependency | Parallelizable | Worktree | Lane Notes | Validation |
+| --- | --- | --- | --- | --- | --- | --- | --- |
 
 ## Risks
 - ...

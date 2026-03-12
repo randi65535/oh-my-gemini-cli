@@ -14,8 +14,8 @@ Launch protocol:
    - `.omg/state/workspace.json` (only when user provided path/lane scope)
    - `.omg/state/hud.json` (create default `visibility=normal` only if missing)
 3. Run `team-plan` then `team-prd`.
-4. Recommend `/omg:workspace` and `/omg:taskboard sync` when the task spans multiple roots or parallel lanes.
-5. Start first execution slice (`team-exec`) only when scope is clear.
+4. Recommend `/omg:workspace`, `/omg:workspace audit`, and `/omg:taskboard sync` when the task spans multiple roots, parallel lanes, or uncertain lane hygiene.
+5. Start first execution slice (`team-exec`) only when scope is clear and the active lane is safe enough for execution/review.
 6. Report current stage and resume command.
 
 Output format:

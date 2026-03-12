@@ -8,7 +8,7 @@ $ARGUMENTS
 Protocol:
 1. Determine active mode/lifecycle state from context or `.omg/state/*` if available.
 2. Mark workflow as stopped (do not discard progress).
-3. Summarize completed work, open TODOs, blockers, taskboard status, and next safe resume step.
+3. Summarize completed work, open TODOs, blockers, taskboard status, current lane/subagent handoff, and next safe resume step.
 4. If filesystem tools are available, update `.omg/state/checkpoint.md`.
 
 Output format:
@@ -21,6 +21,7 @@ Output format:
 - in-flight:
 - open:
 - taskboard:
+- lane handoff:
 
 ## Resume Plan
 1. ...

@@ -9,9 +9,9 @@ Protocol:
 1. Delegate scope definition to `omg-product`.
 2. Convert user intent into measurable acceptance criteria.
 3. Explicitly define non-goals to prevent scope creep.
-4. Document constraints (compatibility, timeline, dependencies, risk limits).
+4. Document constraints (compatibility, timeline, dependencies, risk limits, lane-safety or trust assumptions when relevant).
 5. Map acceptance criteria to task IDs when a taskboard already exists.
-6. Produce a handoff contract for `team-exec` and `team-verify`.
+6. Produce a handoff contract for `team-exec` and `team-verify`, including lane ownership, evidence needs, and early-stop criteria.
 
 Output format:
 ## Stage

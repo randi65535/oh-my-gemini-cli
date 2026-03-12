@@ -25,6 +25,8 @@ Protocol:
    - `loop-stall`
    - `token-burst`
    - `blocker-repeat`
+   - `agent-blocked`
+   - `agent-finished-early`
 4. Build deterministic execution lanes:
    - `P0-safety` (permission/risk guardrails)
    - `P1-quality` (tests/docs/acceptance checks)
@@ -34,8 +36,12 @@ Protocol:
    - debounce window for repeated triggers
    - timeout budget per lane
    - cooldown after repeated failures
-6. Enforce team-safety: side-effect hooks must be disabled in delegated sub-agent turns unless user explicitly allows them.
-7. If filesystem tools are available, write/update `.omg/state/hooks.json`.
+6. Enforce lifecycle symmetry for agent-bound triggers:
+   - every before/enter path must have exactly one terminal outcome (`completed`, `blocked`, or `stopped`)
+   - blocked continuations must re-enter `P0-safety` once before `P1` or `P2`
+   - terminal hooks must not double-fire after continuation or retry
+7. Enforce team-safety: side-effect hooks must be disabled in delegated sub-agent turns unless user explicitly allows them.
+8. If filesystem tools are available, write/update `.omg/state/hooks.json`.
 
 Suggested `hooks.json` shape:
 {
@@ -47,21 +53,27 @@ Suggested `hooks.json` shape:
     "risk-spike": true,
     "loop-stall": true,
     "token-burst": false,
-    "blocker-repeat": true
+    "blocker-repeat": true,
+    "agent-blocked": true,
+    "agent-finished-early": true
   },
   "lanes": {
     "P0-safety": { "timeout_ms": 400, "debounce_ms": 0 },
     "P1-quality": { "timeout_ms": 800, "debounce_ms": 200 },
     "P2-optimization": { "timeout_ms": 600, "debounce_ms": 500 }
   },
+  "lifecycle_policy": {
+    "before_after_symmetry": true,
+    "continuation_reenters_safety_lane": true,
+    "terminal_states": ["completed", "blocked", "stopped"]
+  },
   "team_safety": {
     "disable_side_effects_for_worker_sessions": true
   },
-  "updated_at": "<ISO-8601>",
   "source": "omg:hooks"
 }
 
 Response:
 - Keep it concise and operator-facing.
-- Include `Hook Status`, `Active Lanes`, `Trigger Matrix`, and `Next Command`.
+- Include `Hook Status`, `Active Lanes`, `Trigger Matrix`, `Lifecycle Policy`, and `Next Command`.
 """

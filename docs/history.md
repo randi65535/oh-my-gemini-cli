@@ -6,6 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.3.9` | 2026-03-12 | Workspace hygiene and hook symmetry | Added lane-health auditing, hook lifecycle symmetry rules, and quieter delegated handoffs for safer long sessions |
 | `v0.3.8` | 2026-03-11 | Workspace and taskboard control | Added extension-native workspace lane mapping and verifier-backed taskboard workflows for lighter long-session orchestration |
 | `v0.3.7` | 2026-03-10 | Load surface cleanup | Fixed root context wiring, removed mirrored control-plane skills, and slimmed repeated command boilerplate |
 | `v0.3.6` | 2026-03-10 | Notification routing | Added extension-native notification profiles, event routing, and safe external-delivery boundaries for long-running OmG sessions |
@@ -21,6 +22,34 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.2` | 2026-02-22 | Model/branding consistency | `gemini-3.1-*` naming and OmG branding normalized |
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
+
+## v0.3.9 - Workspace Hygiene and Hook Symmetry (2026-03-12)
+
+Adapted OmG's extension-side orchestration to recent upstream Gemini CLI changes around dirty worktree safety, hook lifecycle consistency, and subagent policy/handoff clarity without adding runtime daemons or heavier always-on context.
+
+### Added
+
+- New workspace sub-action:
+  - `/omg:workspace audit`
+- New workspace/taskboard state conventions:
+  - lane cleanliness/trust/handoff notes inside `.omg/state/workspace.json`
+  - lane-health notes inside `.omg/state/taskboard.md`
+- New hook lifecycle policy conventions:
+  - blocked and early-finish derived hook signals
+  - before/after symmetry and continuation re-entry rules in `.omg/state/hooks.json`
+
+### Changed
+
+- `workspace`, `taskboard`, `doctor`, `intent`, `launch`, and `status` now treat dirty/untrusted lane state as a first-class operational risk.
+- `hooks`, `hooks-init`, `hooks-validate`, and `hooks-test` now validate lifecycle symmetry and blocked-continuation safety-lane re-entry.
+- `team-assemble`, `team-plan`, `team-prd`, `team-exec`, `team-verify`, `team`, `stop`, and `cancel` now keep lane/subagent context explicit while collapsing normal-success verbosity.
+- README, Korean README, and landing page updated with workspace audit, hook symmetry, and Gemini CLI `v0.33.0+` compatibility guidance.
+- Extension/package version bumped to `0.3.9`.
+
+### Structural Fit Note
+
+- OmG remains extension-native: no runtime daemon, background worker, or terminal hook injector was added.
+- Changes are intentionally prompt/state-level so long sessions stay compact and performance-safe.
 
 ## v0.3.8 - Workspace and Taskboard Control (2026-03-11)
 

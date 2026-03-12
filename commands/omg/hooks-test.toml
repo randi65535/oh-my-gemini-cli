@@ -10,18 +10,23 @@ Test protocol:
    - `session-start`
    - `stage-transition`
    - `pre-verify`
+   - `agent-blocked`
    - `post-verify`
    - `checkpoint-save`
+   - `agent-finished-early` (only when simulated execution stops before goal completion)
 2. Evaluate trigger firing order by lane (`P0 -> P1 -> P2`).
 3. Simulate derived signals:
    - `context-drift` when summary entropy increases
    - `loop-stall` when same blocker repeats
    - `risk-spike` when failure density grows
-4. Record skip reasons (debounce, cooldown, disabled profile, worker-session safety).
+   - `agent-blocked` when delegated execution requests continuation
+   - `agent-finished-early` when delegated execution returns a non-goal terminal state
+4. Record skip reasons (debounce, cooldown, disabled profile, worker-session safety, lifecycle duplicate suppression).
 5. Estimate hook overhead and value:
    - estimated time spent
    - estimated redundant-loop reduction
    - estimated token savings from early drift/blocker detection
+   - estimated repeated-hook suppression from lifecycle symmetry
 6. If filesystem tools are available, write/update `.omg/state/hooks-last-test.md`.
 
 Output format:

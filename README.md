@@ -20,20 +20,20 @@ This project started from that observation:
 
 OmG extends Gemini CLI from a single-session assistant into a structured, role-driven engineering workflow.
 
-## What's New in v0.3.8
+## What's New in v0.3.9
 
-- Added extension-native workspace/task tracking:
-  - new `/omg:workspace` command for primary-root and lane/worktree mapping
-  - new `/omg:taskboard` command for stable task IDs, owner lanes, and verifier-backed completion
-- Tightened done criteria without adding runtime weight:
-  - `team-plan` now emits stable task IDs and workspace hints
-  - `team-exec`, `team-verify`, `loop`, and `autopilot` now use the taskboard as a compact source of truth
-- Improved cache-safe long-session handoff:
-  - `checkpoint`, `status`, `cache`, and `optimize` now prefer `.omg/state/taskboard.md` and `.omg/state/workspace.json`
-  - long sessions can resume from compact state files instead of replaying verbose raw turns
-- Kept the extension lightweight:
-  - no new runtime daemon, background worker, or heavy always-on context
-  - command surface expanded only with two slash commands and compact state files
+- Added lane-hygiene auditing without new runtime code:
+  - `/omg:workspace audit` now checks dirty/clean state, trust status, and handoff readiness per lane
+  - `taskboard`, `doctor`, `launch`, and `status` now treat unsafe lane state as a first-class blocker signal
+- Hardened hook lifecycle symmetry:
+  - `hooks`, `hooks-init`, `hooks-validate`, and `hooks-test` now model blocked/early-finish agent outcomes explicitly
+  - blocked continuations must re-enter the safety lane before quality or optimization hooks resume
+- Tightened delegated handoffs while reducing noise:
+  - `team-assemble`, `team-exec`, `team`, `team-verify`, `stop`, and `cancel` now keep lane/subagent context explicit
+  - normal success paths stay terse; detailed output expands only for blocked or early-stop branches
+- Kept the extension lightweight and cache-stable:
+  - no new daemon, background worker, or heavy always-on context
+  - state remains compact (`workspace.json`, `taskboard.md`, `hooks.json`) and avoids volatile churn
 
 ## At A Glance
 
@@ -134,18 +134,28 @@ Activation note:
 Use `workspace` and `taskboard` when work spans multiple roots, multiple implementation lanes, or long verify/fix loops.
 
 - `/omg:workspace` keeps the primary root plus optional worktree/path lanes in `.omg/state/workspace.json`.
-- `/omg:taskboard` keeps stable task IDs, owners, dependencies, statuses (`todo`, `ready`, `in-progress`, `blocked`, `done`, `verified`), and evidence pointers in `.omg/state/taskboard.md`.
-- `team-plan` seeds stable task IDs, `team-exec` pulls the smallest ready slice, and `team-verify` marks tasks verified only with evidence.
+- `/omg:workspace audit` checks lane cleanliness, trust status, and handoff readiness before parallel execution, review, or automation.
+- `/omg:taskboard` keeps stable task IDs, owners, dependencies, statuses (`todo`, `ready`, `in-progress`, `blocked`, `done`, `verified`), lane-health notes, and evidence pointers in `.omg/state/taskboard.md`.
+- `team-plan` seeds stable task IDs plus lane assumptions, `team-exec` pulls the smallest ready slice with explicit lane/subagent context, and `team-verify` marks tasks verified only with evidence plus safe lane state.
 - `checkpoint` and `status` can reference these files instead of replaying the whole chat, which improves cache stability and reduces token waste.
 
 Example flow:
 
 ```text
 /omg:workspace set .
+/omg:workspace audit
 /omg:workspace add ../feature-auth omg-executor
 /omg:taskboard sync
 /omg:taskboard next
 ```
+
+## Workspace Hygiene and Hook Symmetry
+
+Use these controls when long sessions start drifting because lane ownership, delegated execution, or hook continuation behavior is no longer obvious.
+
+- `/omg:workspace audit` surfaces dirty shared worktrees, untrusted review paths, and handoff-ready vs handoff-blocked lanes.
+- `/omg:hooks` and `/omg:hooks-validate` now model paired agent lifecycle outcomes (`completed`, `blocked`, `stopped`) so blocked continuations re-enter the safety lane once before downstream hooks resume.
+- `team-exec`, `team`, `team-verify`, `stop`, and `cancel` keep delegated lane/subagent context compact and explicit, expanding details only when execution stops early or hits a blocker.
 
 ## Notification Routing
 
@@ -202,14 +212,14 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## Gemini CLI Compatibility Notes (Reviewed: 2026-03-11)
+## Gemini CLI Compatibility Notes (Reviewed: 2026-03-12)
 
-- Recommended runtime: Gemini CLI `v0.31.0+` for stable policy/plan-mode behavior in long sessions.
+- Recommended runtime: Gemini CLI `v0.33.0+` for stable hook lifecycle, subagent-policy context, dirty-worktree handling, and newer slash-skill ergonomics.
 - Policy engine migration: if your wrapper scripts still pass `--allowed-tools`, migrate to `--policy` profiles (`--allowed-tools` was deprecated in Gemini CLI `v0.30.0`).
 - Native `/plan` mode and OmG planning commands can coexist:
   - native: `/plan`
   - OmG staged flow: `/omg:team-plan`, `/omg:team-prd`
-- Preview-only features (for example extension manifest plan-directory support from preview channel) are not required for OmG and are intentionally not enabled by default.
+- Preview-only features (for example extension manifest plan-directory support or experimental model steering docs from preview channel) are not required for OmG and are intentionally not enabled by default.
 
 ## Interface Map
 
@@ -218,20 +228,20 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 | Command | Purpose | Typical timing |
 | --- | --- | --- |
 | `/omg:status` | Summarize progress, risks, and next actions | Start/end of a work session |
-| `/omg:doctor` | Run extension/team/hook readiness diagnostics and remediation plan | Before long autonomous runs or when setup seems broken |
+| `/omg:doctor` | Run extension/team/workspace/hook readiness diagnostics and remediation plan | Before long autonomous runs or when setup seems broken |
 | `/omg:hud` | Inspect or switch visual HUD profile (`normal`, `compact`, `hidden`) | Before long sessions or when terminal density changes |
 | `/omg:hud-on` | Quick toggle HUD to full visual mode | When returning to full status boards |
 | `/omg:hud-compact` | Quick toggle HUD to compact mode | During dense implementation loops |
 | `/omg:hud-off` | Quick toggle HUD to hidden mode (plain status sections) | When visual blocks are distracting |
 | `/omg:hooks` | Inspect/switch hook pipeline profile and trigger policy | Before autonomous loops or when hook behavior drifts |
 | `/omg:hooks-init` | Bootstrap hook config and plugin contract scaffolding | At project kickoff or first hook adoption |
-| `/omg:hooks-validate` | Validate hook ordering, safety, and budget constraints | Before enabling high-autonomy workflows |
+| `/omg:hooks-validate` | Validate hook ordering, lifecycle symmetry, safety, and budget constraints | Before enabling high-autonomy workflows |
 | `/omg:hooks-test` | Dry-run hook event sequence and efficiency estimates | After policy changes or repeated loop stalls |
 | `/omg:notify` | Configure notification routing for approvals, blockers, verify results, checkpoints, and idle watchdog alerts | Before unattended `autopilot`/`loop` runs or when alert noise needs tuning |
 | `/omg:intent` | Classify task intent and route to the correct stage/command | Before planning or coding when request intent is ambiguous |
 | `/omg:rules` | Activate task-conditional guardrail rule packs | Before implementation on migration/security/performance-sensitive work |
 | `/omg:memory` | Maintain MEMORY index, topic files, and path-aware rule packs | During long sessions or when decisions/rules drift |
-| `/omg:workspace` | Inspect or set primary root, worktree/path lanes, and collision boundaries | Before parallel implementation or multi-root work |
+| `/omg:workspace` | Inspect, audit, or set primary root, worktree/path lanes, and collision boundaries | Before parallel implementation or multi-root work |
 | `/omg:taskboard` | Maintain a compact task ledger with stable IDs and verifier-backed completion state | After planning and throughout long exec/verify loops |
 | `/omg:reasoning` | Set global reasoning effort and teammate overrides (`low/medium/high/xhigh`) | Before expensive planning/review loops or when depth is role-dependent |
 | `/omg:deep-init` | Build deep project map and validation baseline for long sessions | At project kickoff or when onboarding into unfamiliar codebases |
@@ -239,7 +249,7 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 | `/omg:team` | Execute full stage pipeline (`team-assemble? -> plan -> prd -> taskboard -> exec -> verify -> fix`) | Complex feature or refactor delivery |
 | `/omg:team-plan` | Build dependency-aware execution plan | Before implementation |
 | `/omg:team-prd` | Lock measurable acceptance criteria and constraints | After planning, before coding |
-| `/omg:team-exec` | Implement a scoped delivery slice | Main implementation loop |
+| `/omg:team-exec` | Implement a scoped delivery slice with explicit lane/subagent handoff | Main implementation loop |
 | `/omg:team-verify` | Validate acceptance criteria, regressions, and anti-slop quality gate | After each execution slice |
 | `/omg:team-fix` | Patch only verified failures | When verification fails |
 | `/omg:loop` | Enforce repeated `exec -> verify -> fix` cycles until done/blocker | Mid/late delivery when unresolved findings remain |
@@ -321,7 +331,9 @@ oh-my-gemini-cli/
 | Skill does not trigger | Only the retained deep-work skills are still shipped, or extension metadata is stale | Recheck the retained skill list in the README and reload the extension/session |
 | Team assembly keeps proposing but does not execute | Approval token missing in request | Reply with explicit approval (`yes`, `approve`, `go`, or `run`) |
 | Parallel execution keeps colliding or re-planning the same files | Workspace lanes are not explicit | Run `/omg:workspace status` or set lane/path ownership with `/omg:workspace` |
+| Review or automation is about to run on a dirty/untrusted lane | Shared worktree hygiene is unclear | Run `/omg:workspace audit`, isolate the lane if needed, and only then continue verify/review steps |
 | Done status keeps drifting after long loops | No compact task source of truth or missing verifier signoff | Run `/omg:taskboard sync`, then rerun `/omg:team-verify` to close remaining IDs |
+| Hooks seem to miss terminal events or fire twice after continuation | Hook lifecycle symmetry is not explicit | Run `/omg:hooks-validate`, then fix lifecycle policy before re-enabling autonomous loops |
 | Output is verbose, generic, or repetitive | Reasoning/gate posture too weak for the target artifact | Raise `/omg:reasoning` effort (optionally teammate overrides) and rerun `/omg:team-verify` |
 | Existing launch scripts use `--allowed-tools` | Flag deprecated in newer Gemini CLI | Replace with policy profiles via `--policy` and re-run |
 | Autonomous flow confirms too often (or too little) | Approval posture not aligned to task risk | Run `/omg:approval suggest|auto|full-auto` and recheck guardrails |

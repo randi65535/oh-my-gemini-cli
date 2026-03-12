@@ -15,20 +15,20 @@ Gemini CLI를 위한 컨텍스트 엔지니어링 기반 멀티 에이전트 워
 
 OmG는 Gemini CLI를 단일 세션 도우미에서 구조화된 역할 기반 엔지니어링 워크플로우로 확장합니다.
 
-## v0.3.8의 새로운 내용
+## v0.3.9의 새로운 내용
 
-- 확장 네이티브 작업 추적 추가:
-  - 기본 루트와 lane/worktree 범위를 관리하는 `/omg:workspace`
-  - 안정적인 task ID, 담당 lane, 검증 완료 상태를 관리하는 `/omg:taskboard`
-- 완료 판정 강화:
-  - `team-plan`이 안정적인 task ID와 workspace 힌트를 생성
-  - `team-exec`, `team-verify`, `loop`, `autopilot`이 taskboard를 기준으로 작은 슬라이스를 반복
-- 장기 세션의 캐시 안정성 개선:
-  - `checkpoint`, `status`, `cache`, `optimize`가 `.omg/state/taskboard.md`와 `.omg/state/workspace.json`을 우선 참조
-  - 긴 대화를 다시 싣는 대신 compact 상태 파일로 재개 가능
-- 경량성 유지:
-  - 새로운 데몬, 백그라운드 워커, 무거운 항상-로드 컨텍스트는 추가하지 않음
-  - slash command 2개와 작은 상태 파일만 확장
+- 런타임 코드를 늘리지 않고 lane 위생 점검 추가:
+  - `/omg:workspace audit`가 lane별 dirty/clean 상태, 신뢰 여부, 핸드오프 준비 상태를 점검
+  - `taskboard`, `doctor`, `launch`, `status`가 unsafe lane 상태를 1급 blocker 신호로 취급
+- 훅 라이프사이클 대칭성 강화:
+  - `hooks`, `hooks-init`, `hooks-validate`, `hooks-test`가 blocked/조기 종료 에이전트 결과를 명시적으로 다룸
+  - blocked continuation은 quality/optimization 훅보다 먼저 safety lane을 다시 거치도록 정렬
+- 위임 실행 핸드오프를 더 조용하고 명확하게 정리:
+  - `team-assemble`, `team-exec`, `team`, `team-verify`, `stop`, `cancel`이 lane/sub-agent 컨텍스트를 명시적으로 유지
+  - 정상 성공 경로는 짧게, blocked/조기 종료 분기만 자세히 확장
+- 경량성과 캐시 안정성 유지:
+  - 새 데몬, 백그라운드 워커, 무거운 항상-로드 컨텍스트는 추가하지 않음
+  - 상태는 계속 compact(`workspace.json`, `taskboard.md`, `hooks.json`)하게 유지하고 volatile churn을 피함
 
 ## 한눈에 보기
 
@@ -121,18 +121,28 @@ sequenceDiagram
 여러 경로를 오가거나 병렬 구현 lane이 필요한 작업, 그리고 길어진 verify/fix 루프에는 `workspace`와 `taskboard`를 함께 사용하는 편이 안전합니다.
 
 - `/omg:workspace`는 기본 루트와 선택적 worktree/path lane을 `.omg/state/workspace.json`에 기록합니다.
-- `/omg:taskboard`는 안정적인 task ID, 담당자, 의존성, 상태(`todo`, `ready`, `in-progress`, `blocked`, `done`, `verified`), 검증 근거 포인터를 `.omg/state/taskboard.md`에 유지합니다.
-- `team-plan`이 task ID를 시드하고, `team-exec`이 가장 작은 ready 슬라이스를 가져가며, `team-verify`가 근거가 있을 때만 `verified`로 올립니다.
+- `/omg:workspace audit`는 병렬 실행, 리뷰, 자동화 전에 lane의 cleanliness, trust, handoff readiness를 점검합니다.
+- `/omg:taskboard`는 안정적인 task ID, 담당자, 의존성, 상태(`todo`, `ready`, `in-progress`, `blocked`, `done`, `verified`), lane health 메모, 검증 근거 포인터를 `.omg/state/taskboard.md`에 유지합니다.
+- `team-plan`이 task ID와 lane 가정을 시드하고, `team-exec`이 lane/sub-agent 컨텍스트를 포함한 가장 작은 ready 슬라이스를 가져가며, `team-verify`가 근거와 안전한 lane 상태가 있을 때만 `verified`로 올립니다.
 - `checkpoint`와 `status`는 긴 대화를 재생하지 않고 이 상태 파일들을 참조하므로 토큰 낭비와 캐시 흔들림을 줄일 수 있습니다.
 
 예시:
 
 ```text
 /omg:workspace set .
+/omg:workspace audit
 /omg:workspace add ../feature-auth omg-executor
 /omg:taskboard sync
 /omg:taskboard next
 ```
+
+## Workspace 위생과 Hook 대칭성
+
+장기 세션에서 lane 소유권, 위임 실행, 훅 continuation 흐름이 흐려질 때 이 제어면을 함께 쓰는 편이 안전합니다.
+
+- `/omg:workspace audit`는 dirty 공유 worktree, 신뢰되지 않은 review 경로, handoff-ready/handoff-blocked lane을 드러냅니다.
+- `/omg:hooks`와 `/omg:hooks-validate`는 에이전트 라이프사이클 결과(`completed`, `blocked`, `stopped`)를 짝지어 다루며, blocked continuation이 downstream 훅보다 먼저 safety lane을 다시 지나가도록 강제합니다.
+- `team-exec`, `team`, `team-verify`, `stop`, `cancel`은 위임된 lane/sub-agent 컨텍스트를 compact하게 유지하고, 실행이 조기 종료되거나 blocker에 걸렸을 때만 상세 내역을 확장합니다.
 
 ## 설치
 
@@ -162,6 +172,17 @@ gemini extensions list
 
 참고: 설치/업데이트 명령은 대화형 슬래시 명령 모드가 아니라 터미널 모드(`gemini extensions ...`)에서 실행합니다.
 
+## Gemini CLI 호환성 노트 (검토일: 2026-03-12)
+
+- 권장 런타임: Gemini CLI `v0.33.0+`
+  - 최근 upstream의 hook lifecycle 안정화, sub-agent policy context 전달, dirty worktree 처리, slash 기반 skill 사용성 개선을 반영하기 좋습니다.
+- 정책 엔진 마이그레이션:
+  - 래퍼 스크립트가 아직 `--allowed-tools`를 사용한다면 `--policy` 프로파일로 옮기는 편이 안전합니다.
+- 네이티브 `/plan` 모드와 OmG planning 명령은 함께 사용할 수 있습니다.
+  - native: `/plan`
+  - OmG staged flow: `/omg:team-plan`, `/omg:team-prd`
+- preview 채널 전용 기능(예: experimental model steering 문서나 manifest preview 옵션)은 OmG에 필수는 아니며 기본값으로 켜지지 않습니다.
+
 ## 인터페이스 맵
 
 ### Commands
@@ -169,7 +190,7 @@ gemini extensions list
 | 명령 | 목적 | 사용 시점 |
 | --- | --- | --- |
 | `/omg:status` | 진행 상황, 리스크, 다음 액션 요약 | 세션 시작/종료 |
-| `/omg:doctor` | 확장/팀/훅 준비도 진단과 복구 액션 제시 | 장기 자율 실행 전 또는 환경 이상 징후 발생 시 |
+| `/omg:doctor` | 확장/팀/workspace/훅 준비도 진단과 복구 액션 제시 | 장기 자율 실행 전 또는 환경 이상 징후 발생 시 |
 | `/omg:hud` | 시각 HUD 프로파일 조회/전환 (`normal`, `compact`, `hidden`) | 장기 세션 시작 전 또는 터미널 밀도 변경 시 |
 | `/omg:hud-on` | HUD를 전체 시각 모드로 빠르게 전환 | 전체 상태 보드로 복귀할 때 |
 | `/omg:hud-compact` | HUD를 컴팩트 모드로 빠르게 전환 | 구현 루프 중 밀도 높은 업데이트가 필요할 때 |
@@ -178,12 +199,12 @@ gemini extensions list
 | `/omg:intent` | 요청 인텐트를 분류하고 적절한 스테이지/명령으로 라우팅 | 계획/구현 전, 요청 의도가 모호할 때 |
 | `/omg:rules` | 작업 조건에 맞는 가드레일 룰 팩 활성화 | 마이그레이션/보안/성능 민감 작업 시작 전 |
 | `/omg:deep-init` | 장기 세션을 위한 프로젝트 맵/검증 기준선 초기화 | 신규 코드베이스 온보딩 또는 대형 작업 킥오프 시 |
-| `/omg:workspace` | 기본 루트, worktree/path lane, 충돌 경계를 설정/조회 | 병렬 구현 또는 멀티 루트 작업 전 |
+| `/omg:workspace` | 기본 루트, worktree/path lane, 충돌 경계를 설정/조회하고 audit 수행 | 병렬 구현 또는 멀티 루트 작업 전 |
 | `/omg:taskboard` | 안정적인 task ID와 verifier 기반 완료 상태를 유지하는 컴팩트 작업 보드 | 계획 후 및 장기 exec/verify 루프 전반 |
 | `/omg:team` | 전체 스테이지 파이프라인 실행 (`plan -> prd -> taskboard -> exec -> verify -> fix`) | 복잡한 기능/리팩터링 전달 |
 | `/omg:team-plan` | 의존성을 반영한 실행 계획 수립 | 구현 전 |
 | `/omg:team-prd` | 측정 가능한 수용 기준과 제약 고정 | 계획 후, 코딩 전 |
-| `/omg:team-exec` | 범위가 고정된 구현 슬라이스 수행 | 메인 구현 루프 |
+| `/omg:team-exec` | 범위가 고정된 구현 슬라이스를 lane/sub-agent 핸드오프와 함께 수행 | 메인 구현 루프 |
 | `/omg:team-verify` | 수용 기준과 회귀 검증 | 각 실행 슬라이스 이후 |
 | `/omg:team-fix` | 검증으로 확인된 실패만 패치 | 검증 실패 시 |
 | `/omg:loop` | `exec -> verify -> fix` 반복을 done/blocker까지 강제 | 미해결 이슈가 남은 중/후반 구현 단계 |
@@ -261,7 +282,9 @@ oh-my-gemini-cli/
 | `/omg:*` 명령을 찾을 수 없음 | 현재 세션에 확장이 로드되지 않음 | `gemini extensions list` 실행 후 CLI 세션 재시작 |
 | 스킬이 트리거되지 않음 | 유지된 deep-work 스킬만 남아 있거나 확장 메타데이터가 오래됨 | README의 유지 스킬 목록 확인 후 확장/세션 재로드 |
 | 병렬 구현이 자꾸 같은 파일에서 충돌하거나 재계획됨 | workspace lane이 명시되지 않음 | `/omg:workspace status`로 확인하거나 `/omg:workspace`로 경로/lane 소유권 설정 |
+| dirty하거나 신뢰되지 않은 lane 위에서 바로 리뷰/자동화를 돌리려 함 | 공유 worktree 위생 상태가 불명확함 | `/omg:workspace audit`로 점검하고, 필요 시 lane을 분리한 뒤 verify/review를 이어서 실행 |
 | 길어진 루프에서 done 판정이 흔들림 | 컴팩트한 작업 기준 상태 또는 verifier signoff 부족 | `/omg:taskboard sync` 후 `/omg:team-verify`를 다시 실행해 남은 task ID 정리 |
+| continuation 이후 훅이 두 번 실행되거나 종료 이벤트를 놓침 | hook lifecycle 대칭성이 불명확함 | `/omg:hooks-validate`를 실행해 lifecycle policy를 정리한 뒤 자율 루프를 다시 켬 |
 | 자율 실행에서 확인 요청이 너무 많거나 너무 적음 | 승인 포스처가 작업 위험도와 불일치 | `/omg:approval suggest|auto|full-auto`로 재설정 후 재확인 |
 | 장기 실행 전에 환경 정상 여부가 불확실함 | 상태/구성 드리프트 누적 | `/omg:doctor`(또는 `/omg:doctor team`) 실행 후 복구 항목 반영 |
 

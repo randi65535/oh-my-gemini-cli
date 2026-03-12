@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>oh-my-gemini-cli | Extension-first workflow pack for Gemini CLI</title>
-  <meta name="description" content="oh-my-gemini-cli is an extension-first, context-engineering-powered multi-agent workflow pack for Gemini CLI with workspace-aware lanes and cache-stable taskboards.">
+  <meta name="description" content="oh-my-gemini-cli is an extension-first, context-engineering-powered multi-agent workflow pack for Gemini CLI with lane health audits, hook lifecycle symmetry, and cache-stable taskboards.">
   <style>
     :root {
       --bg: #f4f8f6;
@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.3.8</span>
+        <span class="badge">Latest Update v0.3.9</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (v0.3.8 Workspace and Taskboard Control)</h2>
-      <p class="sub">OmG now adds workspace-aware lanes and a verifier-backed taskboard so long sessions can coordinate parallel work and resume from compact state files instead of replaying raw chat history.</p>
+      <h2>Latest Update (v0.3.9 Workspace Hygiene and Hook Symmetry)</h2>
+      <p class="sub">OmG now audits lane cleanliness and trust, validates hook lifecycle symmetry, and keeps delegated handoffs compact so long sessions stay safer without adding runtime weight.</p>
       <table>
         <thead>
           <tr>
@@ -550,32 +550,28 @@
         </thead>
         <tbody>
           <tr>
-            <td>Workspace Map</td>
-            <td>Added <code>/omg:workspace</code> to track the primary root plus optional worktree/path lanes for parallel execution and safer handoffs.</td>
+            <td>Workspace Audit</td>
+            <td><code>/omg:workspace audit</code> now checks clean/dirty state, trust status, and handoff readiness so shared or unsafe lanes are caught before review or automation.</td>
           </tr>
           <tr>
-            <td>Taskboard</td>
-            <td>Added <code>/omg:taskboard</code> with stable task IDs, owner lanes, dependency fields, and verifier-backed completion state.</td>
+            <td>Taskboard Safety</td>
+            <td><code>/omg:taskboard</code> can now carry lane-health notes, keeping dirty or untrusted execution surfaces visible next to task status and evidence.</td>
           </tr>
           <tr>
-            <td>Done Criteria</td>
-            <td><code>team-plan</code>, <code>team-exec</code>, <code>team-verify</code>, <code>loop</code>, and <code>autopilot</code> now treat taskboard coverage and verifier signoff as part of completion.</td>
+            <td>Hook Symmetry</td>
+            <td><code>/omg:hooks</code> and <code>/omg:hooks-validate</code> now model blocked and early-finish agent outcomes explicitly, including safety-lane re-entry before continuation.</td>
           </tr>
           <tr>
             <td>Compact Handoff</td>
-            <td><code>checkpoint</code>, <code>status</code>, <code>cache</code>, and <code>optimize</code> now prefer <code>.omg/state/taskboard.md</code> and <code>.omg/state/workspace.json</code> over replaying long raw turns.</td>
-          </tr>
-          <tr>
-            <td>Weight Budget</td>
-            <td>The feature is extension-native and lightweight: two new slash commands plus compact state files, with no daemon or heavy always-on context.</td>
+            <td><code>team-exec</code>, <code>team</code>, <code>team-verify</code>, <code>stop</code>, and <code>cancel</code> keep lane/subagent context explicit while collapsing normal success output.</td>
           </tr>
           <tr>
             <td>Doctor Checks</td>
-            <td><code>/omg:doctor</code> now checks workspace/taskboard drift risks in addition to the existing extension readiness surface.</td>
+            <td><code>/omg:doctor</code> now checks dirty/untrusted lane reuse, workspace drift, and hook lifecycle asymmetry in addition to baseline extension readiness.</td>
           </tr>
           <tr>
-            <td>Activation Path</td>
-            <td>No extra runtime wrapper or preview flag is required; once the extension is loaded, the new slash commands are immediately available.</td>
+            <td>Compatibility</td>
+            <td>Documentation now recommends Gemini CLI <code>v0.33.0+</code> for stable hook lifecycle, subagent-policy context, dirty-worktree UX, and newer slash-skill ergonomics.</td>
           </tr>
         </tbody>
       </table>
@@ -653,7 +649,7 @@ Structured Result
           <tr>
             <td>Parallel lane or worktree coordination</td>
             <td>Implicit branch/path assumptions and repeated restarts</td>
-            <td><code>/omg:workspace</code> keeps root/lane ownership explicit for multi-root or parallel execution</td>
+            <td><code>/omg:workspace</code> keeps root/lane ownership explicit and <code>/omg:workspace audit</code> surfaces dirty or untrusted lanes before parallel execution</td>
           </tr>
           <tr>
             <td>Consistency in decisions</td>
@@ -777,8 +773,8 @@ Structured Result
   <section>
     <div class="wrap two-col">
       <div>
-        <h2>Workspace and Taskboard</h2>
-        <p class="sub">Compact state anchors for parallel lanes and long verify/fix loops.</p>
+        <h2>Workspace Audit and Taskboard</h2>
+        <p class="sub">Compact state anchors plus lane hygiene for parallel lanes and long verify/fix loops.</p>
         <table>
           <thead>
             <tr>
@@ -787,8 +783,8 @@ Structured Result
             </tr>
           </thead>
           <tbody>
-            <tr><td><code>/omg:workspace</code></td><td>Track primary root, optional worktree/path lanes, and collision boundaries.</td></tr>
-            <tr><td><code>/omg:taskboard</code></td><td>Track stable task IDs, owners, dependencies, and verifier-backed completion.</td></tr>
+            <tr><td><code>/omg:workspace</code></td><td>Track primary root, optional worktree/path lanes, collision boundaries, and lane health.</td></tr>
+            <tr><td><code>/omg:taskboard</code></td><td>Track stable task IDs, owners, dependencies, verifier-backed completion, and lane-health notes.</td></tr>
             <tr><td><code>/omg:checkpoint</code></td><td>Resume from compact state references instead of replaying full chat history.</td></tr>
             <tr><td><code>/omg:cache</code></td><td>Audit whether compact state anchors are actually keeping cache prefixes stable.</td></tr>
           </tbody>
@@ -798,6 +794,7 @@ Structured Result
         <h2>Example Flow</h2>
         <p class="sub">Lightweight control without adding a runtime daemon.</p>
         <pre class="diagram">/omg:workspace set .
+/omg:workspace audit
 /omg:workspace add ../feature-auth omg-executor
 /omg:taskboard sync
 /omg:team Implement auth flow with tests
@@ -834,19 +831,19 @@ Structured Result
         </thead>
         <tbody>
           <tr><td>Command</td><td><code>/omg:status</code></td><td>Snapshot progress, risk, and next actions</td></tr>
-          <tr><td>Command</td><td><code>/omg:doctor</code></td><td>Diagnose extension/team readiness and generate remediation plan</td></tr>
+          <tr><td>Command</td><td><code>/omg:doctor</code></td><td>Diagnose extension/team/workspace/hook readiness and generate remediation plan</td></tr>
           <tr><td>Command</td><td><code>/omg:hud</code></td><td>Switch status visibility profile (<code>normal</code>/<code>compact</code>/<code>hidden</code>)</td></tr>
           <tr><td>Command</td><td><code>/omg:hud-on</code></td><td>Quick toggle to full HUD status view</td></tr>
           <tr><td>Command</td><td><code>/omg:hud-compact</code></td><td>Quick toggle to compact HUD status view</td></tr>
           <tr><td>Command</td><td><code>/omg:hud-off</code></td><td>Quick toggle to hidden HUD (plain status sections)</td></tr>
           <tr><td>Command</td><td><code>/omg:hooks</code></td><td>Inspect/switch hook trigger profile, lanes, and safety policy</td></tr>
           <tr><td>Command</td><td><code>/omg:hooks-init</code></td><td>Bootstrap hook policy files and plugin contract scaffolding</td></tr>
-          <tr><td>Command</td><td><code>/omg:hooks-validate</code></td><td>Validate trigger graph, ordering, and worker-session safety constraints</td></tr>
+          <tr><td>Command</td><td><code>/omg:hooks-validate</code></td><td>Validate trigger graph, lifecycle symmetry, ordering, and worker-session safety constraints</td></tr>
           <tr><td>Command</td><td><code>/omg:hooks-test</code></td><td>Dry-run event sequences and estimate hook efficiency impact</td></tr>
           <tr><td>Command</td><td><code>/omg:notify</code></td><td>Configure approvals/blockers/verify/checkpoint/idle notification routing</td></tr>
           <tr><td>Command</td><td><code>/omg:intent</code></td><td>Classify request intent and route to the right stage</td></tr>
-          <tr><td>Command</td><td><code>/omg:workspace</code></td><td>Set primary root and worktree/path lane ownership</td></tr>
-          <tr><td>Command</td><td><code>/omg:taskboard</code></td><td>Maintain compact task ledger with stable IDs and verify state</td></tr>
+          <tr><td>Command</td><td><code>/omg:workspace</code></td><td>Set primary root, worktree/path lane ownership, and audit lane health</td></tr>
+          <tr><td>Command</td><td><code>/omg:taskboard</code></td><td>Maintain compact task ledger with stable IDs, verify state, and lane-health notes</td></tr>
           <tr><td>Command</td><td><code>/omg:team-assemble</code></td><td>Build a task-fit team roster and request execution approval</td></tr>
           <tr><td>Command</td><td><code>/omg:deep-init</code></td><td>Build project map and validation baseline before long sessions</td></tr>
           <tr><td>Command</td><td><code>/omg:rules</code></td><td>Activate task-conditional guardrail rule packs</td></tr>
@@ -937,8 +934,8 @@ Structured Result
           </tr>
           <tr>
             <td>Set workspace lanes</td>
-            <td><code>/omg:workspace set .</code> and optionally <code>/omg:workspace add &lt;path&gt; &lt;owner&gt;</code></td>
-            <td>Explicit root/lane ownership before parallel implementation</td>
+            <td><code>/omg:workspace set .</code>, <code>/omg:workspace audit</code>, and optionally <code>/omg:workspace add &lt;path&gt; &lt;owner&gt;</code></td>
+            <td>Explicit root/lane ownership plus lane hygiene before parallel implementation</td>
           </tr>
           <tr>
             <td>Assemble team</td>
@@ -963,7 +960,7 @@ Structured Result
           <tr>
             <td>Validate hook graph</td>
             <td><code>/omg:hooks-validate</code> then <code>/omg:hooks-test</code></td>
-            <td>Safe-to-run decision and dry-run evidence before high-autonomy loops</td>
+            <td>Safe-to-run decision, lifecycle symmetry check, and dry-run evidence before high-autonomy loops</td>
           </tr>
           <tr>
             <td>Execute lifecycle</td>
@@ -1022,15 +1019,17 @@ Structured Result
             <td>Approval posture not aligned with risk profile</td>
             <td>Run <code>/omg:approval suggest|auto|full-auto</code> and re-check policy</td>
           </tr>
+
           <tr>
-            <td>Parallel execution keeps colliding or re-planning the same files</td>
-            <td>Workspace lanes are not explicit</td>
-            <td>Run <code>/omg:workspace status</code> or assign lane/path ownership with <code>/omg:workspace</code></td>
+            <td>Review or automation is about to run on a dirty or untrusted lane</td>
+            <td>Shared worktree hygiene is unclear</td>
+            <td>Run <code>/omg:workspace audit</code>, isolate the lane if needed, and only then continue verify/review steps</td>
           </tr>
+
           <tr>
-            <td>Legacy wrapper scripts use <code>--allowed-tools</code></td>
-            <td>Deprecated flag in recent Gemini CLI versions</td>
-            <td>Migrate wrappers to policy profiles using <code>--policy</code></td>
+            <td>Hooks seem to miss terminal events or fire twice after continuation</td>
+            <td>Hook lifecycle symmetry is not explicit</td>
+            <td>Run <code>/omg:hooks-validate</code>, then fix lifecycle policy before re-enabling autonomous loops</td>
           </tr>
           <tr>
             <td>Output feels generic or repetitive</td>

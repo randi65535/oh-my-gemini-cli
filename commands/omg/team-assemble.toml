@@ -31,6 +31,8 @@ Protocol:
 6. Define collaboration protocol:
    - explicit message flow between lanes
    - workspace/worktree lane ownership when `.omg/state/workspace.json` exists
+   - lane cleanliness/trust notes when `.omg/state/workspace.json` exists
+   - explicit subagent handoff schema (`owner`, `lane`, `evidence`, `termination`)
    - trigger conditions for verify/fix loops
    - anti-slop quality gate before final delivery
    - fallback path when evidence conflicts or execution fails
@@ -46,6 +48,6 @@ Protocol:
 
 Response:
 - Keep it concise and operator-facing.
-- Include `Team Fit Analysis`, `Proposed Team`, `Reasoning Allocation`, `Collaboration Protocol`, and `Approval Gate`.
+- Include `Team Fit Analysis`, `Proposed Team`, `Reasoning Allocation`, `Collaboration Protocol`, `Lane Safety`, and `Approval Gate`.
 - Include `Execution Summary` only when approval is already explicit.
 """

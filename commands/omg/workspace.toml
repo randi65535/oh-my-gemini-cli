@@ -10,17 +10,21 @@ Protocol:
    - `status`
    - `set <root-or-path>`
    - `add <path> <lane-or-owner>`
+   - `audit`
    - `clear`
 2. Track the active execution surface:
    - primary workspace root
    - optional worktree/path lanes
    - owner or lane affinity
+   - lane health (`clean`, `dirty`, `unknown`)
+   - trust status (`trusted`, `untrusted`, `unknown`)
+   - handoff readiness (`ready`, `needs-review`, `blocked`)
    - cross-lane safety notes
 3. Keep the structure minimal and cache-stable:
    - use canonical relative paths when possible
-   - avoid volatile timestamps or shell/session metadata
-   - record only active lanes needed for the current task
-4. Recommend separate worktrees only when parallel implementation would otherwise conflict.
+   - avoid volatile timestamps, counters, or shell/session metadata
+   - record only active lanes and health notes needed for the current task
+4. Recommend separate worktrees only when parallel implementation would otherwise conflict, or when dirty/untrusted lanes need isolation before review or automation.
 5. If filesystem tools are available, write/update `.omg/state/workspace.json`.
 
 Suggested `workspace.json` shape:
@@ -31,7 +35,12 @@ Suggested `workspace.json` shape:
       "id": "main",
       "path": ".",
       "owner": "omg-director",
-      "purpose": "merge-ready baseline"
+      "purpose": "merge-ready baseline",
+      "health": {
+        "cleanliness": "clean",
+        "trusted": "trusted",
+        "handoff": "ready"
+      }
     }
   ],
   "cross_lane_policy": "explicit-handoff",
@@ -40,5 +49,5 @@ Suggested `workspace.json` shape:
 
 Response:
 - Keep it concise and operator-facing.
-- Include `Workspace Status`, `Lane Map`, `Collision Risks`, and `Next Command`.
+- Include `Workspace Status`, `Lane Map`, `Lane Health`, `Collision Risks`, and `Next Command`.
 """
