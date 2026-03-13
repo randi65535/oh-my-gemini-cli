@@ -179,6 +179,35 @@ sequenceDiagram
 - `/omg:hooks`와 `/omg:hooks-validate`는 에이전트 라이프사이클 결과(`completed`, `blocked`, `stopped`)를 짝지어 다루며, blocked continuation이 downstream 훅보다 먼저 safety lane을 다시 지나가도록 강제합니다.
 - `team-exec`, `team`, `team-verify`, `stop`, `cancel`은 위임된 lane/sub-agent 컨텍스트를 compact하게 유지하고, 실행이 조기 종료되거나 blocker에 걸렸을 때만 상세 내역을 확장합니다.
 
+## 자동 사용량 모니터 (AfterAgent Hook)
+
+OmG에는 에이전트 턴이 끝날 때마다 compact 토큰 사용량 라인을 출력하는 확장 훅이 기본 포함됩니다.
+
+- 훅 엔트리포인트: `hooks/hooks.json` (`AfterAgent` -> `omg-quota-watch-after-agent`)
+- 스크립트: `hooks/scripts/after-agent-usage.js`
+- 상태 파일: `.omg/state/quota-watch.json`
+
+자동 표시 항목:
+
+- 최근 턴 토큰 합계(input/output/cached/total)
+- 세션 누적 토큰
+- 현재 활성 모델 기준 누적 토큰
+
+경계:
+
+- 이 훅만으로는 계정의 authoritative 남은 quota를 직접 조회할 수 없습니다.
+- 실제 남은 quota/limit은 `/stats model`로 확인해야 합니다.
+
+이 훅만 비활성화:
+
+```json
+{
+  "hooksConfig": {
+    "disabled": ["omg-quota-watch-after-agent"]
+  }
+}
+```
+
 ## 설치
 
 공식 Gemini Extensions 명령으로 GitHub에서 설치합니다:

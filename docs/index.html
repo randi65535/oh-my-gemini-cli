@@ -717,6 +717,11 @@ Structured Result
             <td><code>/omg:notify</code> keeps approvals, blockers, verify failures, checkpoints, and idle drift observable with extension-native policy files</td>
           </tr>
           <tr>
+            <td>Per-turn usage visibility</td>
+            <td>Manual <code>/stats model</code> checks only</td>
+            <td>Built-in <code>AfterAgent</code> hook prints compact turn/session token usage after each completed turn</td>
+          </tr>
+          <tr>
             <td>Startup/discovery weight</td>
             <td>Broad mirrored command/skill surface plus disconnected shared context</td>
             <td>Slash-command-first surface with 6 retained deep-work skills and a real root <code>GEMINI.md</code> entrypoint</td>
@@ -800,6 +805,36 @@ Structured Result
 /omg:team Implement auth flow with tests
 /omg:taskboard next
 /omg:checkpoint</pre>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap two-col">
+      <div>
+        <h2>Automatic Usage Monitor</h2>
+        <p class="sub">Extension-native <code>AfterAgent</code> hook for per-turn token visibility.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Artifact</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>hooks/hooks.json</code></td><td>Registers <code>omg-quota-watch-after-agent</code> on <code>AfterAgent</code></td></tr>
+            <tr><td><code>hooks/scripts/after-agent-usage.js</code></td><td>Reads transcript and calculates turn/session/model token totals</td></tr>
+            <tr><td><code>.omg/state/quota-watch.json</code></td><td>Persists turn counter and latest usage snapshot</td></tr>
+          </tbody>
+        </table>
+        <p class="sub" style="margin-top:10px;">Boundary: the hook cannot fetch authoritative remaining account quota by itself. Use <code>/stats model</code> for remaining quota/limits.</p>
+      </div>
+      <div>
+        <h2>Sample Output</h2>
+        <p class="sub">Printed automatically after each completed agent turn.</p>
+        <pre class="diagram">[OMG][USAGE][TURN 12] turn=9,703 tok (in 9,487 / out 48 / cache 3,195)
+session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats model</pre>
+        <p class="sub" style="margin-top:10px;">Disable only this hook with <code>hooksConfig.disabled = ["omg-quota-watch-after-agent"]</code>.</p>
       </div>
     </div>
   </section>
@@ -926,6 +961,11 @@ Structured Result
             <td>Set alert posture</td>
             <td><code>/omg:notify profile watchdog</code></td>
             <td>Approval, blocker, verify-failure, checkpoint, and idle-watchdog alerts persisted to policy state</td>
+          </tr>
+          <tr>
+            <td>Enable usage visibility</td>
+            <td><code>/stats model</code> (periodic quota check) + built-in <code>AfterAgent</code> usage hook</td>
+            <td>Automatic per-turn token usage line plus authoritative remaining quota on demand</td>
           </tr>
           <tr>
             <td>Start workflow</td>

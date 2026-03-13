@@ -23,6 +23,7 @@
     "gemini-extension.json",
     "agents/",
     "commands/",
+    "hooks/",
     "skills/",
     "context/",
     "README.md",

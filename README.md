@@ -211,6 +211,35 @@ Example flow:
 -> persists policy: .omg/state/notify.json
 ```
 
+## Automatic Usage Monitor (AfterAgent Hook)
+
+OmG now ships an extension hook that prints a compact token-usage line after each completed agent turn.
+
+- Hook entrypoint: `hooks/hooks.json` (`AfterAgent` -> `omg-quota-watch-after-agent`)
+- Script: `hooks/scripts/after-agent-usage.js`
+- State artifact: `.omg/state/quota-watch.json`
+
+What it shows automatically:
+
+- latest turn token totals (input/output/cached/total)
+- session cumulative tokens
+- cumulative tokens for the latest active model
+
+Boundary:
+
+- This hook cannot read authoritative remaining account quota by itself.
+- For true remaining quota/limits, run `/stats model`.
+
+Disable only this hook:
+
+```json
+{
+  "hooksConfig": {
+    "disabled": ["omg-quota-watch-after-agent"]
+  }
+}
+```
+
 ## Install
 
 Install from GitHub using the official Gemini Extensions command:

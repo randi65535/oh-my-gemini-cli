@@ -1,0 +1,196 @@
+#!/usr/bin/env node
+/*
+ * OmG AfterAgent usage monitor hook.
+ *
+ * This hook reads the active Gemini transcript file and prints a compact
+ * token-usage line after each completed agent turn.
+ */
+
+import fs from "node:fs";
+import path from "node:path";
+
+const STATE_RELATIVE_PATH = path.join(".omg", "state", "quota-watch.json");
+
+function readStdinText() {
+  return new Promise((resolve) => {
+    let data = "";
+    process.stdin.setEncoding("utf8");
+    process.stdin.on("data", (chunk) => {
+      data += chunk;
+    });
+    process.stdin.on("end", () => {
+      resolve(data);
+    });
+    process.stdin.on("error", () => {
+      resolve("");
+    });
+  });
+}
+
+function safeJsonParse(text, fallback = null) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return fallback;
+  }
+}
+
+function asNumber(value) {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : 0;
+}
+
+function formatNumber(value) {
+  return new Intl.NumberFormat("en-US").format(asNumber(value));
+}
+
+function readState(statePath) {
+  try {
+    const raw = fs.readFileSync(statePath, "utf8");
+    const parsed = safeJsonParse(raw, {});
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeState(statePath, state) {
+  const dir = path.dirname(statePath);
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(statePath, `${JSON.stringify(state, null, 2)}\n`, "utf8");
+}
+
+function buildUsageFromTranscript(transcript) {
+  const messages = Array.isArray(transcript?.messages) ? transcript.messages : [];
+  const geminiMessages = messages.filter(
+    (msg) =>
+      msg &&
+      msg.type === "gemini" &&
+      msg.tokens &&
+      typeof msg.tokens === "object"
+  );
+
+  if (geminiMessages.length === 0) {
+    return null;
+  }
+
+  const latest = geminiMessages[geminiMessages.length - 1];
+  const totals = {
+    input: 0,
+    output: 0,
+    cached: 0,
+    thoughts: 0,
+    tool: 0,
+    total: 0,
+  };
+  const byModel = {};
+
+  for (const msg of geminiMessages) {
+    const t = msg.tokens || {};
+    totals.input += asNumber(t.input);
+    totals.output += asNumber(t.output);
+    totals.cached += asNumber(t.cached);
+    totals.thoughts += asNumber(t.thoughts);
+    totals.tool += asNumber(t.tool);
+    totals.total += asNumber(t.total);
+
+    const model = typeof msg.model === "string" && msg.model ? msg.model : "unknown";
+    if (!byModel[model]) {
+      byModel[model] = 0;
+    }
+    byModel[model] += asNumber(t.total);
+  }
+
+  const latestModel =
+    typeof latest.model === "string" && latest.model ? latest.model : "unknown";
+  const latestTokens = latest.tokens || {};
+
+  return {
+    latest: {
+      model: latestModel,
+      input: asNumber(latestTokens.input),
+      output: asNumber(latestTokens.output),
+      cached: asNumber(latestTokens.cached),
+      total: asNumber(latestTokens.total),
+    },
+    session: totals,
+    byModel,
+  };
+}
+
+function buildMonitorLine(usage, turnCount) {
+  return [
+    `[OMG][USAGE][TURN ${turnCount}]`,
+    `turn=${formatNumber(usage.latest.total)} tok`,
+    `(in ${formatNumber(usage.latest.input)} / out ${formatNumber(usage.latest.output)} / cache ${formatNumber(usage.latest.cached)})`,
+    `session=${formatNumber(usage.session.total)} tok`,
+    `model=${usage.latest.model} ${formatNumber(usage.byModel[usage.latest.model] || 0)} tok`,
+    `remaining=/stats model`,
+  ].join(" ");
+}
+
+function emitHookOutput(systemMessage) {
+  const output = {
+    decision: "allow",
+    systemMessage,
+  };
+  process.stdout.write(JSON.stringify(output));
+}
+
+async function main() {
+  const rawInput = await readStdinText();
+  const hookInput = safeJsonParse(rawInput, {});
+
+  const cwd = typeof hookInput?.cwd === "string" && hookInput.cwd ? hookInput.cwd : process.cwd();
+  const sessionId =
+    typeof hookInput?.session_id === "string" && hookInput.session_id
+      ? hookInput.session_id
+      : "unknown";
+  const transcriptPath =
+    typeof hookInput?.transcript_path === "string" && hookInput.transcript_path
+      ? hookInput.transcript_path
+      : "";
+
+  const statePath = path.join(cwd, STATE_RELATIVE_PATH);
+  const prevState = readState(statePath);
+  const nextTurnCount =
+    prevState.last_session_id === sessionId
+      ? asNumber(prevState.turn_count) + 1
+      : 1;
+
+  let line;
+  if (transcriptPath && fs.existsSync(transcriptPath)) {
+    const transcript = safeJsonParse(fs.readFileSync(transcriptPath, "utf8"), null);
+    const usage = buildUsageFromTranscript(transcript);
+    if (usage) {
+      line = buildMonitorLine(usage, nextTurnCount);
+      writeState(statePath, {
+        turn_count: nextTurnCount,
+        last_session_id: sessionId,
+        last_model: usage.latest.model,
+        last_turn_total_tokens: usage.latest.total,
+        last_session_total_tokens: usage.session.total,
+        updated_at: new Date().toISOString(),
+      });
+    }
+  }
+
+  if (!line) {
+    line = `[OMG][USAGE][TURN ${nextTurnCount}] usage=unavailable remaining=/stats model`;
+    writeState(statePath, {
+      turn_count: nextTurnCount,
+      last_session_id: sessionId,
+      updated_at: new Date().toISOString(),
+    });
+  }
+
+  emitHookOutput(line);
+}
+
+main().catch((error) => {
+  const fallback = {
+    decision: "allow",
+    systemMessage: `[OMG][USAGE] monitor-hook error: ${error?.message || String(error)}`,
+  };
+  process.stdout.write(JSON.stringify(fallback));
+});

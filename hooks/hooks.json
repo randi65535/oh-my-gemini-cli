@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "AfterAgent": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "name": "omg-quota-watch-after-agent",
+            "command": "node \"${extensionPath}/hooks/scripts/after-agent-usage.js\"",
+            "timeout": 8000
+          }
+        ]
+      }
+    ]
+  }
+}
+
