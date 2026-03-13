@@ -20,20 +20,16 @@ This project started from that observation:
 
 OmG extends Gemini CLI from a single-session assistant into a structured, role-driven engineering workflow.
 
-## What's New in v0.3.9
+## What's New in v0.4.0
 
-- Added lane-hygiene auditing without new runtime code:
-  - `/omg:workspace audit` now checks dirty/clean state, trust status, and handoff readiness per lane
-  - `taskboard`, `doctor`, `launch`, and `status` now treat unsafe lane state as a first-class blocker signal
-- Hardened hook lifecycle symmetry:
-  - `hooks`, `hooks-init`, `hooks-validate`, and `hooks-test` now model blocked/early-finish agent outcomes explicitly
-  - blocked continuations must re-enter the safety lane before quality or optimization hooks resume
-- Tightened delegated handoffs while reducing noise:
-  - `team-assemble`, `team-exec`, `team`, `team-verify`, `stop`, and `cancel` now keep lane/subagent context explicit
-  - normal success paths stay terse; detailed output expands only for blocked or early-stop branches
-- Kept the extension lightweight and cache-stable:
-  - no new daemon, background worker, or heavy always-on context
-  - state remains compact (`workspace.json`, `taskboard.md`, `hooks.json`) and avoids volatile churn
+- Added extension-native automatic usage monitoring after each completed agent turn:
+  - built-in `AfterAgent` hook: `omg-quota-watch-after-agent`
+  - output includes latest turn tokens, session cumulative tokens, and active-model cumulative tokens
+- Added persistent usage snapshot state:
+  - `.omg/state/quota-watch.json` tracks turn counter and latest usage summary
+- Clarified quota boundary:
+  - authoritative remaining quota/limits still come from `/stats model`
+- Updated docs and landing page to surface setup, behavior, and disable path for the usage monitor
 
 ## At A Glance
 

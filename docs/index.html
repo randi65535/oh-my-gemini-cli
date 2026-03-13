@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.3.9</span>
+        <span class="badge">Latest Update v0.4.0</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (v0.3.9 Workspace Hygiene and Hook Symmetry)</h2>
-      <p class="sub">OmG now audits lane cleanliness and trust, validates hook lifecycle symmetry, and keeps delegated handoffs compact so long sessions stay safer without adding runtime weight.</p>
+      <h2>Latest Update (v0.4.0 Automatic Usage Monitor)</h2>
+      <p class="sub">OmG now includes extension-native per-turn usage monitoring via an AfterAgent hook, with compact token snapshots and clear quota boundaries.</p>
       <table>
         <thead>
           <tr>
@@ -550,28 +550,28 @@
         </thead>
         <tbody>
           <tr>
-            <td>Workspace Audit</td>
-            <td><code>/omg:workspace audit</code> now checks clean/dirty state, trust status, and handoff readiness so shared or unsafe lanes are caught before review or automation.</td>
+            <td>AfterAgent Usage Hook</td>
+            <td>Built-in hook <code>omg-quota-watch-after-agent</code> now runs after each completed agent turn and prints a compact usage line.</td>
           </tr>
           <tr>
-            <td>Taskboard Safety</td>
-            <td><code>/omg:taskboard</code> can now carry lane-health notes, keeping dirty or untrusted execution surfaces visible next to task status and evidence.</td>
+            <td>Usage Snapshot</td>
+            <td><code>hooks/scripts/after-agent-usage.js</code> reads transcript data to report turn/session/model token totals and persists state in <code>.omg/state/quota-watch.json</code>.</td>
           </tr>
           <tr>
-            <td>Hook Symmetry</td>
-            <td><code>/omg:hooks</code> and <code>/omg:hooks-validate</code> now model blocked and early-finish agent outcomes explicitly, including safety-lane re-entry before continuation.</td>
+            <td>Quota Boundary</td>
+            <td>The monitor is token-visibility focused; authoritative remaining quota and limits still come from <code>/stats model</code>.</td>
           </tr>
           <tr>
-            <td>Compact Handoff</td>
-            <td><code>team-exec</code>, <code>team</code>, <code>team-verify</code>, <code>stop</code>, and <code>cancel</code> keep lane/subagent context explicit while collapsing normal success output.</td>
+            <td>Packaging</td>
+            <td>Extension package now includes <code>hooks/</code> assets so monitoring is available immediately after install/update.</td>
           </tr>
           <tr>
-            <td>Doctor Checks</td>
-            <td><code>/omg:doctor</code> now checks dirty/untrusted lane reuse, workspace drift, and hook lifecycle asymmetry in addition to baseline extension readiness.</td>
+            <td>Docs</td>
+            <td>README, Korean README, and landing page now include setup, sample output, and hook disable guidance.</td>
           </tr>
           <tr>
             <td>Compatibility</td>
-            <td>Documentation now recommends Gemini CLI <code>v0.33.0+</code> for stable hook lifecycle, subagent-policy context, dirty-worktree UX, and newer slash-skill ergonomics.</td>
+            <td>Recommended Gemini CLI remains <code>v0.33.0+</code> for stable hook lifecycle and slash-skill ergonomics.</td>
           </tr>
         </tbody>
       </table>

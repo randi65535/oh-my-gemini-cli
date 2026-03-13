@@ -15,20 +15,16 @@ Gemini CLI를 위한 컨텍스트 엔지니어링 기반 멀티 에이전트 워
 
 OmG는 Gemini CLI를 단일 세션 도우미에서 구조화된 역할 기반 엔지니어링 워크플로우로 확장합니다.
 
-## v0.3.9의 새로운 내용
+## v0.4.0의 새로운 내용
 
-- 런타임 코드를 늘리지 않고 lane 위생 점검 추가:
-  - `/omg:workspace audit`가 lane별 dirty/clean 상태, 신뢰 여부, 핸드오프 준비 상태를 점검
-  - `taskboard`, `doctor`, `launch`, `status`가 unsafe lane 상태를 1급 blocker 신호로 취급
-- 훅 라이프사이클 대칭성 강화:
-  - `hooks`, `hooks-init`, `hooks-validate`, `hooks-test`가 blocked/조기 종료 에이전트 결과를 명시적으로 다룸
-  - blocked continuation은 quality/optimization 훅보다 먼저 safety lane을 다시 거치도록 정렬
-- 위임 실행 핸드오프를 더 조용하고 명확하게 정리:
-  - `team-assemble`, `team-exec`, `team`, `team-verify`, `stop`, `cancel`이 lane/sub-agent 컨텍스트를 명시적으로 유지
-  - 정상 성공 경로는 짧게, blocked/조기 종료 분기만 자세히 확장
-- 경량성과 캐시 안정성 유지:
-  - 새 데몬, 백그라운드 워커, 무거운 항상-로드 컨텍스트는 추가하지 않음
-  - 상태는 계속 compact(`workspace.json`, `taskboard.md`, `hooks.json`)하게 유지하고 volatile churn을 피함
+- 완료된 에이전트 턴마다 자동 사용량을 보여주는 확장 네이티브 모니터링 추가:
+  - 내장 `AfterAgent` 훅: `omg-quota-watch-after-agent`
+  - 최근 턴 토큰, 세션 누적 토큰, 활성 모델 누적 토큰을 자동 출력
+- 사용량 스냅샷 상태 파일 추가:
+  - `.omg/state/quota-watch.json`에 턴 카운터와 최신 사용량 요약 저장
+- quota 경계 명확화:
+  - authoritative 남은 quota/limit은 계속 `/stats model`로 확인
+- 사용량 모니터 설정/동작/비활성화 방법을 README와 랜딩 페이지에 반영
 
 ## 한눈에 보기
 
