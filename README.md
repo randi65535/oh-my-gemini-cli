@@ -20,6 +20,21 @@ This project started from that observation:
 
 OmG extends Gemini CLI from a single-session assistant into a structured, role-driven engineering workflow.
 
+## Quick Start
+
+Get OmG running in under a minute:
+
+1. Install from GitHub:
+   `gemini extensions install https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli`
+2. Verify the extension is loaded:
+   interactive mode: `/extensions list` or terminal mode: `gemini extensions list`
+3. Run a smoke test:
+   `/omg:status`
+4. Start with intent routing:
+   `/omg:intent "<your task>"`
+
+For full setup details, see [Install](#install).
+
 ## What's New in v0.4.0
 
 - Added extension-native automatic usage monitoring after each completed agent turn:

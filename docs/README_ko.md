@@ -15,6 +15,21 @@ Gemini CLI를 위한 컨텍스트 엔지니어링 기반 멀티 에이전트 워
 
 OmG는 Gemini CLI를 단일 세션 도우미에서 구조화된 역할 기반 엔지니어링 워크플로우로 확장합니다.
 
+## 빠른 시작
+
+1분 안에 OmG를 실행하려면 아래 순서로 진행하세요.
+
+1. GitHub에서 확장 설치:
+   `gemini extensions install https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli`
+2. 설치 확인:
+   대화형 모드 `/extensions list` 또는 터미널 모드 `gemini extensions list`
+3. 스모크 테스트:
+   `/omg:status`
+4. 인텐트 라우팅으로 시작:
+   `/omg:intent "<요청>"`
+
+상세 설정은 [설치](#설치) 섹션을 참고하세요.
+
 ## v0.4.0의 새로운 내용
 
 - 완료된 에이전트 턴마다 자동 사용량을 보여주는 확장 네이티브 모니터링 추가:
