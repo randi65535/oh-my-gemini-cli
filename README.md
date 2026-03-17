@@ -45,6 +45,9 @@ For full setup details, see [Install](#install).
 - Clarified quota boundary:
   - authoritative remaining quota/limits still come from `/stats model`
 - Updated docs and landing page to surface setup, behavior, and disable path for the usage monitor
+- Added lightweight `/omg:recall` command for history-aware recall with bounded search:
+  - scans `.omg/state/*` anchors first (`taskboard`, `checkpoint`, `workspace`, `workflow`, etc.)
+  - falls back to recent history only when needed, with hard limits to avoid long runtime and token-heavy replay
 
 ## At A Glance
 
@@ -176,6 +179,7 @@ Use `workspace` and `taskboard` when work spans multiple roots, multiple impleme
 - `/omg:taskboard` keeps stable task IDs, owners, dependencies, statuses (`todo`, `ready`, `in-progress`, `blocked`, `done`, `verified`), lane-health notes, and evidence pointers in `.omg/state/taskboard.md`.
 - `team-plan` seeds stable task IDs plus lane assumptions, `team-exec` pulls the smallest ready slice with explicit lane/subagent context, and `team-verify` marks tasks verified only with evidence plus safe lane state.
 - `checkpoint` and `status` can reference these files instead of replaying the whole chat, which improves cache stability and reduces token waste.
+- `/omg:recall "<query>"` performs state-first recall and bounded fallback search, so you can recover prior rationale without replaying full transcripts.
 
 Example flow:
 
@@ -185,6 +189,7 @@ Example flow:
 /omg:workspace add ../feature-auth omg-executor
 /omg:taskboard sync
 /omg:taskboard next
+/omg:recall "why was auth lane blocked" scope=state
 ```
 
 ## Workspace Hygiene and Hook Symmetry
@@ -310,6 +315,7 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 | `/omg:memory` | Maintain MEMORY index, topic files, and path-aware rule packs | During long sessions or when decisions/rules drift |
 | `/omg:workspace` | Inspect, audit, or set primary root, worktree/path lanes, and collision boundaries | Before parallel implementation or multi-root work |
 | `/omg:taskboard` | Maintain a compact task ledger with stable IDs and verifier-backed completion state | After planning and throughout long exec/verify loops |
+| `/omg:recall` | Recover prior decisions/evidence with state-first search and bounded history fallback | When you need past rationale quickly without replaying full transcripts |
 | `/omg:reasoning` | Set global reasoning effort and teammate overrides (`low/medium/high/xhigh`) | Before expensive planning/review loops or when depth is role-dependent |
 | `/omg:deep-init` | Build deep project map and validation baseline for long sessions | At project kickoff or when onboarding into unfamiliar codebases |
 | `/omg:team-assemble` | Dynamically compose a role-fit team with approval gate and lane-specific reasoning map | Before `/omg:team` on cross-domain or non-standard tasks |
@@ -400,6 +406,7 @@ oh-my-gemini-cli/
 | Parallel execution keeps colliding or re-planning the same files | Workspace lanes are not explicit | Run `/omg:workspace status` or set lane/path ownership with `/omg:workspace` |
 | Review or automation is about to run on a dirty/untrusted lane | Shared worktree hygiene is unclear | Run `/omg:workspace audit`, isolate the lane if needed, and only then continue verify/review steps |
 | Done status keeps drifting after long loops | No compact task source of truth or missing verifier signoff | Run `/omg:taskboard sync`, then rerun `/omg:team-verify` to close remaining IDs |
+| You cannot remember why a decision was made earlier | Prior rationale is buried in long session history | Run `/omg:recall "<keyword>" scope=state` first, then widen to `scope=recent` only if needed |
 | Hooks seem to miss terminal events or fire twice after continuation | Hook lifecycle symmetry is not explicit | Run `/omg:hooks-validate`, then fix lifecycle policy before re-enabling autonomous loops |
 | Output is verbose, generic, or repetitive | Reasoning/gate posture too weak for the target artifact | Raise `/omg:reasoning` effort (optionally teammate overrides) and rerun `/omg:team-verify` |
 | Existing launch scripts use `--allowed-tools` | Flag deprecated in newer Gemini CLI | Replace with policy profiles via `--policy` and re-run |
@@ -440,5 +447,3 @@ Extension behavior is manifest-driven through Gemini CLI extension primitives.
 ## License
 
 MIT
-
-

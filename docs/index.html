@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.4.0</span>
+        <span class="badge">Latest Update v0.4.0+</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -531,7 +531,7 @@
       <div class="stats">
         <div class="stat"><div class="n">13</div><div class="l">Sub-agents</div></div>
         <div class="stat"><div class="n">6</div><div class="l">Retained skills</div></div>
-        <div class="stat"><div class="n">38</div><div class="l">Namespaced commands</div></div>
+        <div class="stat"><div class="n">39</div><div class="l">Namespaced commands</div></div>
         <div class="stat"><div class="n">5</div><div class="l">Context layers</div></div>
       </div>
     </div>
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (v0.4.0 Automatic Usage Monitor)</h2>
-      <p class="sub">OmG now includes extension-native per-turn usage monitoring via an AfterAgent hook, with compact token snapshots and clear quota boundaries.</p>
+      <h2>Latest Update (v0.4.x Usage Monitor + State-First Recall)</h2>
+      <p class="sub">OmG now includes extension-native per-turn usage monitoring plus a new state-first recall command to recover prior decisions without replaying full transcript history.</p>
       <table>
         <thead>
           <tr>
@@ -556,6 +556,14 @@
           <tr>
             <td>Usage Snapshot</td>
             <td><code>hooks/scripts/after-agent-usage.js</code> reads transcript data to report turn/session/model token totals and persists state in <code>.omg/state/quota-watch.json</code>.</td>
+          </tr>
+          <tr>
+            <td>State-First Recall</td>
+            <td>Added <code>/omg:recall</code> to recover prior decisions from compact <code>.omg/state/*</code> anchors first, then widen to recent history only when needed.</td>
+          </tr>
+          <tr>
+            <td>Efficiency Guardrails</td>
+            <td><code>/omg:recall</code> keeps bounded fallback limits (recent files/line caps) to avoid long runtime and token-heavy context replay.</td>
           </tr>
           <tr>
             <td>Quota Boundary</td>
@@ -682,6 +690,11 @@ Structured Result
             <td><code>/omg:taskboard</code> + <code>/omg:team-verify</code> keep stable task IDs and verifier-backed completion evidence</td>
           </tr>
           <tr>
+            <td>Prior-decision recall</td>
+            <td>Manual transcript scrolling and guesswork</td>
+            <td><code>/omg:recall</code> retrieves prior rationale via state-first search with bounded fallback.</td>
+          </tr>
+          <tr>
             <td>Task-specific guardrails</td>
             <td>Global/static prompt policies</td>
             <td><code>/omg:rules</code> injects conditional rule packs per task</td>
@@ -790,6 +803,7 @@ Structured Result
           <tbody>
             <tr><td><code>/omg:workspace</code></td><td>Track primary root, optional worktree/path lanes, collision boundaries, and lane health.</td></tr>
             <tr><td><code>/omg:taskboard</code></td><td>Track stable task IDs, owners, dependencies, verifier-backed completion, and lane-health notes.</td></tr>
+            <tr><td><code>/omg:recall</code></td><td>Recover prior rationale from compact state first, then widen to bounded recent history only when required.</td></tr>
             <tr><td><code>/omg:checkpoint</code></td><td>Resume from compact state references instead of replaying full chat history.</td></tr>
             <tr><td><code>/omg:cache</code></td><td>Audit whether compact state anchors are actually keeping cache prefixes stable.</td></tr>
           </tbody>
@@ -804,6 +818,7 @@ Structured Result
 /omg:taskboard sync
 /omg:team Implement auth flow with tests
 /omg:taskboard next
+/omg:recall "why was auth lane blocked" scope=state
 /omg:checkpoint</pre>
       </div>
     </div>
@@ -879,6 +894,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
           <tr><td>Command</td><td><code>/omg:intent</code></td><td>Classify request intent and route to the right stage</td></tr>
           <tr><td>Command</td><td><code>/omg:workspace</code></td><td>Set primary root, worktree/path lane ownership, and audit lane health</td></tr>
           <tr><td>Command</td><td><code>/omg:taskboard</code></td><td>Maintain compact task ledger with stable IDs, verify state, and lane-health notes</td></tr>
+          <tr><td>Command</td><td><code>/omg:recall</code></td><td>Recover prior decisions/evidence with state-first search and bounded history fallback</td></tr>
           <tr><td>Command</td><td><code>/omg:team-assemble</code></td><td>Build a task-fit team roster and request execution approval</td></tr>
           <tr><td>Command</td><td><code>/omg:deep-init</code></td><td>Build project map and validation baseline before long sessions</td></tr>
           <tr><td>Command</td><td><code>/omg:rules</code></td><td>Activate task-conditional guardrail rule packs</td></tr>
@@ -976,6 +992,11 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
             <td>Set workspace lanes</td>
             <td><code>/omg:workspace set .</code>, <code>/omg:workspace audit</code>, and optionally <code>/omg:workspace add &lt;path&gt; &lt;owner&gt;</code></td>
             <td>Explicit root/lane ownership plus lane hygiene before parallel implementation</td>
+          </tr>
+          <tr>
+            <td>Recall prior rationale</td>
+            <td><code>/omg:recall "&lt;keyword&gt;" scope=state</code> (expand to <code>scope=recent</code> only if needed)</td>
+            <td>Fast context recovery without replaying full transcript history</td>
           </tr>
           <tr>
             <td>Assemble team</td>
