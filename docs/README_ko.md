@@ -15,6 +15,10 @@ Gemini CLI를 위한 컨텍스트 엔지니어링 기반 멀티 에이전트 워
 
 OmG는 Gemini CLI를 단일 세션 도우미에서 구조화된 역할 기반 엔지니어링 워크플로우로 확장합니다.
 
+
+<p align="center">
+  <img src="../resources/image/omg_logo_02.jpg" alt="OmG Logo" width="280" />
+</p>
 ## 빠른 시작
 
 1분 안에 OmG를 실행하려면 아래 순서로 진행하세요.

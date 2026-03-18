@@ -20,6 +20,10 @@ This project started from that observation:
 
 OmG extends Gemini CLI from a single-session assistant into a structured, role-driven engineering workflow.
 
+
+<p align="center">
+  <img src="resources/image/omg_logo_02.jpg" alt="OmG Logo" width="280" />
+</p>
 ## Quick Start
 
 Get OmG running in under a minute:
