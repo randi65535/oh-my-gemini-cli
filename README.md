@@ -24,6 +24,7 @@ OmG extends Gemini CLI from a single-session assistant into a structured, role-d
 <p align="center">
   <img src="resources/image/omg_logo_02.jpg" alt="OmG Logo" width="280" />
 </p>
+
 ## Quick Start
 
 ### Installation
