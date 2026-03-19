@@ -6,6 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.4.1` | 2026-03-20 | Usage monitor runtime knobs | Added quiet-hook output control and state-root override for safer, less noisy long sessions |
 | `v0.3.9` | 2026-03-12 | Workspace hygiene and hook symmetry | Added lane-health auditing, hook lifecycle symmetry rules, and quieter delegated handoffs for safer long sessions |
 | `v0.3.8` | 2026-03-11 | Workspace and taskboard control | Added extension-native workspace lane mapping and verifier-backed taskboard workflows for lighter long-session orchestration |
 | `v0.3.7` | 2026-03-10 | Load surface cleanup | Fixed root context wiring, removed mirrored control-plane skills, and slimmed repeated command boilerplate |
@@ -22,6 +23,28 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.2` | 2026-02-22 | Model/branding consistency | `gemini-3.1-*` naming and OmG branding normalized |
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
+
+## v0.4.1 - Usage Monitor Runtime Knobs (2026-03-20)
+
+Added lightweight runtime controls to the built-in AfterAgent usage monitor so long sessions can reduce noise and redirect state persistence without changing the core extension flow.
+
+### Added
+
+- New usage-monitor runtime environment controls:
+  - `OMG_HOOKS_QUIET=1` to suppress non-essential hook status output
+  - `OMG_STATE_ROOT=<dir>` to store `quota-watch.json` outside the default `.omg/state` path
+
+### Changed
+
+- `hooks/scripts/after-agent-usage.js` now resolves state storage via `OMG_STATE_ROOT` when set.
+- Usage monitor state writes are now fail-open to avoid blocking parent workflow execution on local I/O failures.
+- README, Korean README, and hook engineering guide updated with v0.4.1 runtime knob documentation and examples.
+- Extension/package version bumped to `0.4.1`.
+
+### Structural Fit Note
+
+- OmG remains extension-native; no new runtime daemon or background process was introduced.
+- Changes are scoped to hook runtime behavior and documentation for safer, quieter operation in long-running sessions.
 
 ## v0.3.9 - Workspace Hygiene and Hook Symmetry (2026-03-12)
 

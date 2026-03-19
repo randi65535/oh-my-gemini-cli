@@ -52,17 +52,12 @@ gemini extensions list
 
 ## v0.4.1의 새로운 내용
 
-- 완료된 에이전트 턴마다 자동 사용량을 보여주는 확장 네이티브 모니터링 추가:
-  - 내장 `AfterAgent` 훅: `omg-quota-watch-after-agent`
-  - 최근 턴 토큰, 세션 누적 토큰, 활성 모델 누적 토큰을 자동 출력
-- 사용량 스냅샷 상태 파일 추가:
-  - `.omg/state/quota-watch.json`에 턴 카운터와 최신 사용량 요약 저장
-- quota 경계 명확화:
-  - authoritative 남은 quota/limit은 계속 `/stats model`로 확인
-- 사용량 모니터 설정/동작/비활성화 방법을 README와 랜딩 페이지에 반영
-- 경량 회고 검색 명령 `/omg:recall` 추가:
-  - `.omg/state/*` 앵커(`taskboard`, `checkpoint`, `workspace`, `workflow` 등)를 먼저 조회
-  - 필요할 때만 최근 기록으로 제한 확장 검색해 실행 시간/토큰 낭비 최소화
+- 사용량 모니터 런타임 제어 옵션 추가:
+  - `OMG_HOOKS_QUIET=1`로 AfterAgent 상태 라인을 조용 모드로 전환
+  - `OMG_STATE_ROOT=<dir>`로 `quota-watch.json` 저장 경로를 기본 `.omg/state`에서 오버라이드
+- 사용량 모니터 안정성 강화:
+  - 상태 파일 쓰기 실패 시에도 부모 워크플로우를 막지 않는 fail-open 동작 적용
+- v0.4.1 훅 런타임 제어 옵션과 예시를 README/가이드 문서에 반영
 
 ## 한눈에 보기
 

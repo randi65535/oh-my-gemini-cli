@@ -57,17 +57,12 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 
 ## What's New in v0.4.1
 
-- Added extension-native automatic usage monitoring after each completed agent turn:
-  - built-in `AfterAgent` hook: `omg-quota-watch-after-agent`
-  - output includes latest turn tokens, session cumulative tokens, and active-model cumulative tokens
-- Added persistent usage snapshot state:
-  - `.omg/state/quota-watch.json` tracks turn counter and latest usage summary
-- Clarified quota boundary:
-  - authoritative remaining quota/limits still come from `/stats model`
-- Updated docs and landing page to surface setup, behavior, and disable path for the usage monitor
-- Added lightweight `/omg:recall` command for history-aware recall with bounded search:
-  - scans `.omg/state/*` anchors first (`taskboard`, `checkpoint`, `workspace`, `workflow`, etc.)
-  - falls back to recent history only when needed, with hard limits to avoid long runtime and token-heavy replay
+- Added usage-monitor runtime knobs for quieter and more flexible sessions:
+  - `OMG_HOOKS_QUIET=1` suppresses non-essential AfterAgent status lines
+  - `OMG_STATE_ROOT=<dir>` overrides the default `.omg/state` location for `quota-watch.json`
+- Hardened usage monitor behavior:
+  - state writes are now fail-open so monitor I/O issues do not block the parent workflow
+- Updated docs to cover the new v0.4.1 hook runtime controls and examples
 
 ## At A Glance
 
