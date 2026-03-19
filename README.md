@@ -55,7 +55,7 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.4.0
+## What's New in v0.4.1
 
 - Added extension-native automatic usage monitoring after each completed agent turn:
   - built-in `AfterAgent` hook: `omg-quota-watch-after-agent`
@@ -254,6 +254,8 @@ OmG now ships an extension hook that prints a compact token-usage line after eac
 - Hook entrypoint: `hooks/hooks.json` (`AfterAgent` -> `omg-quota-watch-after-agent`)
 - Script: `hooks/scripts/after-agent-usage.js`
 - State artifact: `.omg/state/quota-watch.json`
+- Optional state root override: `OMG_STATE_ROOT=<dir>` (absolute path or path relative to session `cwd`)
+- Optional quiet hook output: `OMG_HOOKS_QUIET=1`
 
 What it shows automatically:
 
@@ -265,6 +267,18 @@ Boundary:
 
 - This hook cannot read authoritative remaining account quota by itself.
 - For true remaining quota/limits, run `/stats model`.
+
+Example (silence hook output but keep state snapshots):
+
+```bash
+export OMG_HOOKS_QUIET=1
+```
+
+Example (store monitor state outside default `.omg/state`):
+
+```bash
+export OMG_STATE_ROOT=.omg/state-local
+```
 
 Disable only this hook:
 

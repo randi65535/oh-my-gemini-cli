@@ -51,6 +51,11 @@ Recommended behavior:
 - Timeout budgets per lane
 - Cooldown for repeatedly failing hooks
 
+## Runtime Knobs (Usage Monitor Hook)
+
+- `OMG_HOOKS_QUIET=1`: suppresses non-essential hook status lines while keeping fail-open behavior.
+- `OMG_STATE_ROOT=<dir>`: overrides the default `.omg/state` location for `quota-watch.json`.
+
 ## Team Safety Policy
 
 In delegated/worker sub-agent turns:

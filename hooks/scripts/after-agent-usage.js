@@ -9,7 +9,9 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const STATE_RELATIVE_PATH = path.join(".omg", "state", "quota-watch.json");
+const DEFAULT_STATE_RELATIVE_PATH = path.join(".omg", "state", "quota-watch.json");
+const QUIET_HOOKS_ENV = "OMG_HOOKS_QUIET";
+const STATE_ROOT_ENV = "OMG_STATE_ROOT";
 
 function readStdinText() {
   return new Promise((resolve) => {
@@ -35,6 +37,25 @@ function safeJsonParse(text, fallback = null) {
   }
 }
 
+function isTruthy(value) {
+  if (typeof value !== "string") {
+    return false;
+  }
+  const normalized = value.trim().toLowerCase();
+  return normalized === "1" || normalized === "true" || normalized === "yes" || normalized === "on";
+}
+
+function resolveStatePath(cwd) {
+  const customStateRoot = process.env[STATE_ROOT_ENV];
+  if (typeof customStateRoot === "string" && customStateRoot.trim()) {
+    const stateRoot = path.isAbsolute(customStateRoot)
+      ? customStateRoot.trim()
+      : path.join(cwd, customStateRoot.trim());
+    return path.join(stateRoot, "quota-watch.json");
+  }
+  return path.join(cwd, DEFAULT_STATE_RELATIVE_PATH);
+}
+
 function asNumber(value) {
   const num = Number(value);
   return Number.isFinite(num) ? num : 0;
@@ -55,9 +76,13 @@ function readState(statePath) {
 }
 
 function writeState(statePath, state) {
-  const dir = path.dirname(statePath);
-  fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(statePath, `${JSON.stringify(state, null, 2)}\n`, "utf8");
+  try {
+    const dir = path.dirname(statePath);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(statePath, `${JSON.stringify(state, null, 2)}\n`, "utf8");
+  } catch {
+    // Fail-open: usage monitor should never block the parent workflow.
+  }
 }
 
 function buildUsageFromTranscript(transcript) {
@@ -151,7 +176,8 @@ async function main() {
       ? hookInput.transcript_path
       : "";
 
-  const statePath = path.join(cwd, STATE_RELATIVE_PATH);
+  const statePath = resolveStatePath(cwd);
+  const quietHooks = isTruthy(process.env[QUIET_HOOKS_ENV]);
   const prevState = readState(statePath);
   const nextTurnCount =
     prevState.last_session_id === sessionId
@@ -184,13 +210,16 @@ async function main() {
     });
   }
 
-  emitHookOutput(line);
+  emitHookOutput(quietHooks ? "" : line);
 }
 
 main().catch((error) => {
+  const quietHooks = isTruthy(process.env[QUIET_HOOKS_ENV]);
   const fallback = {
     decision: "allow",
-    systemMessage: `[OMG][USAGE] monitor-hook error: ${error?.message || String(error)}`,
+    systemMessage: quietHooks
+      ? ""
+      : `[OMG][USAGE] monitor-hook error: ${error?.message || String(error)}`,
   };
   process.stdout.write(JSON.stringify(fallback));
 });
