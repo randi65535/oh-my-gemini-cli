@@ -26,18 +26,33 @@ OmG extends Gemini CLI from a single-session assistant into a structured, role-d
 </p>
 ## Quick Start
 
-Get OmG running in under a minute:
+### Installation
 
-1. Install from GitHub:
-   `gemini extensions install https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli`
-2. Verify the extension is loaded:
-   interactive mode: `/extensions list` or terminal mode: `gemini extensions list`
-3. Run a smoke test:
-   `/omg:status`
-4. Start with intent routing:
-   `/omg:intent "<your task>"`
+Install from GitHub using the official Gemini Extensions command:
 
-For full setup details, see [Install](#install).
+```bash
+gemini extensions install https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli
+```
+
+Verify in interactive mode:
+
+```text
+/extensions list
+```
+
+Verify in terminal mode:
+
+```bash
+gemini extensions list
+```
+
+Run a smoke test:
+
+```text
+/omg:status
+```
+
+Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
 ## What's New in v0.4.0
 
@@ -259,34 +274,6 @@ Disable only this hook:
   }
 }
 ```
-
-## Install
-
-Install from GitHub using the official Gemini Extensions command:
-
-```bash
-gemini extensions install https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli
-```
-
-Verify in interactive mode:
-
-```text
-/extensions list
-```
-
-Verify in terminal mode:
-
-```bash
-gemini extensions list
-```
-
-Run a smoke test:
-
-```text
-/omg:status
-```
-
-Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
 ## Gemini CLI Compatibility Notes (Reviewed: 2026-03-12)
 
