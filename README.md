@@ -55,14 +55,14 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.4.1
+## What's New in v0.4.2
 
-- Added usage-monitor runtime knobs for quieter and more flexible sessions:
-  - `OMG_HOOKS_QUIET=1` suppresses non-essential AfterAgent status lines
-  - `OMG_STATE_ROOT=<dir>` overrides the default `.omg/state` location for `quota-watch.json`
-- Hardened usage monitor behavior:
-  - state writes are now fail-open so monitor I/O issues do not block the parent workflow
-- Updated docs to cover the new v0.4.1 hook runtime controls and examples
+- Added Gemini CLI v0.34-era UX compatibility updates:
+  - documented direct skill invocation via `/skill-name` and skill refresh flow (`/skills reload`)
+  - documented footer customization flow via `/footer` and `ui.footer.*` settings
+- Added a slash-friendly planning-skill alias:
+  - new `omg-plan` skill avoids collisions with Gemini CLI's built-in `/plan` command
+- Updated README, Korean README, and landing docs with explicit version/compatibility notes for stable (`v0.33.x`) and preview (`v0.34.0-preview.0+`) channels
 
 ## At A Glance
 
@@ -71,7 +71,7 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 | Delivery model | Official Gemini CLI extension (`gemini-extension.json`) |
 | Core building blocks | `GEMINI.md`, `agents/`, `commands/`, `skills/`, `context/` |
 | Main use case | Complex implementation tasks that need plan -> execute -> review loops |
-| Control surface | Slash-command-first `/omg:*` control plane + 6 deep-work `$skills` + sub-agent delegation |
+| Control surface | Slash-command-first `/omg:*` control plane + 7 deep-work `$skills` (including `omg-plan` alias) + sub-agent delegation |
 | Default model strategy | Judgment/acceptance gates on `gemini-3.1-pro`, implementation-heavy work on `gemini-3.1-flash`, broad low-risk exploration on `gemini-3.1-flash-lite` |
 
 ## Why OmG
@@ -81,7 +81,7 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 | Context gets mixed across planning and execution | Role-separated agents with focused responsibilities |
 | Hard to keep progress visible in long tasks | Explicit workflow stages and command-driven status checks |
 | Parallel lanes or worktrees drift out of sync | `workspace` + `taskboard` keep lane ownership, task IDs, and verification state compact and explicit |
-| Repetitive prompt engineering for common jobs | Slash commands for operational control plus retained deep-work skills (`$plan`, `$execute`, `$research`) |
+| Repetitive prompt engineering for common jobs | Slash commands for operational control plus retained deep-work skills (`$plan`, `$omg-plan`, `$execute`, `$research`) |
 | Drift between "what was decided" and "what was changed" | Review and debugging roles inside the same orchestration loop |
 
 ## Architecture
@@ -285,9 +285,14 @@ Disable only this hook:
 }
 ```
 
-## Gemini CLI Compatibility Notes (Reviewed: 2026-03-12)
+## Gemini CLI Compatibility Notes (Reviewed: 2026-03-21)
 
-- Recommended runtime: Gemini CLI `v0.33.0+` for stable hook lifecycle, subagent-policy context, dirty-worktree handling, and newer slash-skill ergonomics.
+- Recommended stable runtime: Gemini CLI `v0.33.0+` for stable hook lifecycle, subagent-policy context, and dirty-worktree handling.
+- Newer UX controls from Gemini CLI `v0.34.0-preview.0+`:
+  - direct skill invocation via `/skill-name`
+  - footer customization via `/footer` (backed by `ui.footer.items`, `ui.footer.showLabels`, `ui.footer.hideCWD`, `ui.footer.hideSandboxStatus`, `ui.footer.hideModelInfo`)
+- OmG compatibility for slash skill invocation:
+  - use `/omg-plan` (or `$omg-plan`) when you want the OmG planning skill without colliding with native `/plan`.
 - Policy engine migration: if your wrapper scripts still pass `--allowed-tools`, migrate to `--policy` profiles (`--allowed-tools` was deprecated in Gemini CLI `v0.30.0`).
 - Native `/plan` mode and OmG planning commands can coexist:
   - native: `/plan`
@@ -342,11 +347,12 @@ Disable only this hook:
 
 ### Skills
 
-Retained skills are intentionally limited to non-overlapping deep-work workflows so the extension loads less discovery metadata at session start.
+Retained skills are intentionally limited to a compact deep-work set so the extension loads less discovery metadata at session start (with one compatibility alias: `$omg-plan`).
 
 | Skill | Focus | Output style |
 | --- | --- | --- |
 | `$plan` | Convert goals into phased plan | Milestones, risks, and acceptance criteria |
+| `$omg-plan` | Slash-friendly planning alias that avoids native `/plan` collisions | Same planning output as `$plan` |
 | `$ralplan` | Strict, stage-gated planning with rollback points | Quality-first execution map |
 | `$execute` | Implement a scoped plan slice | Change summary with validation notes |
 | `$prd` | Convert requests into measurable acceptance criteria | PRD-style scope contract |
@@ -402,6 +408,7 @@ oh-my-gemini-cli/
 | --- | --- | --- |
 | `settings.filter is not a function` during install | Stale Gemini CLI runtime or stale cached extension metadata | Update Gemini CLI, uninstall extension, then reinstall from repository URL |
 | `/omg:*` command not found | Extension not loaded in current session | Run `gemini extensions list`, then restart Gemini CLI session |
+| `/plan` opens native plan mode when you wanted OmG planning skill | Name collision between built-in `/plan` and skill-slash invocation | Use `/omg-plan` (or `$omg-plan`) for the OmG planning skill, or use `/omg:team-plan` for staged workflow planning |
 | Skill does not trigger | Only the retained deep-work skills are still shipped, or extension metadata is stale | Recheck the retained skill list in the README and reload the extension/session |
 | Team assembly keeps proposing but does not execute | Approval token missing in request | Reply with explicit approval (`yes`, `approve`, `go`, or `run`) |
 | Parallel execution keeps colliding or re-planning the same files | Workspace lanes are not explicit | Run `/omg:workspace status` or set lane/path ownership with `/omg:workspace` |

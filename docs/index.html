@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.4.1+</span>
+        <span class="badge">Latest Update v0.4.2+</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -530,7 +530,7 @@
 
       <div class="stats">
         <div class="stat"><div class="n">13</div><div class="l">Sub-agents</div></div>
-        <div class="stat"><div class="n">6</div><div class="l">Retained skills</div></div>
+        <div class="stat"><div class="n">7</div><div class="l">Retained skills</div></div>
         <div class="stat"><div class="n">39</div><div class="l">Namespaced commands</div></div>
         <div class="stat"><div class="n">5</div><div class="l">Context layers</div></div>
       </div>
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (v0.4.x Usage Monitor + State-First Recall)</h2>
-      <p class="sub">OmG now includes extension-native per-turn usage monitoring plus a new state-first recall command to recover prior decisions without replaying full transcript history.</p>
+      <h2>Latest Update (v0.4.2 Skills + Footer Compatibility)</h2>
+      <p class="sub">OmG now documents Gemini CLI v0.34-era skill/footer UX and adds a slash-friendly planning-skill alias to avoid `/plan` collisions.</p>
       <table>
         <thead>
           <tr>
@@ -550,36 +550,36 @@
         </thead>
         <tbody>
           <tr>
-            <td>AfterAgent Usage Hook</td>
-            <td>Built-in hook <code>omg-quota-watch-after-agent</code> now runs after each completed agent turn and prints a compact usage line.</td>
+            <td>Direct skill invocation</td>
+            <td>Updated docs for Gemini CLI <code>/skill-name</code> support and skill refresh flow via <code>/skills reload</code>.</td>
           </tr>
           <tr>
-            <td>Usage Snapshot</td>
-            <td><code>hooks/scripts/after-agent-usage.js</code> reads transcript data to report turn/session/model token totals and persists state in <code>.omg/state/quota-watch.json</code>.</td>
+            <td>Footer customization</td>
+            <td>Updated compatibility docs for <code>/footer</code> and <code>ui.footer.*</code> controls (<code>items</code>, label toggle, and visibility flags).</td>
           </tr>
           <tr>
-            <td>State-First Recall</td>
-            <td>Added <code>/omg:recall</code> to recover prior decisions from compact <code>.omg/state/*</code> anchors first, then widen to recent history only when needed.</td>
+            <td>Skill alias</td>
+            <td>Added <code>omg-plan</code> skill alias so OmG planning can be invoked without conflicting with built-in <code>/plan</code>.</td>
           </tr>
           <tr>
-            <td>Efficiency Guardrails</td>
-            <td><code>/omg:recall</code> keeps bounded fallback limits (recent files/line caps) to avoid long runtime and token-heavy context replay.</td>
+            <td>Retained skills surface</td>
+            <td>Updated retained-skill documentation from 6 to 7 to include the new slash-friendly planning alias.</td>
           </tr>
           <tr>
-            <td>Quota Boundary</td>
-            <td>The monitor is token-visibility focused; authoritative remaining quota and limits still come from <code>/stats model</code>.</td>
+            <td>Stable channel baseline</td>
+            <td>OmG stable baseline remains Gemini CLI <code>v0.33.0+</code>.</td>
           </tr>
           <tr>
-            <td>Packaging</td>
-            <td>Extension package now includes <code>hooks/</code> assets so monitoring is available immediately after install/update.</td>
+            <td>Preview channel UX</td>
+            <td>Gemini CLI <code>v0.34.0-preview.0+</code> adds direct slash-skill activation and footer customization commands.</td>
           </tr>
           <tr>
             <td>Docs</td>
-            <td>README, Korean README, and landing page now include setup, sample output, and hook disable guidance.</td>
+            <td>README, Korean README, and landing page now include explicit version-gated guidance for skills/footer behavior.</td>
           </tr>
           <tr>
             <td>Compatibility</td>
-            <td>Recommended Gemini CLI remains <code>v0.33.0+</code> for stable hook lifecycle and slash-skill ergonomics.</td>
+            <td>Use <code>/omg-plan</code> (or <code>$omg-plan</code>) when you want OmG planning skill behavior without native <code>/plan</code> mode.</td>
           </tr>
         </tbody>
       </table>
@@ -642,7 +642,7 @@ Structured Result
           <tr>
             <td>Large feature planning</td>
             <td>Manual prompt decomposition</td>
-            <td><code>$plan</code> and <code>omg-planner</code> with phased output format</td>
+            <td><code>$plan</code> / <code>$omg-plan</code> and <code>omg-planner</code> with phased output format</td>
           </tr>
           <tr>
             <td>Parallel role execution</td>
@@ -737,7 +737,7 @@ Structured Result
           <tr>
             <td>Startup/discovery weight</td>
             <td>Broad mirrored command/skill surface plus disconnected shared context</td>
-            <td>Slash-command-first surface with 6 retained deep-work skills and a real root <code>GEMINI.md</code> entrypoint</td>
+            <td>Slash-command-first surface with 7 retained deep-work skills and a real root <code>GEMINI.md</code> entrypoint</td>
           </tr>
         </tbody>
       </table>
@@ -907,6 +907,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
           <tr><td>Command</td><td><code>/omg:optimize</code></td><td>Tune prompt/context quality and cost profile</td></tr>
           <tr><td>Command</td><td><code>/omg:cache</code></td><td>Inspect cache/context behavior and compact-state anchoring</td></tr>
           <tr><td>Skill</td><td><code>$plan</code></td><td>Milestone-level decomposition</td></tr>
+          <tr><td>Skill</td><td><code>$omg-plan</code></td><td>Slash-friendly planning alias that avoids native <code>/plan</code> collision</td></tr>
           <tr><td>Skill</td><td><code>$execute</code></td><td>Implementation pass for a scoped slice</td></tr>
           <tr><td>Skill</td><td><code>$prd</code></td><td>Measurable scope and acceptance-criteria drafting</td></tr>
           <tr><td>Skill</td><td><code>$ralplan</code></td><td>Strict staged planning with rollback points</td></tr>
@@ -1074,6 +1075,11 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
             <td><code>/omg:* not found</code></td>
             <td>Extension not loaded in current process</td>
             <td>Run <code>gemini extensions list</code> and restart session</td>
+          </tr>
+          <tr>
+            <td><code>/plan</code> opens native plan mode when OmG planning skill was expected</td>
+            <td>Built-in <code>/plan</code> and skill slash invocation names can collide in newer Gemini CLI versions</td>
+            <td>Use <code>/omg-plan</code> (or <code>$omg-plan</code>) for OmG planning skill behavior, or <code>/omg:team-plan</code> for staged planning</td>
           </tr>
           <tr>
             <td>Autonomous flow confirms too often or too little</td>

@@ -50,14 +50,14 @@ gemini extensions list
 
 참고: 설치/업데이트 명령은 대화형 슬래시 명령 모드가 아니라 터미널 모드(`gemini extensions ...`)에서 실행합니다.
 
-## v0.4.1의 새로운 내용
+## v0.4.2의 새로운 내용
 
-- 사용량 모니터 런타임 제어 옵션 추가:
-  - `OMG_HOOKS_QUIET=1`로 AfterAgent 상태 라인을 조용 모드로 전환
-  - `OMG_STATE_ROOT=<dir>`로 `quota-watch.json` 저장 경로를 기본 `.omg/state`에서 오버라이드
-- 사용량 모니터 안정성 강화:
-  - 상태 파일 쓰기 실패 시에도 부모 워크플로우를 막지 않는 fail-open 동작 적용
-- v0.4.1 훅 런타임 제어 옵션과 예시를 README/가이드 문서에 반영
+- Gemini CLI v0.34 계열 UX 호환성 업데이트:
+  - `/skill-name` 직접 호출과 `/skills reload` 기반 스킬 새로고침 흐름 문서화
+  - `/footer` 및 `ui.footer.*` 기반 footer 커스텀 흐름 문서화
+- 플랜 스킬 별칭 추가:
+  - Gemini CLI 기본 `/plan`과 충돌을 피하기 위한 `omg-plan` 스킬 추가
+- README/한국어 README/랜딩 문서에 stable(`v0.33.x`)과 preview(`v0.34.0-preview.0+`) 버전 호환성 기준 반영
 
 ## 한눈에 보기
 
@@ -66,7 +66,7 @@ gemini extensions list
 | 제공 방식 | 공식 Gemini CLI 확장 (`gemini-extension.json`) |
 | 핵심 구성 요소 | `GEMINI.md`, `agents/`, `commands/`, `skills/`, `context/` |
 | 주요 사용 사례 | 계획 -> 실행 -> 검증 루프가 필요한 복잡한 구현 작업 |
-| 제어 인터페이스 | slash-command-first `/omg:*` 제어면 + 6개 deep-work `$skill` + 서브 에이전트 위임 |
+| 제어 인터페이스 | slash-command-first `/omg:*` 제어면 + 7개 deep-work `$skills`(`omg-plan` 별칭 포함) + 서브 에이전트 위임 |
 | 기본 모델 전략 | 계획/아키텍처는 `gemini-3.1-pro`, 실행 중심 작업은 `gemini-3.1-flash`, 작고 저위험한 수정은 `gemini-3.1-flash-lite` |
 
 ## 왜 OmG인가
@@ -76,7 +76,7 @@ gemini extensions list
 | 계획과 실행 컨텍스트가 섞임 | 역할 분리 에이전트로 책임 분리 |
 | 장기 작업에서 진행 가시성 부족 | 명시적 워크플로우 스테이지 + 상태 명령 |
 | 병렬 lane/worktree가 서로 충돌하거나 드리프트 | `workspace` + `taskboard`로 lane 소유권, task ID, 검증 상태를 컴팩트하게 유지 |
-| 반복적인 프롬프트 엔지니어링 필요 | 운영 제어는 slash command로, 깊은 작업은 유지된 스킬(`$plan`, `$execute`, `$research`)로 분리 |
+| 반복적인 프롬프트 엔지니어링 필요 | 운영 제어는 slash command로, 깊은 작업은 유지된 스킬(`$plan`, `$omg-plan`, `$execute`, `$research`)로 분리 |
 | 결정 사항과 변경 사항의 드리프트 | 동일 오케스트레이션 루프 내 리뷰/디버깅 역할 포함 |
 
 ## 아키텍처
@@ -253,10 +253,15 @@ export OMG_STATE_ROOT=.omg/state-local
 }
 ```
 
-## Gemini CLI 호환성 노트 (검토일: 2026-03-12)
+## Gemini CLI 호환성 노트 (검토일: 2026-03-21)
 
-- 권장 런타임: Gemini CLI `v0.33.0+`
-  - 최근 upstream의 hook lifecycle 안정화, sub-agent policy context 전달, dirty worktree 처리, slash 기반 skill 사용성 개선을 반영하기 좋습니다.
+- 권장 stable 런타임: Gemini CLI `v0.33.0+`
+  - hook lifecycle 안정화, sub-agent policy context 전달, dirty worktree 처리 기준에서 안정적으로 사용 가능합니다.
+- Gemini CLI `v0.34.0-preview.0+`에서 추가된 UX:
+  - `/skill-name` 기반 스킬 직접 호출
+  - `/footer` 기반 footer 구성(내부적으로 `ui.footer.items`, `ui.footer.showLabels`, `ui.footer.hideCWD`, `ui.footer.hideSandboxStatus`, `ui.footer.hideModelInfo`)
+- OmG의 slash-skill 호환 경로:
+  - 기본 `/plan`과 충돌 없이 OmG 플랜 스킬을 부르려면 `/omg-plan`(또는 `$omg-plan`)을 사용합니다.
 - 정책 엔진 마이그레이션:
   - 래퍼 스크립트가 아직 `--allowed-tools`를 사용한다면 `--policy` 프로파일로 옮기는 편이 안전합니다.
 - 네이티브 `/plan` 모드와 OmG planning 명령은 함께 사용할 수 있습니다.
@@ -305,11 +310,12 @@ export OMG_STATE_ROOT=.omg/state-local
 
 ### Skills
 
-유지되는 스킬은 겹치지 않는 deep-work 워크플로우만 남겨 세션 시작 시 discovery 메타데이터를 줄였습니다.
+유지되는 스킬은 discovery 메타데이터를 줄이기 위해 compact deep-work 세트로 유지하며, `/plan` 충돌 회피를 위한 호환 별칭 `$omg-plan`만 추가로 제공합니다.
 
 | 스킬 | 초점 | 출력 스타일 |
 | --- | --- | --- |
 | `$plan` | 목표를 단계별 계획으로 변환 | 마일스톤, 리스크, 수용 기준 |
+| `$omg-plan` | 기본 `/plan`과 충돌을 피하는 slash 친화 플랜 별칭 | `$plan`과 동일한 계획 산출물 |
 | `$ralplan` | 롤백 지점을 포함한 엄격한 스테이지 게이팅 계획 | 품질 우선 실행 맵 |
 | `$execute` | 범위가 고정된 계획 슬라이스 구현 | 변경 요약 + 검증 노트 |
 | `$prd` | 요청을 측정 가능한 수용 기준으로 변환 | PRD 스타일 범위 계약 |
@@ -362,6 +368,7 @@ oh-my-gemini-cli/
 | --- | --- | --- |
 | 설치 중 `settings.filter is not a function` | Gemini CLI 런타임 또는 확장 메타데이터 캐시가 오래됨 | Gemini CLI 업데이트 후 확장 제거/재설치 |
 | `/omg:*` 명령을 찾을 수 없음 | 현재 세션에 확장이 로드되지 않음 | `gemini extensions list` 실행 후 CLI 세션 재시작 |
+| `/plan`이 열리고 OmG 플랜 스킬이 실행되지 않음 | 기본 `/plan`과 스킬 슬래시 호출 이름이 충돌함 | OmG 플랜 스킬은 `/omg-plan`(또는 `$omg-plan`)으로 호출하거나, 단계형 흐름은 `/omg:team-plan` 사용 |
 | 스킬이 트리거되지 않음 | 유지된 deep-work 스킬만 남아 있거나 확장 메타데이터가 오래됨 | README의 유지 스킬 목록 확인 후 확장/세션 재로드 |
 | 병렬 구현이 자꾸 같은 파일에서 충돌하거나 재계획됨 | workspace lane이 명시되지 않음 | `/omg:workspace status`로 확인하거나 `/omg:workspace`로 경로/lane 소유권 설정 |
 | dirty하거나 신뢰되지 않은 lane 위에서 바로 리뷰/자동화를 돌리려 함 | 공유 worktree 위생 상태가 불명확함 | `/omg:workspace audit`로 점검하고, 필요 시 lane을 분리한 뒤 verify/review를 이어서 실행 |

@@ -6,6 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.4.2` | 2026-03-21 | Skills/footer compatibility alignment | Added slash-friendly `omg-plan` skill alias and documented Gemini CLI v0.34 skill/footer UX with version-gated guidance |
 | `v0.4.1` | 2026-03-20 | Usage monitor runtime knobs | Added quiet-hook output control and state-root override for safer, less noisy long sessions |
 | `v0.3.9` | 2026-03-12 | Workspace hygiene and hook symmetry | Added lane-health auditing, hook lifecycle symmetry rules, and quieter delegated handoffs for safer long sessions |
 | `v0.3.8` | 2026-03-11 | Workspace and taskboard control | Added extension-native workspace lane mapping and verifier-backed taskboard workflows for lighter long-session orchestration |
@@ -23,6 +24,32 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.2` | 2026-02-22 | Model/branding consistency | `gemini-3.1-*` naming and OmG branding normalized |
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
+
+## v0.4.2 - Skills and Footer Compatibility Alignment (2026-03-21)
+
+Aligned OmG docs and skill surface with recent Gemini CLI v0.34-era UX updates around slash skill invocation and footer customization, while keeping stable-channel guidance explicit.
+
+### Added
+
+- New slash-friendly planning alias skill:
+  - `skills/omg-plan/SKILL.md`
+
+### Changed
+
+- README, Korean README, and landing page now document:
+  - direct skill invocation via `/skill-name`
+  - skill refresh flow via `/skills reload`
+  - footer customization via `/footer` and `ui.footer.*` configuration keys
+- Added explicit version gating:
+  - stable baseline: Gemini CLI `v0.33.0+`
+  - newer skill/footer UX: Gemini CLI `v0.34.0-preview.0+`
+- Added collision guidance for native `/plan` vs OmG planning skill invocation (`/omg-plan` / `$omg-plan`).
+- Extension/package version bumped to `0.4.2`.
+
+### Structural Fit Note
+
+- OmG remains extension-native; no runtime daemon or background worker was introduced.
+- This release focuses on compatibility clarity and naming-surface safety for newer Gemini CLI UX.
 
 ## v0.4.1 - Usage Monitor Runtime Knobs (2026-03-20)
 
