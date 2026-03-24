@@ -18,6 +18,10 @@
   "license": "MIT",
   "author": "Joonghyun-Lee-Frieren",
   "type": "module",
+  "scripts": {
+    "test:version": "node scripts/check-version.js",
+    "sync:version": "node scripts/sync-version.js"
+  },
   "files": [
     "GEMINI.md",
     "gemini-extension.json",
