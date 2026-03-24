@@ -55,14 +55,13 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.4.2
+## What's New in v0.4.3
 
-- Added Gemini CLI v0.34-era UX compatibility updates:
-  - documented direct skill invocation via `/skill-name` and skill refresh flow (`/skills reload`)
-  - documented footer customization flow via `/footer` and `ui.footer.*` settings
-- Added a slash-friendly planning-skill alias:
-  - new `omg-plan` skill avoids collisions with Gemini CLI's built-in `/plan` command
-- Updated README, Korean README, and landing docs with explicit version/compatibility notes for stable (`v0.33.x`) and preview (`v0.34.0-preview.0+`) channels
+- Hardened the built-in AfterAgent usage monitor:
+  - repeated hook retries against the same transcript snapshot now short-circuit instead of double-printing the same usage line
+  - `.omg/state/quota-watch.json` now stores a transcript fingerprint alongside the turn counter and usage snapshot
+- Kept the usage monitor fail-open while making fallback behavior idempotent for repeated invocations
+- Updated README, Korean README, and landing docs with retry-safe usage-monitor notes
 
 ## At A Glance
 
@@ -248,7 +247,7 @@ OmG now ships an extension hook that prints a compact token-usage line after eac
 
 - Hook entrypoint: `hooks/hooks.json` (`AfterAgent` -> `omg-quota-watch-after-agent`)
 - Script: `hooks/scripts/after-agent-usage.js`
-- State artifact: `.omg/state/quota-watch.json`
+- State artifact: `.omg/state/quota-watch.json` (turn counter, latest usage snapshot, and last processed transcript fingerprint)
 - Optional state root override: `OMG_STATE_ROOT=<dir>` (absolute path or path relative to session `cwd`)
 - Optional quiet hook output: `OMG_HOOKS_QUIET=1`
 
@@ -262,6 +261,7 @@ Boundary:
 
 - This hook cannot read authoritative remaining account quota by itself.
 - For true remaining quota/limits, run `/stats model`.
+- If Gemini retries the same transcript snapshot, the hook treats it as already delivered and suppresses duplicate output.
 
 Example (silence hook output but keep state snapshots):
 

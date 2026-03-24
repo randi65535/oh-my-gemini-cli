@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.4.2+</span>
+        <span class="badge">Latest Update v0.4.3+</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (v0.4.2 Skills + Footer Compatibility)</h2>
-      <p class="sub">OmG now documents Gemini CLI v0.34-era skill/footer UX and adds a slash-friendly planning-skill alias to avoid `/plan` collisions.</p>
+      <h2>Latest Update (v0.4.3 Usage Monitor Deduplication)</h2>
+      <p class="sub">OmG now keeps the built-in AfterAgent usage monitor retry-safe so repeated hook replays against the same transcript snapshot do not double-print the same usage line.</p>
       <table>
         <thead>
           <tr>
@@ -550,36 +550,24 @@
         </thead>
         <tbody>
           <tr>
-            <td>Direct skill invocation</td>
-            <td>Updated docs for Gemini CLI <code>/skill-name</code> support and skill refresh flow via <code>/skills reload</code>.</td>
+            <td>Retry-safe usage monitor</td>
+            <td>Repeated hook retries against the same transcript snapshot are treated as already delivered instead of double-printing the same usage line.</td>
           </tr>
           <tr>
-            <td>Footer customization</td>
-            <td>Updated compatibility docs for <code>/footer</code> and <code>ui.footer.*</code> controls (<code>items</code>, label toggle, and visibility flags).</td>
+            <td>Transcript fingerprint</td>
+            <td><code>.omg/state/quota-watch.json</code> now stores the transcript fingerprint alongside the turn counter and latest usage snapshot.</td>
           </tr>
           <tr>
-            <td>Skill alias</td>
-            <td>Added <code>omg-plan</code> skill alias so OmG planning can be invoked without conflicting with built-in <code>/plan</code>.</td>
-          </tr>
-          <tr>
-            <td>Retained skills surface</td>
-            <td>Updated retained-skill documentation from 6 to 7 to include the new slash-friendly planning alias.</td>
-          </tr>
-          <tr>
-            <td>Stable channel baseline</td>
-            <td>OmG stable baseline remains Gemini CLI <code>v0.33.0+</code>.</td>
-          </tr>
-          <tr>
-            <td>Preview channel UX</td>
-            <td>Gemini CLI <code>v0.34.0-preview.0+</code> adds direct slash-skill activation and footer customization commands.</td>
+            <td>Fail-open fallback</td>
+            <td>The monitor still degrades safely when transcript data is missing, but it now suppresses duplicate fallback replays for the same session state.</td>
           </tr>
           <tr>
             <td>Docs</td>
-            <td>README, Korean README, and landing page now include explicit version-gated guidance for skills/footer behavior.</td>
+            <td>README, Korean README, and landing page now document retry-safe usage-monitor behavior and the new state fields.</td>
           </tr>
           <tr>
-            <td>Compatibility</td>
-            <td>Use <code>/omg-plan</code> (or <code>$omg-plan</code>) when you want OmG planning skill behavior without native <code>/plan</code> mode.</td>
+            <td>Extension boundary</td>
+            <td>The hook remains extension-native and fail-open, so it does not add a runtime daemon or new delivery channel.</td>
           </tr>
         </tbody>
       </table>
@@ -732,7 +720,7 @@ Structured Result
           <tr>
             <td>Per-turn usage visibility</td>
             <td>Manual <code>/stats model</code> checks only</td>
-            <td>Built-in <code>AfterAgent</code> hook prints compact turn/session token usage after each completed turn</td>
+            <td>Built-in <code>AfterAgent</code> hook prints compact turn/session token usage after each completed turn and suppresses duplicate replays of the same transcript snapshot</td>
           </tr>
           <tr>
             <td>Startup/discovery weight</td>
@@ -838,8 +826,8 @@ Structured Result
           </thead>
           <tbody>
             <tr><td><code>hooks/hooks.json</code></td><td>Registers <code>omg-quota-watch-after-agent</code> on <code>AfterAgent</code></td></tr>
-            <tr><td><code>hooks/scripts/after-agent-usage.js</code></td><td>Reads transcript and calculates turn/session/model token totals</td></tr>
-            <tr><td><code>.omg/state/quota-watch.json</code></td><td>Persists turn counter and latest usage snapshot</td></tr>
+            <tr><td><code>hooks/scripts/after-agent-usage.js</code></td><td>Reads transcript, calculates turn/session/model token totals, and deduplicates repeated retries against the same snapshot</td></tr>
+            <tr><td><code>.omg/state/quota-watch.json</code></td><td>Persists turn counter, latest usage snapshot, and last processed transcript fingerprint</td></tr>
           </tbody>
         </table>
         <p class="sub" style="margin-top:10px;">Boundary: the hook cannot fetch authoritative remaining account quota by itself. Use <code>/stats model</code> for remaining quota/limits.</p>
@@ -848,7 +836,8 @@ Structured Result
         <h2>Sample Output</h2>
         <p class="sub">Printed automatically after each completed agent turn.</p>
         <pre class="diagram">[OMG][USAGE][TURN 12] turn=9,703 tok (in 9,487 / out 48 / cache 3,195)
-session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats model</pre>
+session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats model
+(duplicate retries against the same transcript snapshot are suppressed)</pre>
         <p class="sub" style="margin-top:10px;">Disable only this hook with <code>hooksConfig.disabled = ["omg-quota-watch-after-agent"]</code>.</p>
       </div>
     </div>

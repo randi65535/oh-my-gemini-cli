@@ -6,6 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.4.3` | 2026-03-24 | AfterAgent deduplication and retry safety | Added transcript-fingerprint state tracking so repeated usage-hook retries no longer double-print the same turn |
 | `v0.4.2` | 2026-03-21 | Skills/footer compatibility alignment | Added slash-friendly `omg-plan` skill alias and documented Gemini CLI v0.34 skill/footer UX with version-gated guidance |
 | `v0.4.1` | 2026-03-20 | Usage monitor runtime knobs | Added quiet-hook output control and state-root override for safer, less noisy long sessions |
 | `v0.3.9` | 2026-03-12 | Workspace hygiene and hook symmetry | Added lane-health auditing, hook lifecycle symmetry rules, and quieter delegated handoffs for safer long sessions |
@@ -24,6 +25,28 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.2` | 2026-02-22 | Model/branding consistency | `gemini-3.1-*` naming and OmG branding normalized |
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
+
+## v0.4.3 - AfterAgent Deduplication and Retry Safety (2026-03-24)
+
+Hardened the built-in AfterAgent usage monitor so repeated hook retries or fallback replays against the same transcript snapshot are treated as already delivered instead of double-printing the same usage line.
+
+### Added
+
+- Transcript fingerprinting for the usage monitor:
+  - `hooks/scripts/after-agent-usage.js` now tracks a stable event key per session/transcript snapshot
+  - repeated hook invocations against the same snapshot now short-circuit without emitting duplicate output
+
+### Changed
+
+- `hooks/scripts/after-agent-usage.js` now persists the last processed transcript fingerprint in `.omg/state/quota-watch.json`.
+- Usage-monitor state now keeps the retry-safe transcript hash alongside the turn counter and usage snapshot when transcript data is available.
+- README, Korean README, and landing page updated with retry-safe usage-monitor notes.
+- Extension/package version bumped to `0.4.3`.
+
+### Structural Fit Note
+
+- OmG remains extension-native; no runtime daemon or background worker was introduced.
+- The change keeps hook retries idempotent without adding new runtime dependencies or delivery channels.
 
 ## v0.4.2 - Skills and Footer Compatibility Alignment (2026-03-21)
 

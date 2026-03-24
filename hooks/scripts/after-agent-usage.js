@@ -4,8 +4,12 @@
  *
  * This hook reads the active Gemini transcript file and prints a compact
  * token-usage line after each completed agent turn.
+ *
+ * Repeated hook retries against the same transcript snapshot are treated as
+ * already delivered so the usage line stays idempotent.
  */
 
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -59,6 +63,10 @@ function resolveStatePath(cwd) {
 function asNumber(value) {
   const num = Number(value);
   return Number.isFinite(num) ? num : 0;
+}
+
+function hashText(text) {
+  return crypto.createHash("sha256").update(text, "utf8").digest("hex");
 }
 
 function formatNumber(value) {
@@ -154,6 +162,17 @@ function buildMonitorLine(usage, turnCount) {
   ].join(" ");
 }
 
+function buildEventKey(sessionId, transcriptPath, transcriptRaw) {
+  const sessionPart = typeof sessionId === "string" && sessionId ? sessionId : "unknown";
+  if (typeof transcriptRaw === "string") {
+    return `${sessionPart}:transcript:${hashText(transcriptRaw)}`;
+  }
+
+  const sourcePart =
+    typeof transcriptPath === "string" && transcriptPath ? transcriptPath : "missing";
+  return `${sessionPart}:transcript-missing:${sourcePart}`;
+}
+
 function emitHookOutput(systemMessage) {
   const output = {
     decision: "allow",
@@ -179,26 +198,50 @@ async function main() {
   const statePath = resolveStatePath(cwd);
   const quietHooks = isTruthy(process.env[QUIET_HOOKS_ENV]);
   const prevState = readState(statePath);
-  const nextTurnCount =
-    prevState.last_session_id === sessionId
-      ? asNumber(prevState.turn_count) + 1
-      : 1;
-
   let line;
+  let nextTurnCount = prevState.last_session_id === sessionId ? asNumber(prevState.turn_count) : 0;
+  let eventKey = buildEventKey(sessionId, transcriptPath, null);
+  let lastTranscriptHash = null;
+
   if (transcriptPath && fs.existsSync(transcriptPath)) {
-    const transcript = safeJsonParse(fs.readFileSync(transcriptPath, "utf8"), null);
+    const transcriptRaw = fs.readFileSync(transcriptPath, "utf8");
+    lastTranscriptHash = hashText(transcriptRaw);
+    eventKey = buildEventKey(sessionId, transcriptPath, transcriptRaw);
+
+    const duplicateEvent =
+      prevState.last_session_id === sessionId && prevState.last_event_key === eventKey;
+    if (duplicateEvent) {
+      emitHookOutput("");
+      return;
+    }
+
+    nextTurnCount += 1;
+
+    const transcript = safeJsonParse(transcriptRaw, null);
     const usage = buildUsageFromTranscript(transcript);
     if (usage) {
       line = buildMonitorLine(usage, nextTurnCount);
       writeState(statePath, {
         turn_count: nextTurnCount,
         last_session_id: sessionId,
+        last_event_key: eventKey,
+        last_transcript_hash: lastTranscriptHash,
         last_model: usage.latest.model,
         last_turn_total_tokens: usage.latest.total,
         last_session_total_tokens: usage.session.total,
         updated_at: new Date().toISOString(),
       });
     }
+  } else {
+    eventKey = buildEventKey(sessionId, transcriptPath, null);
+    const duplicateEvent =
+      prevState.last_session_id === sessionId && prevState.last_event_key === eventKey;
+    if (duplicateEvent) {
+      emitHookOutput("");
+      return;
+    }
+
+    nextTurnCount += 1;
   }
 
   if (!line) {
@@ -206,6 +249,8 @@ async function main() {
     writeState(statePath, {
       turn_count: nextTurnCount,
       last_session_id: sessionId,
+      last_event_key: eventKey,
+      ...(lastTranscriptHash ? { last_transcript_hash: lastTranscriptHash } : {}),
       updated_at: new Date().toISOString(),
     });
   }
