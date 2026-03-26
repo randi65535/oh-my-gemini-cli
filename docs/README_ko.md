@@ -50,13 +50,16 @@ gemini extensions list
 
 참고: 설치/업데이트 명령은 대화형 슬래시 명령 모드가 아니라 터미널 모드(`gemini extensions ...`)에서 실행합니다.
 
-## v0.4.3의 새로운 내용
+## v0.4.4의 새로운 내용
 
-- AfterAgent 사용량 모니터를 강화했습니다.
-  - 같은 transcript 스냅샷에 대한 반복 훅 재시도는 이미 전달된 것으로 처리해 중복 출력을 막습니다.
-  - `.omg/state/quota-watch.json`에 턴 카운터, 최신 사용량 스냅샷, transcript fingerprint를 함께 저장합니다.
-- 반복 호출에 대해 fallback 동작은 유지하되, 동일 스냅샷에서는 idempotent하게 처리하도록 정리했습니다.
-- README/한국어 README/랜딩 문서에 retry-safe 사용량 모니터 내용을 반영했습니다.
+- 내장 AfterAgent 훅의 신뢰성과 안전성을 함께 강화했습니다.
+  - 사용량 모니터는 같은 transcript 스냅샷 재시도에서도 retry-safe/idempotent 동작을 유지합니다.
+  - learn-signal 훅은 정보성 질의 세션을 필터링하고, 실행 의도가 있는 경우에만 `/omg:learn` 안내를 노출합니다.
+- `.omg/state/learn-watch.json` 상태 추적을 추가했습니다.
+  - transcript 이벤트 중복 억제 키
+  - 세션당 1회 안내 추적
+  - stale-state 충돌 완화를 위한 carry-over 상태 정리
+- README/한국어 README/랜딩 문서와 변경 이력에 훅 안전화 내용을 반영했습니다.
 
 ## 한눈에 보기
 
@@ -75,6 +78,7 @@ gemini extensions list
 | 계획과 실행 컨텍스트가 섞임 | 역할 분리 에이전트로 책임 분리 |
 | 장기 작업에서 진행 가시성 부족 | 명시적 워크플로우 스테이지 + 상태 명령 |
 | 병렬 lane/worktree가 서로 충돌하거나 드리프트 | `workspace` + `taskboard`로 lane 소유권, task ID, 검증 상태를 컴팩트하게 유지 |
+| 정보성 대화에도 학습 안내가 과도하게 뜸 | learn-signal 필터가 실행 의도가 있는 세션에서만 `/omg:learn` 안내를 노출 |
 | 반복적인 프롬프트 엔지니어링 필요 | 운영 제어는 slash command로, 깊은 작업은 유지된 스킬(`$plan`, `$omg-plan`, `$execute`, `$research`)로 분리 |
 | 결정 사항과 변경 사항의 드리프트 | 동일 오케스트레이션 루프 내 리뷰/디버깅 역할 포함 |
 
@@ -249,6 +253,33 @@ export OMG_STATE_ROOT=.omg/state-local
 {
   "hooksConfig": {
     "disabled": ["omg-quota-watch-after-agent"]
+  }
+}
+```
+
+## Learn-Signal 안전 필터 (AfterAgent Hook)
+
+OmG는 실행 의도가 확인된 세션에서만 `/omg:learn` 안내를 띄우도록 안전 강화된 learn-signal 훅도 함께 제공합니다.
+
+- 훅 엔트리포인트: `hooks/hooks.json` (`AfterAgent` -> `omg-learn-signal-after-agent`)
+- 스크립트: `hooks/scripts/learn.js`
+- 상태 파일: `.omg/state/learn-watch.json` (중복 억제 이벤트 키, 세션당 1회 안내 추적, 정리된 상태)
+- 런타임 제어:
+  - `OMG_STATE_ROOT=<dir>`로 `learn-watch.json` 저장 위치 변경
+  - `OMG_HOOKS_QUIET=1`로 안내 출력만 숨기고 상태 저장은 유지
+
+안전 동작:
+
+- 정보성 질의만 있는 세션은 안내를 생략합니다.
+- 같은 transcript 스냅샷에 대한 반복 재시도는 중복 출력하지 않습니다.
+- 기존 상태가 손상되었거나 스키마가 오래된 경우 정리 후 재사용합니다.
+
+이 훅만 비활성화:
+
+```json
+{
+  "hooksConfig": {
+    "disabled": ["omg-learn-signal-after-agent"]
   }
 }
 ```

@@ -55,13 +55,16 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.4.3
+## What's New in v0.4.4
 
-- Hardened the built-in AfterAgent usage monitor:
-  - repeated hook retries against the same transcript snapshot now short-circuit instead of double-printing the same usage line
-  - `.omg/state/quota-watch.json` now stores a transcript fingerprint alongside the turn counter and usage snapshot
-- Kept the usage monitor fail-open while making fallback behavior idempotent for repeated invocations
-- Updated README, Korean README, and landing docs with retry-safe usage-monitor notes
+- Hardened built-in AfterAgent hooks for reliability and safety:
+  - usage monitor remains retry-safe and idempotent for repeated transcript snapshots
+  - learn-signal hook now filters informational-only sessions and nudges `/omg:learn` only on actionable intent
+- Added learn-signal state tracking in `.omg/state/learn-watch.json`:
+  - deduped transcript event keys
+  - prompt-once session tracking
+  - sanitized carry-over state to reduce stale-state collisions
+- Updated README, Korean README, landing docs, and changelog notes for the new hook behavior
 
 ## At A Glance
 
@@ -80,6 +83,7 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 | Context gets mixed across planning and execution | Role-separated agents with focused responsibilities |
 | Hard to keep progress visible in long tasks | Explicit workflow stages and command-driven status checks |
 | Parallel lanes or worktrees drift out of sync | `workspace` + `taskboard` keep lane ownership, task IDs, and verification state compact and explicit |
+| Informational chats trigger noisy automation nudges | Learn-signal filtering suppresses `/omg:learn` prompts unless actionable implementation intent is present |
 | Repetitive prompt engineering for common jobs | Slash commands for operational control plus retained deep-work skills (`$plan`, `$omg-plan`, `$execute`, `$research`) |
 | Drift between "what was decided" and "what was changed" | Review and debugging roles inside the same orchestration loop |
 
@@ -281,6 +285,33 @@ Disable only this hook:
 {
   "hooksConfig": {
     "disabled": ["omg-quota-watch-after-agent"]
+  }
+}
+```
+
+## Learn-Signal Safety Filter (AfterAgent Hook)
+
+OmG now also ships a safety-hardened learn-signal hook so `/omg:learn` nudges appear only when a session has actionable implementation intent.
+
+- Hook entrypoint: `hooks/hooks.json` (`AfterAgent` -> `omg-learn-signal-after-agent`)
+- Script: `hooks/scripts/learn.js`
+- State artifact: `.omg/state/learn-watch.json` (deduped event key, prompt-once session tracking, and sanitized state)
+- Runtime controls:
+  - `OMG_STATE_ROOT=<dir>` to move `learn-watch.json` beside other OmG state
+  - `OMG_HOOKS_QUIET=1` to keep the hook silent while preserving state updates
+
+Safety behavior:
+
+- informational-only query sessions are filtered before emit
+- repeated retries against the same transcript snapshot are deduplicated
+- legacy or malformed prior state is sanitized before reuse to reduce stale-state collisions
+
+Disable only this hook:
+
+```json
+{
+  "hooksConfig": {
+    "disabled": ["omg-learn-signal-after-agent"]
   }
 }
 ```

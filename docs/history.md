@@ -6,6 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.4.4` | 2026-03-26 | Learn-signal safety hardening | Added actionable-session filtering, deduped learn-signal state tracking, and safer stale-state handling for `/omg:learn` nudges |
 | `v0.4.3` | 2026-03-24 | AfterAgent deduplication and retry safety | Added transcript-fingerprint state tracking so repeated usage-hook retries no longer double-print the same turn |
 | `v0.4.2` | 2026-03-21 | Skills/footer compatibility alignment | Added slash-friendly `omg-plan` skill alias and documented Gemini CLI v0.34 skill/footer UX with version-gated guidance |
 | `v0.4.1` | 2026-03-20 | Usage monitor runtime knobs | Added quiet-hook output control and state-root override for safer, less noisy long sessions |
@@ -25,6 +26,32 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.2` | 2026-02-22 | Model/branding consistency | `gemini-3.1-*` naming and OmG branding normalized |
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
+
+## v0.4.4 - Learn-Signal Safety Hardening (2026-03-26)
+
+Hardened the learn-signal hook path so `/omg:learn` nudges fire only when sessions include actionable implementation intent, while remaining retry-safe under repeated transcript snapshots.
+
+### Added
+
+- New learn-signal state artifact:
+  - `.omg/state/learn-watch.json`
+- New learn-signal hook registration:
+  - `hooks/hooks.json` (`AfterAgent` -> `omg-learn-signal-after-agent`)
+
+### Changed
+
+- `hooks/scripts/learn.js` now:
+  - filters informational-only query sessions
+  - deduplicates repeated transcript snapshots with a stable event key
+  - sanitizes malformed/legacy prior state before reuse
+  - keeps fail-open behavior and supports `OMG_STATE_ROOT` plus `OMG_HOOKS_QUIET`
+- README, Korean README, and landing page now document learn-signal filtering and state behavior.
+- Extension/package version bumped to `0.4.4`.
+
+### Structural Fit Note
+
+- OmG remains extension-native; no runtime daemon or background worker was introduced.
+- Safety hardening stays prompt/state-level and keeps hook operation compact for long sessions.
 
 ## v0.4.3 - AfterAgent Deduplication and Retry Safety (2026-03-24)
 

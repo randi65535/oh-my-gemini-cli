@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.4.3+</span>
+        <span class="badge">Latest Update v0.4.4+</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -531,7 +531,7 @@
       <div class="stats">
         <div class="stat"><div class="n">13</div><div class="l">Sub-agents</div></div>
         <div class="stat"><div class="n">7</div><div class="l">Retained skills</div></div>
-        <div class="stat"><div class="n">39</div><div class="l">Namespaced commands</div></div>
+        <div class="stat"><div class="n">40</div><div class="l">Namespaced commands</div></div>
         <div class="stat"><div class="n">5</div><div class="l">Context layers</div></div>
       </div>
     </div>
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (v0.4.3 Usage Monitor Deduplication)</h2>
-      <p class="sub">OmG now keeps the built-in AfterAgent usage monitor retry-safe so repeated hook replays against the same transcript snapshot do not double-print the same usage line.</p>
+      <h2>Latest Update (Hook Reliability and Safety Hardening)</h2>
+      <p class="sub">OmG now keeps both built-in AfterAgent hooks safer: usage snapshots are retry-safe and learn nudges are filtered to actionable sessions only.</p>
       <table>
         <thead>
           <tr>
@@ -563,7 +563,15 @@
           </tr>
           <tr>
             <td>Docs</td>
-            <td>README, Korean README, and landing page now document retry-safe usage-monitor behavior and the new state fields.</td>
+            <td>README, Korean README, and landing page now document retry-safe usage-monitor behavior plus learn-signal filtering and state handling.</td>
+          </tr>
+          <tr>
+            <td>Learn-signal safety filter</td>
+            <td><code>hooks/scripts/learn.js</code> now suppresses informational-only learn nudges, deduplicates repeated transcript snapshots, and sanitizes stale state before reuse.</td>
+          </tr>
+          <tr>
+            <td>Learn state artifact</td>
+            <td><code>.omg/state/learn-watch.json</code> tracks deduped event keys, prompt-once session behavior, and last skip reason for safer long sessions.</td>
           </tr>
           <tr>
             <td>Extension boundary</td>
@@ -681,6 +689,11 @@ Structured Result
             <td>Prior-decision recall</td>
             <td>Manual transcript scrolling and guesswork</td>
             <td><code>/omg:recall</code> retrieves prior rationale via state-first search with bounded fallback.</td>
+          </tr>
+          <tr>
+            <td>Informational sessions trigger noisy learn nudges</td>
+            <td>Manual filtering or turning off learning prompts entirely</td>
+            <td><code>omg-learn-signal-after-agent</code> filters informational-only queries and prompts <code>/omg:learn</code> only when actionable implementation signals exist.</td>
           </tr>
           <tr>
             <td>Task-specific guardrails</td>
@@ -815,8 +828,8 @@ Structured Result
   <section>
     <div class="wrap two-col">
       <div>
-        <h2>Automatic Usage Monitor</h2>
-        <p class="sub">Extension-native <code>AfterAgent</code> hook for per-turn token visibility.</p>
+        <h2>Automatic Hook Monitors</h2>
+        <p class="sub">Extension-native <code>AfterAgent</code> hooks for usage visibility and learn-signal safety filtering.</p>
         <table>
           <thead>
             <tr>
@@ -828,6 +841,8 @@ Structured Result
             <tr><td><code>hooks/hooks.json</code></td><td>Registers <code>omg-quota-watch-after-agent</code> on <code>AfterAgent</code></td></tr>
             <tr><td><code>hooks/scripts/after-agent-usage.js</code></td><td>Reads transcript, calculates turn/session/model token totals, and deduplicates repeated retries against the same snapshot</td></tr>
             <tr><td><code>.omg/state/quota-watch.json</code></td><td>Persists turn counter, latest usage snapshot, and last processed transcript fingerprint</td></tr>
+            <tr><td><code>hooks/scripts/learn.js</code></td><td>Filters informational-only learning nudges, deduplicates retries, and sanitizes legacy state before emit</td></tr>
+            <tr><td><code>.omg/state/learn-watch.json</code></td><td>Persists learn-signal dedupe key, prompt-once session tracking, and skip reason</td></tr>
           </tbody>
         </table>
         <p class="sub" style="margin-top:10px;">Boundary: the hook cannot fetch authoritative remaining account quota by itself. Use <code>/stats model</code> for remaining quota/limits.</p>
@@ -837,8 +852,9 @@ Structured Result
         <p class="sub">Printed automatically after each completed agent turn.</p>
         <pre class="diagram">[OMG][USAGE][TURN 12] turn=9,703 tok (in 9,487 / out 48 / cache 3,195)
 session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats model
+(actionable session only) [OMG][Learn] Actionable session signals detected (4/11). Run '/omg:learn'
 (duplicate retries against the same transcript snapshot are suppressed)</pre>
-        <p class="sub" style="margin-top:10px;">Disable only this hook with <code>hooksConfig.disabled = ["omg-quota-watch-after-agent"]</code>.</p>
+        <p class="sub" style="margin-top:10px;">Disable per hook with <code>hooksConfig.disabled = ["omg-quota-watch-after-agent"]</code> or <code>["omg-learn-signal-after-agent"]</code>.</p>
       </div>
     </div>
   </section>
@@ -972,6 +988,11 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
             <td>Enable usage visibility</td>
             <td><code>/stats model</code> (periodic quota check) + built-in <code>AfterAgent</code> usage hook</td>
             <td>Automatic per-turn token usage line plus authoritative remaining quota on demand</td>
+          </tr>
+          <tr>
+            <td>Learn signal (automatic)</td>
+            <td>Built-in <code>AfterAgent</code> learn-signal hook</td>
+            <td><code>/omg:learn</code> nudge appears only for actionable sessions; informational-only turns are filtered out</td>
           </tr>
           <tr>
             <td>Start workflow</td>
