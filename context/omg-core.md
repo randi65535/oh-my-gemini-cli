@@ -6,63 +6,55 @@ OmG adds a role-driven workflow layer to Gemini CLI.
 
 - Use `/omg:*` commands for operational control.
 - Keep always-on context thin; heavy procedure belongs in the invoked command, not here.
-- Retained deep-work skills are intentionally limited to:
-  - `$plan`
-  - `$execute`
-  - `$prd`
-  - `$ralplan`
-  - `$research`
-  - `$context-optimize`
+- Retained deep-work skills are limited to: `$plan`, `$execute`, `$prd`, `$ralplan`, `$research`, `$context-optimize`.
 
-## Default Flow
+## Default Flow (Hybrid Routing)
 
-- On non-trivial work: `intent` -> `workspace` -> `team-assemble` -> `interview` (if flags present) -> `team-plan` -> `team-prd` -> `taskboard` -> `team-exec` -> `team-verify` -> `team-fix`.
-- Repeat `team-exec -> team-verify -> team-fix` until acceptance criteria pass or a blocker is explicit.
-- Use `loop` when unfinished work still has a valid next slice.
+- **Entry**: `intent` -> `workspace` (if dirty lanes or multi-root setup needed) -> `team-assemble` (if role fit is unclear).
+- **Clarification**: `interview` (if depth flags detected or scope is ambiguous) -> `team-plan` -> `team-prd`.
+- **Execution**: `taskboard` -> `team-exec` -> `team-verify` -> `team-fix`.
+- **Loop**: Repeat `exec -> verify -> fix` until acceptance. Use `loop` for subsequent slices.
+
+## System Map: Modes, Controls & Agents
+
+- **Operational Modes**: `balanced`, `speed`, `deep`, `autopilot`, `ralph`, `ultrawork`.
+- **Control Plane**: `rules`, `memory`, `workspace`, `taskboard`, `deep-init`, `hud`, `hooks`, `notify`, `reasoning`, `approval`, `doctor`, `cancel`.
+- **Agent Role Registry**:
+  - **Strategy**: `omg-director`, `omg-architect`, `omg-planner`.
+  - **Production**: `omg-product`, `omg-consultant`, `omg-editor`.
+  - **Execution**: `omg-executor`, `omg-reviewer`, `omg-verifier`, `omg-debugger`.
 
 ## Workflow State: Interviewing
 
 - **Entry**: Triggered via depth flags (`--essential|--standard|--deep`) on `/omg:intent`.
 - **Hold**: All automated implementation pipelines are blocked while in this state.
 - **Agent**: `interview` is the exclusive agent active during this state.
-- **Persistence**: Dialogue state, confirmed facts, and the `ready_to_run_prompt` must be saved to `.omg/state/interview-context.json`.
-- **Meta-commands**: Support `$intent-status`, `$intent-restart`, `$intent-help`, `$intent-resume`, and `$intent-done` within the interview loop.
-  - **State-Driven**: These commands are operational interfaces for `.omg/state/interview-context.json`. They must derive their output directly from the file.
-  - **Status/Resume**: Must `read_file` the JSON and display the current `clarity_score`, `facts`, and `ready_to_run_prompt`.
-  - **Restart**: Must physically delete the JSON file to ensure a 100% clean state reset.
-- **Exit**: Transition to `ready_to_execute` once the depth-specific Clarity Score is met or `$intent-done` is issued. A final PRD artifact must be generated.
+- **Persistence**: Dialogue state, confirmed facts, and `ready_to_run_prompt` must be saved to `.omg/state/interview-context.json`.
+- **Meta-commands**: Support `$intent-status`, `$intent-restart`, `$intent-help`, `$intent-resume`, and `$intent-done`.
 
 ## Intent Pinning Pattern
 
 - **Handoff Accuracy**: Every `/omg:*` command recommendation **MUST** include the `--intent="[Core Objective]"` flag to prevent context drift between agents.
 - **North Star**: Receiving agents use the `--intent` flag as their primary directive, overriding background noise.
 
-## Context and State
+## Context and State Management
 
-- Read only files needed for the current step and summarize before handoff.
-- Persist state only when the active command needs it under `.omg/state/*`, `MEMORY.md`, `.omg/memory/*`, `.omg/rules/*`, `.omg/hooks/*`, or `.omg/notify/*`.
-- **Single Source of Truth**: `.omg/state/interview-context.json` is the **exclusive** reference for the Socratic gateway. 
-  - **Smart Synchronization**: Agents should only `read_file` the state at **entry points** (start of a new command session or processing `$intent-*` magic words) to ensure alignment with the physical file. 
-  - **In-Loop Efficiency**: During a continuous dialogue loop, the agent may trust its internal conversation history to minimize redundant tool calls, unless an external change or inconsistency is detected.
-  - **Implicit Adoption**: When a read occurs, the file's data is immediately adopted as the absolute current state, overriding any stale internal context without unnecessary comparison.
-  - **Update Policy**: Only update the file (`write_file`) when a tangible change (new facts, score update, or command shift) is detected.
-- Prefer stable task IDs, workspace lane labels, lane-health summaries, and compact evidence pointers over repeating raw diffs in chat.
-- Keep successful delegated handoffs terse; expand only when execution stops early, blocks, or crosses lane boundaries.
-- `GEMINI.md` is the thin extension entrypoint; `context/omg-core.md` is the imported shared baseline.
+- **Single Source of Truth (SSoT)**: `.omg/state/interview-context.json` is the **exclusive** reference for the Socratic gateway. 
+  - **Smart Synchronization**: Agents `read_file` the state ONLY at entry points to ensure alignment.
+  - **Implicit Adoption**: On read, the file content overrides any stale internal context immediately.
+  - **Update Policy**: Update the file (`write_file`) only when tangible changes (facts, score, prompt) occur.
+- **Summarization**: Read only files needed for the current step and summarize before handoff.
+- **Persistence**: Use `.omg/state/*`, `MEMORY.md`, `.omg/memory/*`, `.omg/rules/*`, `.omg/hooks/*`, or `.omg/notify/*`.
 
 ## Command Response Contract
 
 - Keep `/omg:*` outputs concise and operator-facing.
-- State current status or decision first, then blockers or risks, then the next command or action.
-- Use tables only for matrices or comparisons.
-- Mention validation evidence and persisted files only when relevant.
+- State status/decision first, then blockers/risks, then the next command.
+- Use tables only for matrices or comparisons. Mention evidence/persisted files only when relevant.
 
-## Safety
+## Safety & Integrity
 
-- Do not start implementation when scope or acceptance criteria are missing.
-- Never claim completion without validation evidence.
-- Never mark work done when open taskboard items, lane-health blockers, or missing verifier signoff remain.
-- Isolate dirty or untrusted worktrees before autonomous review, verification, or script-heavy guidance.
-- Re-enter safety checks after blocked agent continuations before resuming quality or optimization hooks.
-- Stop autonomous loops on hard blockers, missing permissions, or repeated failures.
-- Keep side-effect hooks and external notifications disabled in delegated worker sessions unless the user explicitly opts in.
+- **Pre-requisites**: Do not start implementation if scope or acceptance criteria are missing.
+- **Validation**: Never claim completion or mark work done without verification evidence.
+- **Isolation**: Isolate dirty/untrusted worktrees before autonomous review or verification.
+- **Termination**: Stop autonomous loops on hard blockers, missing permissions, or repeated failures.
