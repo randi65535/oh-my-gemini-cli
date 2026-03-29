@@ -6,23 +6,27 @@ Input:
 $ARGUMENTS
 
 Protocol:
-1. Classify the primary intent into one:
-   - team-assemble
-   - plan
-   - prd
-   - exec
-   - verify
-   - fix
-   - research
-   - lifecycle
-2. Identify missing constraints or acceptance criteria needed before execution.
-3. Detect when workspace/worktree setup or workspace audit is needed before execution or parallel delegation.
-4. Detect command-intent mismatch (for example, implementation request but planning stage is missing).
-5. Recommend the next OmG command and agent handoff.
-6. If filesystem tools are available, write/update `.omg/state/intent.md`.
+1. Detect depth flags:
+   - `--essential`: Quick clarification (Clarity > 65)
+   - `--standard`: Default rigor (Clarity > 80)
+   - `--deep`: Deep Socratic dive (Clarity > 95)
+   - `--empty`: Explicitly skip interview and show standard classification with "None" depth.
+2. Handle Routing:
+   - **Interview Flags (`--essential`, `--standard`, `--deep`)**: 
+     - Transition to `workflow_state: interviewing` and invoke `interview`.
+     - **Immediate Action**: Provide the **First Socratic Question** based on the query. Do not recommend a next command.
+   - **`--empty` Flag**: Execute standard classification and show `Depth Detected: None`.
+   - **No Flag**: Execute standard classification as-is (Original OmG flow).
+3. [Recovery Guard]: If an unfinished interview is detected in `.omg/state/interview-context.json`, prompt the user to `$intent-resume` or `$intent-restart`.
+4. Identify missing constraints or acceptance criteria needed before execution.
+5. Detect when workspace/worktree setup or workspace audit is needed before execution or parallel delegation.
+6. Detect command-intent mismatch (for example, implementation request but planning stage is missing).
+7. Recommend the next OmG command and agent handoff.
+8. If filesystem tools are available, write/update `.omg/state/intent.md`.
 
 Routing hints:
-- multi-root, dirty-lane, or worktree-sensitive implementation -> `/omg:workspace` (use `/omg:workspace audit` when lane health or trust is unclear)
+- depth flags detected -> `/omg:interview` (via `interview`)
+- multi-root, dirty-lane, or worktree-sensitive implementation -> `/omg:workspace`
 - dynamic multi-role team setup -> `/omg:team-assemble`
 - planning ambiguity -> `/omg:team-plan`
 - scope ambiguity -> `/omg:team-prd`
@@ -35,5 +39,11 @@ Routing hints:
 
 Response:
 - Keep it concise and operator-facing.
-- Include `Intent Gate`, `Missing Inputs`, `Recommended Route`, and `Ready-to-Run Prompt`.
+- If interview flags are present:
+  - The response **IS** the start of the interview.
+  - Include `Intent Gate`, `Depth Detected: [Mode]`, `Confirmed Intent`, and the **First Socratic Question**.
+- If `--empty` flag is present:
+  - Include `Intent Gate`, `Depth Detected: None`, `Confirmed Intent`, `Missing Inputs`, `Recommended Route`, and `Ready-to-Run Prompt` (Include `--intent="[Summary]"` flag).
+- If NO flags are present:
+  - Include `Intent Gate`, `Missing Inputs`, `Recommended Route`, and `Ready-to-Run Prompt` (Include `--intent="[Summary]"` flag). (Original Format)
 """
