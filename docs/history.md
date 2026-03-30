@@ -6,6 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.4.5` | 2026-03-30 | Deep-interview lock nudge suppression | Learn-signal hook now suppresses automated nudges while deep-interview lock is active and resumes safely after lock release |
 | `v0.4.4` | 2026-03-26 | Learn-signal safety hardening | Added actionable-session filtering, deduped learn-signal state tracking, and safer stale-state handling for `/omg:learn` nudges |
 | `v0.4.3` | 2026-03-24 | AfterAgent deduplication and retry safety | Added transcript-fingerprint state tracking so repeated usage-hook retries no longer double-print the same turn |
 | `v0.4.2` | 2026-03-21 | Skills/footer compatibility alignment | Added slash-friendly `omg-plan` skill alias and documented Gemini CLI v0.34 skill/footer UX with version-gated guidance |
@@ -26,6 +27,33 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.2` | 2026-02-22 | Model/branding consistency | `gemini-3.1-*` naming and OmG branding normalized |
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
+
+## v0.4.5 - Deep-Interview Lock Nudge Suppression (2026-03-30)
+
+Adapted OmG hook behavior to recent one-week `oh-my-codex` deep-interview safety direction: when deep-interview lock state is active, automated learn nudges are suppressed so interview flow can continue without interruptions.
+
+### Added
+
+- Deep-interview lock input support in learn-signal flow:
+  - read-only lock source: `.omg/state/deep-interview.json`
+- Additional learn-state visibility fields:
+  - `deep_interview_lock_active`
+  - `deep_interview_lock_source`
+
+### Changed
+
+- `hooks/scripts/learn.js` now:
+  - suppresses nudges when deep-interview lock state is active
+  - keeps informational-query filtering, transcript deduplication, and fail-open safety behavior
+  - resolves lock-state path through `OMG_STATE_ROOT` when provided
+  - treats recently updated lock snapshots as active for backward-compatible state schemas
+- README, Korean README, and landing page now document deep-interview lock suppression behavior.
+- Extension/package version bumped to `0.4.5`.
+
+### Structural Fit Note
+
+- OmG remains extension-native; no runtime daemon or background worker was introduced.
+- The update is hook/state-level only, aligned to existing extension boundaries.
 
 ## v0.4.4 - Learn-Signal Safety Hardening (2026-03-26)
 

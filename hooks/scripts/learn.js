@@ -4,6 +4,7 @@
  *
  * Safety-hardened learn nudger:
  * - skips informational-only sessions
+ * - suppresses nudges while deep-interview lock is active
  * - deduplicates repeated transcript snapshots
  * - sanitizes legacy state before reuse
  */
@@ -15,6 +16,11 @@ import path from "node:path";
 const QUIET_HOOKS_ENV = "OMG_HOOKS_QUIET";
 const STATE_ROOT_ENV = "OMG_STATE_ROOT";
 const DEFAULT_STATE_RELATIVE_PATH = path.join(".omg", "state", "learn-watch.json");
+const DEFAULT_DEEP_INTERVIEW_STATE_RELATIVE_PATH = path.join(
+  ".omg",
+  "state",
+  "deep-interview.json",
+);
 
 const ACTION_KEYWORDS = [
   "build",
@@ -89,6 +95,17 @@ function resolveStatePath(cwd) {
   return path.join(cwd, DEFAULT_STATE_RELATIVE_PATH);
 }
 
+function resolveDeepInterviewStatePath(cwd) {
+  const customStateRoot = process.env[STATE_ROOT_ENV];
+  if (typeof customStateRoot === "string" && customStateRoot.trim()) {
+    const stateRoot = path.isAbsolute(customStateRoot)
+      ? customStateRoot.trim()
+      : path.join(cwd, customStateRoot.trim());
+    return path.join(stateRoot, "deep-interview.json");
+  }
+  return path.join(cwd, DEFAULT_DEEP_INTERVIEW_STATE_RELATIVE_PATH);
+}
+
 function hashText(text) {
   return crypto.createHash("sha256").update(text, "utf8").digest("hex");
 }
@@ -128,6 +145,77 @@ function readState(statePath) {
   } catch {
     return {};
   }
+}
+
+function readDeepInterviewState(statePath) {
+  try {
+    const raw = fs.readFileSync(statePath, "utf8");
+    const parsed = safeJsonParse(raw, null);
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function parseTimestamp(value) {
+  if (typeof value !== "string" || !value.trim()) {
+    return null;
+  }
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function isDeepInterviewLockActive(state, nowMs = Date.now()) {
+  if (!state || typeof state !== "object") {
+    return false;
+  }
+
+  if (state.active === false || state.locked === false) {
+    return false;
+  }
+
+  if (typeof state.released_at === "string" && state.released_at.trim()) {
+    return false;
+  }
+
+  const expiresAt = parseTimestamp(state.expires_at);
+  if (expiresAt !== null && expiresAt <= nowMs) {
+    return false;
+  }
+
+  if (state.active === true || state.locked === true) {
+    return true;
+  }
+
+  const status =
+    typeof state.status === "string" ? state.status.trim().toLowerCase() : "";
+  if (["active", "locked", "in-progress", "running", "interviewing"].includes(status)) {
+    return true;
+  }
+  if (
+    [
+      "done",
+      "completed",
+      "released",
+      "inactive",
+      "idle",
+      "stopped",
+      "failed",
+      "cancelled",
+      "canceled",
+    ].includes(status)
+  ) {
+    return false;
+  }
+
+  // Backward-compatible fallback: treat recently updated lock snapshots as active
+  // even when no explicit boolean/status flag exists.
+  const updatedAt = parseTimestamp(state.updated_at);
+  if (updatedAt !== null && nowMs - updatedAt <= 2 * 60 * 60 * 1000) {
+    return true;
+  }
+
+  return false;
 }
 
 function writeState(statePath, state) {
@@ -275,8 +363,11 @@ async function main() {
       : "";
   const quietHooks = isTruthy(process.env[QUIET_HOOKS_ENV]);
   const statePath = resolveStatePath(cwd);
+  const deepInterviewStatePath = resolveDeepInterviewStatePath(cwd);
   const prevState = readState(statePath);
   const config = loadLearnConfig(cwd);
+  const deepInterviewState = readDeepInterviewState(deepInterviewStatePath);
+  const deepInterviewLockActive = isDeepInterviewLockActive(deepInterviewState);
 
   if (!transcriptPath || !fs.existsSync(transcriptPath)) {
     const eventKey = buildEventKey(sessionId, transcriptPath, null);
@@ -319,6 +410,8 @@ async function main() {
 
   if (messageCount < config.minSessionLength) {
     reason = "short-session";
+  } else if (deepInterviewLockActive) {
+    reason = "deep-interview-lock-active";
   } else if (classification.informationalOnly) {
     reason = "informational-only";
   } else if (
@@ -344,6 +437,8 @@ async function main() {
     last_reason: reason,
     last_user_message_count: messageCount,
     last_actionable_message_count: classification.actionableCount,
+    deep_interview_lock_active: deepInterviewLockActive,
+    deep_interview_lock_source: deepInterviewStatePath,
     updated_at: new Date().toISOString(),
   });
 

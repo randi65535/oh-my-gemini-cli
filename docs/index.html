@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.4.4+</span>
+        <span class="badge">Latest Update v0.4.5+</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -540,7 +540,7 @@
   <section>
     <div class="wrap">
       <h2>Latest Update (Hook Reliability and Safety Hardening)</h2>
-      <p class="sub">OmG now keeps both built-in AfterAgent hooks safer: usage snapshots are retry-safe and learn nudges are filtered to actionable sessions only.</p>
+      <p class="sub">OmG now keeps both built-in AfterAgent hooks safer: usage snapshots are retry-safe, and learn nudges are suppressed during deep-interview lock windows.</p>
       <table>
         <thead>
           <tr>
@@ -567,7 +567,7 @@
           </tr>
           <tr>
             <td>Learn-signal safety filter</td>
-            <td><code>hooks/scripts/learn.js</code> now suppresses informational-only learn nudges, deduplicates repeated transcript snapshots, and sanitizes stale state before reuse.</td>
+            <td><code>hooks/scripts/learn.js</code> now suppresses learn nudges while deep-interview lock is active, filters informational-only sessions, deduplicates repeated transcript snapshots, and sanitizes stale state before reuse.</td>
           </tr>
           <tr>
             <td>Learn state artifact</td>
@@ -694,6 +694,11 @@ Structured Result
             <td>Informational sessions trigger noisy learn nudges</td>
             <td>Manual filtering or turning off learning prompts entirely</td>
             <td><code>omg-learn-signal-after-agent</code> filters informational-only queries and prompts <code>/omg:learn</code> only when actionable implementation signals exist.</td>
+          </tr>
+          <tr>
+            <td>Deep interview gets interrupted by auto nudges</td>
+            <td>Manual pause of hooks during interview windows</td>
+            <td><code>omg-learn-signal-after-agent</code> suppresses learn nudges automatically while <code>.omg/state/deep-interview.json</code> reports an active lock.</td>
           </tr>
           <tr>
             <td>Task-specific guardrails</td>
@@ -829,7 +834,7 @@ Structured Result
     <div class="wrap two-col">
       <div>
         <h2>Automatic Hook Monitors</h2>
-        <p class="sub">Extension-native <code>AfterAgent</code> hooks for usage visibility and learn-signal safety filtering.</p>
+        <p class="sub">Extension-native <code>AfterAgent</code> hooks for usage visibility and learn-signal safety filtering, including deep-interview lock suppression.</p>
         <table>
           <thead>
             <tr>
@@ -843,6 +848,7 @@ Structured Result
             <tr><td><code>.omg/state/quota-watch.json</code></td><td>Persists turn counter, latest usage snapshot, and last processed transcript fingerprint</td></tr>
             <tr><td><code>hooks/scripts/learn.js</code></td><td>Filters informational-only learning nudges, deduplicates retries, and sanitizes legacy state before emit</td></tr>
             <tr><td><code>.omg/state/learn-watch.json</code></td><td>Persists learn-signal dedupe key, prompt-once session tracking, and skip reason</td></tr>
+            <tr><td><code>.omg/state/deep-interview.json</code></td><td>Lock-state input; when active, learn nudges are suppressed to protect interview flow</td></tr>
           </tbody>
         </table>
         <p class="sub" style="margin-top:10px;">Boundary: the hook cannot fetch authoritative remaining account quota by itself. Use <code>/stats model</code> for remaining quota/limits.</p>
@@ -853,6 +859,7 @@ Structured Result
         <pre class="diagram">[OMG][USAGE][TURN 12] turn=9,703 tok (in 9,487 / out 48 / cache 3,195)
 session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats model
 (actionable session only) [OMG][Learn] Actionable session signals detected (4/11). Run '/omg:learn'
+(deep-interview lock active) learn nudge suppressed
 (duplicate retries against the same transcript snapshot are suppressed)</pre>
         <p class="sub" style="margin-top:10px;">Disable per hook with <code>hooksConfig.disabled = ["omg-quota-watch-after-agent"]</code> or <code>["omg-learn-signal-after-agent"]</code>.</p>
       </div>
@@ -992,7 +999,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
           <tr>
             <td>Learn signal (automatic)</td>
             <td>Built-in <code>AfterAgent</code> learn-signal hook</td>
-            <td><code>/omg:learn</code> nudge appears only for actionable sessions; informational-only turns are filtered out</td>
+            <td><code>/omg:learn</code> nudge appears only for actionable sessions; informational-only turns and deep-interview lock windows are suppressed</td>
           </tr>
           <tr>
             <td>Start workflow</td>
