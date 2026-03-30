@@ -1,0 +1,37 @@
+description = "Run a Socratic Interview loop to clarify requirements and generate a PRD."
+prompt = """
+Run OmG `interview` loop.
+
+Input:
+$ARGUMENTS
+
+Protocol:
+1. Initialize or Resume:
+   - **Check First**: Use `read_file` to verify the existence of `.omg/state/interview-context.json`.
+   - **If the file is missing**: **Request the user to start** an active interview via `/omg:intent --[depth]`.
+   - **If resuming**: Surface the `ready_to_run_prompt` from the file.
+2. Socratic Dialogue:
+   - Invoke the `interview` agent.
+   - **State Enforcement**: The agent MUST use the contents of `interview-context.json` as the exclusive source of truth.
+   - Identify the highest-risk ambiguity or technical gap.
+   - Ask ONE targeted Socratic question.
+3. Convergence & Scoring:
+   - Update `clarity_score`, `facts`, and `questions_asked` in the state file.
+   - Thresholds:
+     - `--essential`: Score > 65
+     - `--standard`: Score > 80
+     - `--deep`: Score > 95
+4. Meta-command Logic:
+   - **$intent-status**: Read the JSON and display its exact contents.
+   - **$intent-restart**: Delete the JSON file to start fresh.
+   - **$intent-done**: Use the JSON facts to generate the PRD.
+5. Finalization:
+   - When the threshold is met or `$intent-done` is triggered:
+     - Generate `.omg/state/prd-[slug].md` based on `.omg/templates/prd-template.md`.
+     - Transition the workflow to `ready_to_execute`.
+     - Instruct the user to run `/omg:team-plan --intent="[Confirmed Objective]"` or `/omg:team-exec --intent="[Confirmed Objective]"`.
+
+Response:
+- Keep it concise and professional.
+- Include `[PROGRESS]`, `[CONFIRMED FACTS]`, `[SOCRATIC QUESTION]`, and the `[READY-TO-RUN PROMPT]`.
+"""
