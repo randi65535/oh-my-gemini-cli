@@ -31,7 +31,7 @@ OmG transforme Gemini CLI, d'un assistant mono-session, en workflow d'ingénieri
 | Blocs principaux | `agents/`, `commands/`, `skills/`, `context/` |
 | Cas d'usage principal | Tâches complexes nécessitant des boucles planifier -> exécuter -> vérifier |
 | Surface de contrôle | Commandes `/omg:*` + workflows `$skill` + délégation à des sous-agents |
-| Stratégie modèle par défaut | Planification/architecture avec `gemini-3.1-pro`, exécution avec `gemini-3.1-flash`, petites corrections à faible risque avec `gemini-3.1-flash-lite` |
+| Stratégie modèle par défaut | Planification/architecture avec `gemini-3.1-pro`, exécution avec `gemini-3-flash`, petites corrections à faible risque avec `gemini-3.1-flash-lite` |
 
 ## Pourquoi OmG
 
@@ -158,7 +158,7 @@ Note : les commandes d'installation/mise à jour s'exécutent en mode terminal (
 | `omg-architect` | Frontières système, interfaces, maintenabilité long terme | `gemini-3.1-pro` |
 | `omg-planner` | Découpage des tâches et dépendances | `gemini-3.1-pro` |
 | `omg-product` | Verrouillage scope/non-scope et critères mesurables | `gemini-3.1-pro` |
-| `omg-executor` | Cycles d'implémentation rapides | `gemini-3.1-flash` |
+| `omg-executor` | Cycles d'implémentation rapides | `gemini-3-flash` |
 | `omg-reviewer` | Vérification de justesse et risques de régression | `gemini-3.1-pro` |
 | `omg-verifier` | Vérification des preuves d'acceptation et readiness release | `gemini-3.1-pro` |
 | `omg-debugger` | Analyse cause racine et stratégie de patch | `gemini-3.1-pro` |
@@ -217,5 +217,6 @@ oh-my-gemini-cli/
 ## Licence
 
 MIT
+
 
 

@@ -558,7 +558,7 @@ Reimplemented OmG around Gemini CLI's official Extensions model.
 
 ### Changed
 
-- Model references standardized to `gemini-3.1-pro` and `gemini-3.1-flash`
+- Model references standardized to `gemini-3.1-pro` and `gemini-3-flash`
 - Agent label output updated to display full model names
 - Project brand text normalized from `OMG` to `OmG`
 - Tagline changed to: `Gemini thinks. OmG orchestrates.`
@@ -610,3 +610,4 @@ Reimplemented OmG around Gemini CLI's official Extensions model.
 
 - Historical details before `v0.1.0` are not tracked.
 - For commit-level details, inspect repository git history.
+

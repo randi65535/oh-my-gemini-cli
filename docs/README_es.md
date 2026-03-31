@@ -31,7 +31,7 @@ OmG amplía Gemini CLI, de un asistente de sesión única, a un flujo de ingenie
 | Bloques principales | `agents/`, `commands/`, `skills/`, `context/` |
 | Caso de uso principal | Tareas complejas que necesitan ciclos de planificar -> ejecutar -> revisar |
 | Superficie de control | Comandos `/omg:*` + flujos `$skill` + delegación a sub-agentes |
-| Estrategia de modelo por defecto | Planificación/arquitectura en `gemini-3.1-pro`, trabajo intensivo de ejecución en `gemini-3.1-flash`, cambios pequeños y de bajo riesgo en `gemini-3.1-flash-lite` |
+| Estrategia de modelo por defecto | Planificación/arquitectura en `gemini-3.1-pro`, trabajo intensivo de ejecución en `gemini-3-flash`, cambios pequeños y de bajo riesgo en `gemini-3.1-flash-lite` |
 
 ## Por qué OmG
 
@@ -158,7 +158,7 @@ Nota: los comandos de instalación/actualización de extensiones se ejecutan en 
 | `omg-architect` | Límites del sistema, interfaces, mantenibilidad a largo plazo | `gemini-3.1-pro` |
 | `omg-planner` | Descomposición y secuenciación de tareas | `gemini-3.1-pro` |
 | `omg-product` | Bloqueo de alcance, no-objetivos y criterios medibles | `gemini-3.1-pro` |
-| `omg-executor` | Ciclos rápidos de implementación | `gemini-3.1-flash` |
+| `omg-executor` | Ciclos rápidos de implementación | `gemini-3-flash` |
 | `omg-reviewer` | Verificación de corrección y riesgo de regresión | `gemini-3.1-pro` |
 | `omg-verifier` | Evidencia de criterios de aceptación y preparación para release | `gemini-3.1-pro` |
 | `omg-debugger` | Análisis de causa raíz y estrategia de parche | `gemini-3.1-pro` |
@@ -217,5 +217,6 @@ oh-my-gemini-cli/
 ## Licencia
 
 MIT
+
 
 

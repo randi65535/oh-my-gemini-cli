@@ -21,7 +21,7 @@ Suggested `mode.json` shape:
 {
   "mode": "<selected>",
   "planning_model": "gemini-3.1-pro",
-  "execution_model": "gemini-3.1-flash",
+  "execution_model": "gemini-3-flash",
   "quick_edit_model": "gemini-3.1-flash-lite",
   "verification_strictness": "normal|high",
   "max_autonomous_cycles": 5
@@ -31,3 +31,5 @@ Response:
 - Keep it concise and operator-facing.
 - Include `Mode Status`, `Profile Settings`, and `Recommended Next Command`.
 """
+
+

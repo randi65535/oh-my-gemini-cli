@@ -75,7 +75,7 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 | Core building blocks | `GEMINI.md`, `agents/`, `commands/`, `skills/`, `context/` |
 | Main use case | Complex implementation tasks that need plan -> execute -> review loops |
 | Control surface | Slash-command-first `/omg:*` control plane + 8 deep-work `$skills` (including `omg-plan` alias) + sub-agent delegation |
-| Default model strategy | Judgment/acceptance gates on `gemini-3.1-pro`, implementation-heavy work on `gemini-3.1-flash`, broad low-risk exploration on `gemini-3.1-flash-lite` |
+| Default model strategy | Judgment/acceptance gates on `gemini-3.1-pro`, implementation-heavy work on `gemini-3-flash`, broad low-risk exploration on `gemini-3.1-flash-lite` |
 
 ## Why OmG
 
@@ -401,7 +401,7 @@ Retained skills are intentionally limited to a compact deep-work set so the exte
 | `omg-architect` | System boundaries, interfaces, long-term maintainability | `gemini-3.1-pro` |
 | `omg-planner` | Task decomposition and sequencing | `gemini-3.1-pro` |
 | `omg-product` | Scope lock, non-goals, and measurable acceptance criteria | `gemini-3.1-pro` |
-| `omg-executor` | Fast implementation cycles | `gemini-3.1-flash` |
+| `omg-executor` | Fast implementation cycles | `gemini-3-flash` |
 | `omg-reviewer` | Correctness and regression risk checks | `gemini-3.1-pro` |
 | `omg-verifier` | Acceptance-gate evidence and release-readiness checks | `gemini-3.1-pro` |
 | `omg-debugger` | Root-cause analysis and patch strategy | `gemini-3.1-pro` |
@@ -409,7 +409,7 @@ Retained skills are intentionally limited to a compact deep-work set so the exte
 | `omg-researcher` | External option analysis and synthesis | `gemini-3.1-pro` |
 | `omg-director` | Team message routing, conflict resolution, and lifecycle orchestration | `gemini-3.1-pro` |
 | `omg-consultant` | Strategic analysis criteria and recommendation framing | `gemini-3.1-pro` |
-| `omg-editor` | Final deliverable structure, consistency, and audience fit | `gemini-3.1-flash` |
+| `omg-editor` | Final deliverable structure, consistency, and audience fit | `gemini-3-flash` |
 | `omg-quick` | Small, tactical fixes | `gemini-3.1-flash-lite` |
 
 ## Context Layer Model
@@ -491,3 +491,4 @@ Extension behavior is manifest-driven through Gemini CLI extension primitives.
 ## License
 
 MIT
+

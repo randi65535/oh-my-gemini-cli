@@ -22,7 +22,7 @@ Protocol:
    - editorial lane: `omg-editor` for final packaging
 4. Assign model profiles by lane:
    - judgment and acceptance gates -> `gemini-3.1-pro`
-   - implementation-heavy execution -> `gemini-3.1-flash`
+   - implementation-heavy execution -> `gemini-3-flash`
    - broad low-risk exploration -> `gemini-3.1-flash-lite` (upgrade to `gemini-3.1-pro` if depth is critical)
 5. Assign reasoning effort per lane:
    - load `.omg/state/reasoning.json` when available
@@ -51,3 +51,5 @@ Response:
 - Include `Team Fit Analysis`, `Proposed Team`, `Reasoning Allocation`, `Collaboration Protocol`, `Lane Safety`, and `Approval Gate`.
 - Include `Execution Summary` only when approval is already explicit.
 """
+
+

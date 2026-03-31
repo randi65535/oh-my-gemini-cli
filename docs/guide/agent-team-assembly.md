@@ -65,7 +65,7 @@ Orchestration lane:
 Default role-to-model policy:
 
 - judgment and acceptance gates: `gemini-3.1-pro`
-- implementation-heavy execution: `gemini-3.1-flash`
+- implementation-heavy execution: `gemini-3-flash`
 - broad low-risk exploration: `gemini-3.1-flash-lite`
 
 This keeps budget predictable while preserving quality at key decision points.
@@ -141,3 +141,4 @@ If the team stalls:
 2. Reduce lane count and simplify role overlap.
 3. Force verification-first loop via `/omg:team-verify`.
 4. Use `/omg:consensus` when strategy lanes disagree.
+
