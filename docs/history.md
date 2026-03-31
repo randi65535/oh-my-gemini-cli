@@ -6,6 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.4.6` | 2026-03-31 | Deep-dive discovery skill | Added extension-native `$deep-dive` trace-to-interview skill with clarity scoring and optional interview/launch state artifacts |
 | `v0.4.5` | 2026-03-30 | Deep-interview lock nudge suppression | Learn-signal hook now suppresses automated nudges while deep-interview lock is active and resumes safely after lock release |
 | `v0.4.4` | 2026-03-26 | Learn-signal safety hardening | Added actionable-session filtering, deduped learn-signal state tracking, and safer stale-state handling for `/omg:learn` nudges |
 | `v0.4.3` | 2026-03-24 | AfterAgent deduplication and retry safety | Added transcript-fingerprint state tracking so repeated usage-hook retries no longer double-print the same turn |
@@ -27,6 +28,32 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.2` | 2026-02-22 | Model/branding consistency | `gemini-3.1-*` naming and OmG branding normalized |
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
+
+## v0.4.6 - Deep-Dive Discovery Skill (2026-03-31)
+
+Adapted OmG to recent one-week `oh-my-claudecode` skill direction by adding an extension-native discovery stage that runs trace-first analysis and escalates to interview prompts only when ambiguity remains.
+
+### Added
+
+- New retained skill:
+  - `skills/deep-dive/SKILL.md` (`$deep-dive`)
+- Structured discovery outputs:
+  - clarity score (`low/medium/high`)
+  - assumption ledger for unresolved or provisional decisions
+  - launch brief summary for handoff into planning/execution
+- Optional state artifacts for durable handoff:
+  - `.omg/state/interview-context.json`
+  - `.omg/state/launch-brief.md`
+
+### Changed
+
+- README, Korean README, and landing page now document `$deep-dive` behavior and retained skill count update.
+- Extension/package version bumped to `0.4.6`.
+
+### Structural Fit Note
+
+- OmG remains extension-native; no runtime daemon or background worker was introduced.
+- The feature is implemented as prompt/skill/state-file behavior within Gemini CLI extension boundaries.
 
 ## v0.4.5 - Deep-Interview Lock Nudge Suppression (2026-03-30)
 

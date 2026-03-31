@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.4.5+</span>
+        <span class="badge">Latest Update v0.4.6+</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -530,7 +530,7 @@
 
       <div class="stats">
         <div class="stat"><div class="n">13</div><div class="l">Sub-agents</div></div>
-        <div class="stat"><div class="n">7</div><div class="l">Retained skills</div></div>
+        <div class="stat"><div class="n">8</div><div class="l">Retained skills</div></div>
         <div class="stat"><div class="n">40</div><div class="l">Namespaced commands</div></div>
         <div class="stat"><div class="n">5</div><div class="l">Context layers</div></div>
       </div>
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (Hook Reliability and Safety Hardening)</h2>
-      <p class="sub">OmG now keeps both built-in AfterAgent hooks safer: usage snapshots are retry-safe, and learn nudges are suppressed during deep-interview lock windows.</p>
+      <h2>Latest Update (Deep-Dive Discovery Skill)</h2>
+      <p class="sub">OmG now adds a trace-to-interview discovery skill that raises requirement clarity before planning and implementation.</p>
       <table>
         <thead>
           <tr>
@@ -550,32 +550,28 @@
         </thead>
         <tbody>
           <tr>
-            <td>Retry-safe usage monitor</td>
-            <td>Repeated hook retries against the same transcript snapshot are treated as already delivered instead of double-printing the same usage line.</td>
+            <td>New retained skill</td>
+            <td>Added <code>$deep-dive</code> as an extension-native discovery pass before planning.</td>
           </tr>
           <tr>
-            <td>Transcript fingerprint</td>
-            <td><code>.omg/state/quota-watch.json</code> now stores the transcript fingerprint alongside the turn counter and latest usage snapshot.</td>
+            <td>Trace -> interview flow</td>
+            <td>The skill runs requirement tracing first, then escalates into an interview loop only where ambiguity remains.</td>
           </tr>
           <tr>
-            <td>Fail-open fallback</td>
-            <td>The monitor still degrades safely when transcript data is missing, but it now suppresses duplicate fallback replays for the same session state.</td>
+            <td>Clarity scoring</td>
+            <td>Outputs a bounded clarity signal (<code>low/medium/high</code>) so teams can decide whether to continue discovery or move into execution.</td>
           </tr>
           <tr>
-            <td>Docs</td>
-            <td>README, Korean README, and landing page now document retry-safe usage-monitor behavior plus learn-signal filtering and state handling.</td>
+            <td>State artifacts</td>
+            <td>Optional file outputs include <code>.omg/state/interview-context.json</code> and <code>.omg/state/launch-brief.md</code>.</td>
           </tr>
           <tr>
-            <td>Learn-signal safety filter</td>
-            <td><code>hooks/scripts/learn.js</code> now suppresses learn nudges while deep-interview lock is active, filters informational-only sessions, deduplicates repeated transcript snapshots, and sanitizes stale state before reuse.</td>
-          </tr>
-          <tr>
-            <td>Learn state artifact</td>
-            <td><code>.omg/state/learn-watch.json</code> tracks deduped event keys, prompt-once session behavior, and last skip reason for safer long sessions.</td>
+            <td>Docs and version</td>
+            <td>README, Korean README, landing page, and history were updated with a package/extension version bump to <code>0.4.6</code>.</td>
           </tr>
           <tr>
             <td>Extension boundary</td>
-            <td>The hook remains extension-native and fail-open, so it does not add a runtime daemon or new delivery channel.</td>
+            <td>The feature stays inside Gemini CLI extension primitives (prompt, skill, file-state); no runtime daemon or external service was added.</td>
           </tr>
         </tbody>
       </table>
@@ -743,7 +739,7 @@ Structured Result
           <tr>
             <td>Startup/discovery weight</td>
             <td>Broad mirrored command/skill surface plus disconnected shared context</td>
-            <td>Slash-command-first surface with 7 retained deep-work skills and a real root <code>GEMINI.md</code> entrypoint</td>
+            <td>Slash-command-first surface with 8 retained deep-work skills and a real root <code>GEMINI.md</code> entrypoint</td>
           </tr>
         </tbody>
       </table>
@@ -876,7 +872,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
         </div>
         <div class="card">
           <h3>Skills</h3>
-          <p>Small retained deep-work skill set for planning, scoped execution, PRD drafting, research, and context cleanup.</p>
+          <p>Small retained deep-work skill set for discovery, planning, scoped execution, PRD drafting, research, and context cleanup.</p>
         </div>
         <div class="card">
           <h3>Sub-agents</h3>
@@ -924,6 +920,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
           <tr><td>Skill</td><td><code>$prd</code></td><td>Measurable scope and acceptance-criteria drafting</td></tr>
           <tr><td>Skill</td><td><code>$ralplan</code></td><td>Strict staged planning with rollback points</td></tr>
           <tr><td>Skill</td><td><code>$research</code></td><td>Option comparison and tradeoff synthesis</td></tr>
+          <tr><td>Skill</td><td><code>$deep-dive</code></td><td>Trace-to-interview discovery with clarity score and launch brief</td></tr>
           <tr><td>Skill</td><td><code>$context-optimize</code></td><td>Signal-to-noise optimization in context</td></tr>
         </tbody>
       </table>

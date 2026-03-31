@@ -56,17 +56,16 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.4.5
+## What's New in v0.4.6
 
-- Hardened built-in AfterAgent hooks for reliability and safety:
-  - usage monitor remains retry-safe and idempotent for repeated transcript snapshots
-  - learn-signal hook now suppresses nudges while deep-interview lock is active, and still nudges `/omg:learn` only on actionable intent
-- Added learn-signal state tracking in `.omg/state/learn-watch.json`:
-  - deduped transcript event keys
-  - prompt-once session tracking
-  - deep-interview lock visibility (`deep_interview_lock_active`, lock source path)
-  - sanitized carry-over state to reduce stale-state collisions
-- Updated README, Korean README, landing docs, and changelog notes for the new hook behavior
+- Added new deep-discovery skill: `$deep-dive`
+  - runs a trace -> deep-interview pipeline before planning/execution
+  - computes implementation readiness (`low|medium|high`) and captures assumption risks explicitly
+  - emits interview and launch artifacts when filesystem tools are available:
+    - `.omg/state/interview-context.json`
+    - `.omg/state/launch-brief.md`
+- Kept the flow extension-native (prompt/state level) without adding daemon/runtime wrappers
+- Updated README, Korean README, landing docs, and changelog notes for the new skill
 
 ## At A Glance
 
@@ -75,7 +74,7 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 | Delivery model | Official Gemini CLI extension (`gemini-extension.json`) |
 | Core building blocks | `GEMINI.md`, `agents/`, `commands/`, `skills/`, `context/` |
 | Main use case | Complex implementation tasks that need plan -> execute -> review loops |
-| Control surface | Slash-command-first `/omg:*` control plane + 7 deep-work `$skills` (including `omg-plan` alias) + sub-agent delegation |
+| Control surface | Slash-command-first `/omg:*` control plane + 8 deep-work `$skills` (including `omg-plan` alias) + sub-agent delegation |
 | Default model strategy | Judgment/acceptance gates on `gemini-3.1-pro`, implementation-heavy work on `gemini-3.1-flash`, broad low-risk exploration on `gemini-3.1-flash-lite` |
 
 ## Why OmG
@@ -392,6 +391,7 @@ Retained skills are intentionally limited to a compact deep-work set so the exte
 | `$execute` | Implement a scoped plan slice | Change summary with validation notes |
 | `$prd` | Convert requests into measurable acceptance criteria | PRD-style scope contract |
 | `$research` | Explore options/tradeoffs | Decision-oriented comparison |
+| `$deep-dive` | Run trace-to-interview discovery before planning | Clarity score, assumption ledger, and launch brief |
 | `$context-optimize` | Improve context structure | Compression and signal-to-noise adjustments |
 
 ### Sub-agents
