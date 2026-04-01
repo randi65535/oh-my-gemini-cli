@@ -30,13 +30,17 @@ Routing hints:
 - depth keywords detected -> `/omg:interview` (via `interview`)
 - multi-root, dirty-lane, or worktree-sensitive implementation -> `/omg:workspace` (use `/omg:workspace audit` when lane health or trust is unclear)
 - dynamic multi-role team setup -> `/omg:team-assemble`
-- planning ambiguity -> `/omg:team-plan`
-- scope ambiguity -> `/omg:team-prd`
-- implementation-ready -> `/omg:team-exec`
+- planning ambiguity -> `/omg:team-plan` or `$plan`
+- scope ambiguity -> `/omg:team-prd` or `$prd`
+- implementation-ready -> `/omg:team-exec` or `$execute`
+- discovery/trace-to-interview pass -> `$deep-dive`
+- high-risk/quality-first planning -> `$ralplan`
+- technical/API research -> `$research`
+- context bloat/efficiency -> `$context-optimize`
+- pattern extraction/session learning -> `$learn`
 - validation request -> `/omg:team-verify`
 - defect-only fix -> `/omg:team-fix`
 - task drift or completion-proof drift -> `/omg:taskboard`
-- option research -> `$research`
 - mode/lifecycle operations -> `/omg:mode`, `/omg:launch`, `/omg:checkpoint`, `/omg:stop`
 
 Response:
