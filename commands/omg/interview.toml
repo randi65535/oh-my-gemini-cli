@@ -8,7 +8,7 @@ $ARGUMENTS
 Protocol:
 1. Initialize or Resume:
    - **Check First**: Use `read_file` to verify the existence of `.omg/state/interview-context.json`.
-   - **If the file is missing**: **Request the user to start** an active interview via `/omg:intent --[depth]`.
+   - **If the file is missing**: **Request the user to start** an active interview via `/omg:intent [depth]`.
    - **If resuming**: Surface the `ready_to_run_prompt` from the file.
 2. Socratic Dialogue:
    - Invoke the `interview` agent.
@@ -18,9 +18,9 @@ Protocol:
 3. Convergence & Scoring:
    - Update `clarity_score`, `facts`, and `questions_asked` in the state file.
    - Thresholds:
-     - `--essential`: Score > 65
-     - `--standard`: Score > 80
-     - `--deep`: Score > 95
+     - `low`: Score > 65
+     - `medium`: Score > 80
+     - `high`: Score > 95
 4. Meta-command Logic:
    - **$intent-status**: Read the JSON and display its exact contents.
    - **$intent-restart**: Delete the JSON file to start fresh.

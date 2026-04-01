@@ -64,7 +64,7 @@ gemini extensions list
   - 계획/실행 단계의 read-before-modify + minimal-diff 정책 강화
   - 권한/도구 거부 시 동일 호출 재시도 금지, approval/fallback 경로 강제
   - verifier/reviewer의 `pass|fail|unknown` 증거 판정 규율 강화
-- 다음 프롬프트 표면을 직접 업데이트했습니다.
+- 다음 프롬프트 인터페이스를 직접 업데이트했습니다.
   - `context/omg-core.md`
   - `agents/{director,planner,executor,reviewer,verifier}.md`
   - `commands/omg/{team-assemble,team,team-plan,team-exec,team-verify,team-fix,doctor}.toml`

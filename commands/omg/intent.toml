@@ -6,9 +6,9 @@ Input:
 $ARGUMENTS
 
 Protocol:
-1. [Pre-check] Detect depth flags:
-   - `--essential`, `--standard`, `--deep`: High-fidelity mode.
-   - `--empty`: Explicitly skip interview.
+1. [Pre-check] Detect depth keywords:
+   - `low`, `medium`, `high`: High-fidelity mode.
+   - `skip`: Explicitly skip interview.
 2. [State Guard] If an unfinished interview is detected in `.omg/state/interview-context.json`, prompt the user to `$intent-resume` or `$intent-restart`.
 3. [Classification] Classify the primary intent into one:
    - `team-assemble`: Dynamic multi-role team setup.
@@ -27,7 +27,7 @@ Protocol:
 7. [Persistence] If filesystem tools are available, write/update `.omg/state/intent.md`.
 
 Routing hints:
-- depth flags detected -> `/omg:interview` (via `interview`)
+- depth keywords detected -> `/omg:interview` (via `interview`)
 - multi-root, dirty-lane, or worktree-sensitive implementation -> `/omg:workspace` (use `/omg:workspace audit` when lane health or trust is unclear)
 - dynamic multi-role team setup -> `/omg:team-assemble`
 - planning ambiguity -> `/omg:team-plan`
