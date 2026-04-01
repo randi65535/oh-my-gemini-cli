@@ -56,16 +56,20 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.4.6
+## What's New in v0.5.0
 
-- Added new deep-discovery skill: `$deep-dive`
-  - runs a trace -> deep-interview pipeline before planning/execution
-  - computes implementation readiness (`low|medium|high`) and captures assumption risks explicitly
-  - emits interview and launch artifacts when filesystem tools are available:
-    - `.omg/state/interview-context.json`
-    - `.omg/state/launch-brief.md`
-- Kept the flow extension-native (prompt/state level) without adding daemon/runtime wrappers
-- Updated README, Korean README, landing docs, and changelog notes for the new skill
+- Added Claude-derived prompt-ops hardening across OmG orchestration layers:
+  - critical-path vs sidecar delegation rules for safer parallel lanes
+  - read-before-modify and minimal-diff policy in planning/execution stages
+  - denied-tool/permission recovery contract (no blind retries)
+  - stricter verifier/reviewer evidence gates (`pass|fail|unknown` discipline)
+- Updated core prompt surfaces:
+  - `context/omg-core.md`
+  - `agents/{director,planner,executor,reviewer,verifier}.md`
+  - `commands/omg/{team-assemble,team,team-plan,team-exec,team-verify,team-fix,doctor}.toml`
+  - `skills/{plan,execute}/SKILL.md`
+- Fixed retained-skill diagnostics so `/omg:doctor` validates all current deep-work skills (`$omg-plan`, `$deep-dive` included)
+- Bumped extension/package version to `0.5.0` and refreshed README, Korean README, landing docs, and history
 
 ## At A Glance
 
@@ -84,6 +88,7 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 | Context gets mixed across planning and execution | Role-separated agents with focused responsibilities |
 | Hard to keep progress visible in long tasks | Explicit workflow stages and command-driven status checks |
 | Parallel lanes or worktrees drift out of sync | `workspace` + `taskboard` keep lane ownership, task IDs, and verification state compact and explicit |
+| Permission-denied tool calls keep looping with no recovery path | Denied actions become explicit approval/fallback events with blocker tracking |
 | Deep interview sessions get interrupted by automated nudges | Learn-signal hook suppresses nudges while deep-interview lock is active and resumes only after lock release |
 | Repetitive prompt engineering for common jobs | Slash commands for operational control plus retained deep-work skills (`$plan`, `$omg-plan`, `$execute`, `$research`) |
 | Drift between "what was decided" and "what was changed" | Review and debugging roles inside the same orchestration loop |
@@ -491,4 +496,3 @@ Extension behavior is manifest-driven through Gemini CLI extension primitives.
 ## License
 
 MIT
-

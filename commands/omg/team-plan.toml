@@ -7,12 +7,14 @@ $ARGUMENTS
 
 Protocol:
 1. Load `.omg/state/workspace.json` when available and respect active lane/path scope plus lane health/trust notes.
-2. Delegate decomposition to `omg-planner`.
-3. Delegate architecture-sensitive risks to `omg-architect`.
-4. Build a phased task graph with stable task IDs, owners, dependencies, workspace lanes, and lane-health assumptions.
-5. Mark tasks as sequential or parallelizable, and note when isolated worktrees or explicit handoffs are required.
-6. Define verification checkpoints per phase.
-7. If filesystem tools are available, seed/update `.omg/state/taskboard.md`.
+2. Keep this stage read-only: no implementation edits in planning.
+3. Delegate decomposition to `omg-planner`.
+4. Delegate architecture-sensitive risks to `omg-architect`.
+5. Build a phased task graph with stable task IDs, owners, dependencies, workspace lanes, and lane-health assumptions.
+6. Mark tasks as critical-path, sequential, or sidecar parallelizable, and note when isolated worktrees or explicit handoffs are required.
+7. Define verification checkpoints per phase.
+8. List 3-5 critical files most relevant for implementation.
+9. If filesystem tools are available, seed/update `.omg/state/taskboard.md`.
 
 Output format:
 ## Stage
@@ -22,8 +24,11 @@ Output format:
 - ...
 
 ## Task Graph
-| Task ID | Task | Owner | Dependency | Parallelizable | Worktree | Lane Notes | Validation |
+| Task ID | Task | Owner | Dependency | Path Type (critical/sequential/sidecar) | Worktree | Lane Notes | Validation |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+
+## Critical Files
+- ...
 
 ## Risks
 - ...

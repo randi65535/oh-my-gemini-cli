@@ -29,13 +29,16 @@ Protocol:
    - apply teammate overrides first, then global default
    - use higher effort for reviewer/verifier lanes on high-risk tasks
 6. Define collaboration protocol:
+   - classify tasks into critical path vs sidecar parallel lanes
+   - keep immediate blockers on the active lane; parallelize only independent sidecars
    - explicit message flow between lanes
    - workspace/worktree lane ownership when `.omg/state/workspace.json` exists
    - lane cleanliness/trust notes when `.omg/state/workspace.json` exists
    - explicit subagent handoff schema (`owner`, `lane`, `evidence`, `termination`)
+   - avoid duplicate unresolved delegation across lanes
    - trigger conditions for verify/fix loops
    - anti-slop quality gate before final delivery
-   - fallback path when evidence conflicts or execution fails
+   - fallback path when evidence conflicts, execution fails, or permissions are denied
 7. Confirmation gate:
    - If input includes explicit approval tokens (`approve`, `approved`, `yes`, `go`, `run`), proceed to execution.
    - Otherwise stop after team proposal and ask: "Proceed with this team? (yes/no)"
@@ -48,8 +51,6 @@ Protocol:
 
 Response:
 - Keep it concise and operator-facing.
-- Include `Team Fit Analysis`, `Proposed Team`, `Reasoning Allocation`, `Collaboration Protocol`, `Lane Safety`, and `Approval Gate`.
+- Include `Team Fit Analysis`, `Proposed Team`, `Critical Path`, `Reasoning Allocation`, `Collaboration Protocol`, `Lane Safety`, and `Approval Gate`.
 - Include `Execution Summary` only when approval is already explicit.
 """
-
-

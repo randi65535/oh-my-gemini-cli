@@ -6,7 +6,7 @@ OmG adds a role-driven workflow layer to Gemini CLI.
 
 - Use `/omg:*` commands for operational control.
 - Keep always-on context thin; heavy procedure belongs in the invoked command, not here.
-- Retained deep-work skills are limited to: `$plan`, `$execute`, `$prd`, `$ralplan`, `$research`, `$context-optimize`.
+- Retained deep-work skills are limited to: `$plan`, `$omg-plan`, `$execute`, `$prd`, `$ralplan`, `$research`, `$deep-dive`, `$context-optimize`.
 
 ## Default Flow (Hybrid Routing)
 
@@ -14,6 +14,7 @@ OmG adds a role-driven workflow layer to Gemini CLI.
 - **Clarification**: `interview` (if depth flags detected or scope is ambiguous) -> `team-plan` -> `team-prd`.
 - **Execution**: `taskboard` -> `team-exec` -> `team-verify` -> `team-fix`.
 - **Loop**: Repeat `exec -> verify -> fix` until acceptance. Use `loop` for subsequent slices.
+- **Parallel Rule**: Keep immediate blockers on the active lane; delegate only independent sidecar tasks in parallel.
 
 ## System Map: Modes, Controls & Agents
 
@@ -39,12 +40,20 @@ OmG adds a role-driven workflow layer to Gemini CLI.
 
 ## Context and State Management
 
-- **Single Source of Truth (SSoT)**: `.omg/state/interview-context.json` is the **exclusive** reference for the Socratic gateway. 
+- **Single Source of Truth (SSoT)**: `.omg/state/interview-context.json` is the **exclusive** reference for the Socratic gateway.
   - **Smart Synchronization**: Agents `read_file` the state ONLY at entry points to ensure alignment.
   - **Implicit Adoption**: On read, the file content overrides any stale internal context immediately.
   - **Update Policy**: Update the file (`write_file`) only when tangible changes (facts, score, prompt) occur.
 - **Summarization**: Read only files needed for the current step and summarize before handoff.
 - **Persistence**: Use `.omg/state/*`, `MEMORY.md`, `.omg/memory/*`, `.omg/rules/*`, `.omg/hooks/*`, or `.omg/notify/*`.
+
+## Execution Discipline
+
+- **Read Before Modify**: Read target files or state first; avoid blind edits.
+- **Minimal Diff**: Prefer editing existing files over creating new files unless scope explicitly requires new files.
+- **Critical-Path Focus**: Complete immediate blocking work before adding speculative side tasks.
+- **Permission Recovery**: If a tool/action is denied, do not retry unchanged; request approval or switch to a safe fallback plan.
+- **Concise Success Path**: Keep normal-success reporting compact and expand only blocker or early-stop branches.
 
 ## Command Response Contract
 
@@ -57,4 +66,5 @@ OmG adds a role-driven workflow layer to Gemini CLI.
 - **Pre-requisites**: Do not start implementation if scope or acceptance criteria are missing.
 - **Validation**: Never claim completion or mark work done without verification evidence.
 - **Isolation**: Isolate dirty/untrusted worktrees before autonomous review or verification.
+- **Denied Actions**: Treat denied permissions/tool calls as a workflow event; re-plan or escalate explicitly.
 - **Termination**: Stop autonomous loops on hard blockers, missing permissions, or repeated failures.

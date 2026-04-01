@@ -8,14 +8,16 @@ $ARGUMENTS
 Execution protocol (staged):
 1. If team composition is unclear or task is non-standard, run `team-assemble` first.
 2. Load `.omg/state/workspace.json` and `.omg/state/reasoning.json` when available.
-3. `team-plan`: Delegate decomposition to `omg-planner` and architecture checks to `omg-architect`, including lane-health and isolation risks.
-4. `team-prd`: Delegate scope lock and acceptance criteria to `omg-product`.
-5. `taskboard`: Sync compact task ledger before first implementation slice.
-6. `team-exec`: Delegate implementation slices to `omg-executor` with explicit lane/subagent context and terse success reporting.
-7. `team-verify`: Delegate validation to `omg-reviewer` and `omg-verifier` (include anti-slop quality check plus lane/handoff evidence).
-8. `team-fix`: If verification fails, delegate root-cause and patches to `omg-debugger` + `omg-executor`.
-9. Repeat steps 6-8 until acceptance criteria pass, all tracked tasks are verified, or blockers are explicit.
-10. Return one merged lifecycle report.
+3. Identify the immediate blocking objective and keep it on the active critical lane.
+4. `team-plan`: Delegate decomposition to `omg-planner` and architecture checks to `omg-architect`, including lane-health and isolation risks.
+5. `team-prd`: Delegate scope lock and acceptance criteria to `omg-product`.
+6. `taskboard`: Sync compact task ledger before first implementation slice.
+7. `team-exec`: Delegate implementation slices to `omg-executor` with explicit lane/subagent context and terse success reporting.
+8. `team-verify`: Delegate validation to `omg-reviewer` and `omg-verifier` (include anti-slop quality check plus lane/handoff evidence).
+9. `team-fix`: If verification fails, delegate root-cause and patches to `omg-debugger` + `omg-executor`.
+10. Repeat steps 7-9 until acceptance criteria pass, all tracked tasks are verified, or blockers are explicit.
+11. If permissions/tools are denied, do not retry unchanged commands; mark blocker and route to explicit approval or fallback path.
+12. Return one merged lifecycle report.
 
 State handling:
 - If filesystem tools are available, update `.omg/state/workflow.md` with stage status and open blockers.
@@ -26,6 +28,6 @@ State handling:
 
 Final report format:
 - Keep it concise and operator-facing.
-- Include `Pipeline Summary`, `Team Assembly`, `Stage Results`, `Work Completed`, `Validation`, and `Open Items`.
+- Include `Pipeline Summary`, `Team Assembly`, `Critical Path Status`, `Stage Results`, `Work Completed`, `Validation`, and `Open Items`.
 - Collapse stage details when a stage was skipped, unchanged, or ended on the normal success path; expand only blocker or early-stop branches.
 """

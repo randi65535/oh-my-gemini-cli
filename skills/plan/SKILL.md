@@ -17,9 +17,11 @@ Use this skill when the request is non-trivial and should be planned before edit
 
 1. Restate goals, constraints, and acceptance criteria.
 2. Inspect only the repository areas required for planning.
-3. Break work into phases and atomic tasks.
-4. Mark dependencies and parallelizable tasks.
-5. Add validation checkpoints and rollback notes.
+3. Keep this stage read-only (no edits).
+4. Break work into phases and atomic tasks.
+5. Mark dependencies, critical path tasks, and parallelizable sidecars.
+6. Add validation checkpoints and rollback notes.
+7. List 3-5 critical files for implementation focus.
 
 ## Output Template
 
@@ -34,6 +36,9 @@ Use this skill when the request is non-trivial and should be planned before edit
 ## Task Breakdown
 1. ...
 2. ...
+
+## Critical Files
+- ...
 
 ## Risks
 - ...

@@ -6,6 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.5.0` | 2026-04-01 | Prompt ops hardening | Applied Claude-derived delegation/edit/verification guardrails across OmG core context, team commands, and agent contracts |
 | `v0.4.6` | 2026-03-31 | Deep-dive discovery skill | Added extension-native `$deep-dive` trace-to-interview skill with clarity scoring and optional interview/launch state artifacts |
 | `v0.4.5` | 2026-03-30 | Deep-interview lock nudge suppression | Learn-signal hook now suppresses automated nudges while deep-interview lock is active and resumes safely after lock release |
 | `v0.4.4` | 2026-03-26 | Learn-signal safety hardening | Added actionable-session filtering, deduped learn-signal state tracking, and safer stale-state handling for `/omg:learn` nudges |
@@ -28,6 +29,45 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.2` | 2026-02-22 | Model/branding consistency | `gemini-3.1-*` naming and OmG branding normalized |
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
+
+## v0.5.0 - Prompt Ops Hardening (2026-04-01)
+
+Adapted operational prompt patterns from the public Claude Code system-prompt breakdown into OmG's extension-native orchestration surfaces, focusing on safer delegation, stricter evidence gates, and denial-aware recovery paths.
+
+### Added
+
+- Critical-path vs sidecar delegation policy across team orchestration:
+  - `commands/omg/team-assemble.toml`
+  - `commands/omg/team.toml`
+  - `commands/omg/team-plan.toml`
+- Explicit execution-discipline guidance in core context:
+  - `context/omg-core.md`
+- Stronger verification posture with `pass|fail|unknown` evidence discipline:
+  - `commands/omg/team-verify.toml`
+  - `agents/reviewer.md`
+  - `agents/verifier.md`
+
+### Changed
+
+- Updated role contracts for orchestration and implementation discipline:
+  - `agents/director.md`
+  - `agents/planner.md`
+  - `agents/executor.md`
+- Hardened fix-stage and denial handling:
+  - `commands/omg/team-exec.toml`
+  - `commands/omg/team-fix.toml`
+- Updated retained-skill diagnostics coverage:
+  - `commands/omg/doctor.toml` now validates `plan`, `omg-plan`, `execute`, `prd`, `ralplan`, `research`, `deep-dive`, and `context-optimize`
+- Updated planning/execution skills:
+  - `skills/plan/SKILL.md`
+  - `skills/execute/SKILL.md`
+- README, Korean README, and landing page now document the new guardrails.
+- Extension/package version bumped to `0.5.0`.
+
+### Structural Fit Note
+
+- OmG remains extension-native; no runtime daemon, external agent service, or binary patching flow was introduced.
+- Changes are prompt/skill/state-policy level only, aligned with Gemini CLI extension primitives.
 
 ## v0.4.6 - Deep-Dive Discovery Skill (2026-03-31)
 
@@ -610,4 +650,3 @@ Reimplemented OmG around Gemini CLI's official Extensions model.
 
 - Historical details before `v0.1.0` are not tracked.
 - For commit-level details, inspect repository git history.
-

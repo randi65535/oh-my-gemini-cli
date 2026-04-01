@@ -57,17 +57,20 @@ gemini extensions list
 
 참고: 설치/업데이트 명령은 대화형 슬래시 명령 모드가 아니라 터미널 모드(`gemini extensions ...`)에서 실행합니다.
 
-## v0.4.6의 새로운 내용
+## v0.5.0의 새로운 내용
 
-- 신규 deep-discovery 스킬 `$deep-dive`를 추가했습니다.
-  - trace -> deep-interview 질문 루프로 실행 전 요구사항 모호성을 줄입니다.
-  - 명확도 점수(`low/medium/high`), 가정 원장(assumption ledger), 실행 브리프를 산출합니다.
-- 필요 시 파일 기반 상태 산출물을 생성합니다.
-  - `.omg/state/interview-context.json`
-  - `.omg/state/launch-brief.md`
-- 확장 경계를 유지했습니다.
-  - Gemini CLI extension 구조 내부(프롬프트/스킬/상태 파일)에서만 동작하며, 별도 런타임 데몬은 추가하지 않았습니다.
-- README/한국어 README/랜딩 문서/히스토리에 v0.4.6 변경 사항을 반영했습니다.
+- Claude Code 계열 시스템 프롬프트에서 검증된 운영 규칙을 OmG 확장 구조에 맞게 반영했습니다.
+  - 병렬 lane에서 critical-path와 sidecar 작업을 분리해 위임
+  - 계획/실행 단계의 read-before-modify + minimal-diff 정책 강화
+  - 권한/도구 거부 시 동일 호출 재시도 금지, approval/fallback 경로 강제
+  - verifier/reviewer의 `pass|fail|unknown` 증거 판정 규율 강화
+- 다음 프롬프트 표면을 직접 업데이트했습니다.
+  - `context/omg-core.md`
+  - `agents/{director,planner,executor,reviewer,verifier}.md`
+  - `commands/omg/{team-assemble,team,team-plan,team-exec,team-verify,team-fix,doctor}.toml`
+  - `skills/{plan,execute}/SKILL.md`
+- `/omg:doctor`가 유지 스킬 전체(`$omg-plan`, `$deep-dive` 포함)를 진단하도록 보강했습니다.
+- 패키지/확장 버전을 `0.5.0`으로 올리고 README/한국어 README/랜딩/히스토리를 갱신했습니다.
 
 ## 한눈에 보기
 
@@ -86,6 +89,7 @@ gemini extensions list
 | 계획과 실행 컨텍스트가 섞임 | 역할 분리 에이전트로 책임 분리 |
 | 장기 작업에서 진행 가시성 부족 | 명시적 워크플로우 스테이지 + 상태 명령 |
 | 병렬 lane/worktree가 서로 충돌하거나 드리프트 | `workspace` + `taskboard`로 lane 소유권, task ID, 검증 상태를 컴팩트하게 유지 |
+| 권한 거부된 도구 호출이 반복 재시도로 루프됨 | 거부 이벤트를 approval/fallback 기반 blocker로 승격해 재시도 루프를 차단 |
 | deep-interview 진행 중 자동 안내가 인터뷰를 끊음 | learn-signal 훅이 deep-interview 잠금 활성 시 안내를 억제하고 잠금 해제 후에만 재개 |
 | 반복적인 프롬프트 엔지니어링 필요 | 운영 제어는 slash command로, 깊은 작업은 유지된 스킬(`$plan`, `$omg-plan`, `$execute`, `$research`)로 분리 |
 | 결정 사항과 변경 사항의 드리프트 | 동일 오케스트레이션 루프 내 리뷰/디버깅 역할 포함 |
@@ -451,4 +455,3 @@ oh-my-gemini-cli/
 ## 라이선스
 
 MIT
-

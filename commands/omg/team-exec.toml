@@ -9,12 +9,15 @@ Protocol:
 1. Confirm current accepted scope from `team-prd`.
 2. Read `.omg/state/taskboard.md` and `.omg/state/workspace.json` when available, then confirm the active lane owner plus cleanliness/trust notes.
 3. Pull only the smallest ready task slice with a stable task ID.
-4. Delegate implementation to `omg-executor` with explicit lane/subagent context.
-5. Keep each execution slice small and reviewable; keep the success path terse unless the slice stops early or blocks.
-6. Record changed files, workspace lane, rationale, and any early-stop or blocked termination reason.
-7. Include checks/tests performed for this slice.
-8. If lane health is unsafe for review or automation, call it out and recommend `/omg:workspace audit` or isolated worktree use.
-9. If filesystem tools are available, update `.omg/state/taskboard.md`.
+4. Read target files before editing and preserve existing conventions.
+5. Delegate implementation to `omg-executor` with explicit lane/subagent context.
+6. Prefer editing existing files; create new files only when required by accepted scope.
+7. Keep each execution slice small and reviewable; keep the success path terse unless the slice stops early or blocks.
+8. Record changed files, workspace lane, rationale, and any early-stop or blocked termination reason.
+9. Include checks/tests performed for this slice.
+10. If lane health is unsafe for review or automation, call it out and recommend `/omg:workspace audit` or isolated worktree use.
+11. If permissions/tools are denied, stop this slice as blocked and emit explicit approval/fallback needs.
+12. If filesystem tools are available, update `.omg/state/taskboard.md`.
 
 Output format:
 ## Stage
@@ -28,6 +31,7 @@ Output format:
 - termination: goal | blocked | stopped-early
 - lane:
 - subagent:
+- permission: ok | needs-approval | denied
 
 ## Implementation Log
 | Change | File(s) | Lane | Reason |

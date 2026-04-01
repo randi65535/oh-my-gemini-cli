@@ -15,10 +15,12 @@ Use this skill when the task is implementation-ready and requires code changes n
 ## Workflow
 
 1. Confirm exact scope and acceptance criteria.
-2. Load only relevant files and preserve existing conventions.
-3. Implement the smallest viable diff.
-4. Run the most relevant checks/tests.
-5. Summarize changed files, validation, and remaining work.
+2. Read target files and lane/task state before editing.
+3. Load only relevant files and preserve existing conventions.
+4. Implement the smallest viable diff.
+5. Prefer editing existing files over creating new files unless scope requires it.
+6. Run the most relevant checks/tests.
+7. Summarize changed files, validation, blockers, and remaining work.
 
 ## Output Template
 
@@ -32,6 +34,9 @@ Use this skill when the task is implementation-ready and requires code changes n
 ## Validation
 - ...
 
+## Blockers
+- ...
+
 ## Follow-ups
 - ...
 ```
@@ -40,3 +45,4 @@ Use this skill when the task is implementation-ready and requires code changes n
 
 - Escalate to `omg-reviewer` for high-risk or cross-cutting changes.
 - Use `omg-debugger` immediately when checks fail.
+- If permissions/tools are denied, stop and return explicit approval/fallback needs.

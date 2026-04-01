@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.4.6+</span>
+        <span class="badge">Latest Update v0.5.0+</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (Deep-Dive Discovery Skill)</h2>
-      <p class="sub">OmG now adds a trace-to-interview discovery skill that raises requirement clarity before planning and implementation.</p>
+      <h2>Latest Update (Prompt Ops Hardening)</h2>
+      <p class="sub">OmG now applies Claude-derived orchestration guardrails inside Gemini CLI extension boundaries.</p>
       <table>
         <thead>
           <tr>
@@ -550,28 +550,32 @@
         </thead>
         <tbody>
           <tr>
-            <td>New retained skill</td>
-            <td>Added <code>$deep-dive</code> as an extension-native discovery pass before planning.</td>
+            <td>Delegation policy</td>
+            <td>Split work into <code>critical path</code> and <code>sidecar</code> lanes so immediate blockers stay on the active lane.</td>
           </tr>
           <tr>
-            <td>Trace -> interview flow</td>
-            <td>The skill runs requirement tracing first, then escalates into an interview loop only where ambiguity remains.</td>
+            <td>Edit discipline</td>
+            <td>Planning/execution prompts now enforce read-before-modify and minimal-diff behavior.</td>
           </tr>
           <tr>
-            <td>Clarity scoring</td>
-            <td>Outputs a bounded clarity signal (<code>low/medium/high</code>) so teams can decide whether to continue discovery or move into execution.</td>
+            <td>Denied action recovery</td>
+            <td>Permission/tool denials are promoted to explicit approval or fallback blockers instead of blind retries.</td>
           </tr>
           <tr>
-            <td>State artifacts</td>
-            <td>Optional file outputs include <code>.omg/state/interview-context.json</code> and <code>.omg/state/launch-brief.md</code>.</td>
+            <td>Verification strictness</td>
+            <td>Reviewer/verifier gates now enforce evidence-first <code>pass/fail/unknown</code> decisions with adversarial edge checks.</td>
+          </tr>
+          <tr>
+            <td>Doctor coverage</td>
+            <td><code>/omg:doctor</code> now validates the full retained skill set including <code>$omg-plan</code> and <code>$deep-dive</code>.</td>
           </tr>
           <tr>
             <td>Docs and version</td>
-            <td>README, Korean README, landing page, and history were updated with a package/extension version bump to <code>0.4.6</code>.</td>
+            <td>README, Korean README, landing page, and history were updated with a package/extension version bump to <code>0.5.0</code>.</td>
           </tr>
           <tr>
             <td>Extension boundary</td>
-            <td>The feature stays inside Gemini CLI extension primitives (prompt, skill, file-state); no runtime daemon or external service was added.</td>
+            <td>The update stays inside Gemini CLI extension primitives (prompt, skill, file-state); no runtime daemon or external service was added.</td>
           </tr>
         </tbody>
       </table>
@@ -1179,4 +1183,3 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
   </script>
 </body>
 </html>
-
