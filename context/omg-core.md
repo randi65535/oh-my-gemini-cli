@@ -27,7 +27,7 @@ OmG adds a role-driven workflow layer to Gemini CLI.
 
 ## Workflow State: Interviewing
 
-- **Entry**: Triggered via depth flags (`--essential|--standard|--deep`) on `/omg:intent`.
+- **Entry**: Triggered via depth keywords (`low|medium|high`) on `/omg:intent`.
 - **Hold**: All automated implementation pipelines are blocked while in this state.
 - **Agent**: `interview` is the exclusive agent active during this state.
 - **Persistence**: Dialogue state, confirmed facts, and `ready_to_run_prompt` must be saved to `.omg/state/interview-context.json`.
