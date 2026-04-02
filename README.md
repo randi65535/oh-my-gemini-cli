@@ -478,7 +478,7 @@ Extension behavior is manifest-driven through Gemini CLI extension primitives.
 - [oh-my-claudecode](https://github.com/Yeachan-Heo/oh-my-claudecode) - Claude Code CLI harness
 - [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode) - OpenCode agent harness
 - [Claude Code Prompt Caching](https://news.hada.io/topic?id=26835) - Context engineering principles
-- [everything-claude-code](https://github.com/affaanmustafa/everything-claude-code) - Claude Code CLI harness
+- [everything-claude-code](https://github.com/affaan-m/everything-claude-code) - Claude Code CLI harness
 
 ## Docs
 
