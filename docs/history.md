@@ -6,6 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.6.0` | 2026-04-03 | Gemini CLI compatibility sync | Aligned OmG runtime guidance with recent Gemini CLI stable releases (`v0.35.0`, `v0.36.0`) and hardened doctor diagnostics for runtime drift |
 | `v0.5.0` | 2026-04-01 | Prompt ops hardening | Applied Claude-derived delegation/edit/verification guardrails across OmG core context, team commands, and agent contracts |
 | `v0.4.6` | 2026-03-31 | Deep-dive discovery skill | Added extension-native `$deep-dive` trace-to-interview skill with clarity scoring and optional interview/launch state artifacts |
 | `v0.4.5` | 2026-03-30 | Deep-interview lock nudge suppression | Learn-signal hook now suppresses automated nudges while deep-interview lock is active and resumes safely after lock release |
@@ -29,6 +30,35 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.2` | 2026-02-22 | Model/branding consistency | `gemini-3.1-*` naming and OmG branding normalized |
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
+
+## v0.6.0 - Gemini CLI Compatibility Sync (2026-04-03)
+
+Reviewed upstream Gemini CLI release notes published in the last two weeks (from 2026-03-20 to 2026-04-03) and aligned OmG compatibility assumptions with stable-channel behavior.
+
+### Added
+
+- Runtime-drift checks in doctor diagnostics:
+  - `commands/omg/doctor.toml`
+  - Flags outdated Gemini CLI runtimes that can break current worktree/sandbox assumptions.
+
+### Changed
+
+- README compatibility guidance refreshed from `v0.33.0+` to `v0.36.0+` baseline:
+  - `README.md`
+  - `docs/README_ko.md`
+- Incorporated recent upstream release impact notes:
+  - stable `v0.35.0` (2026-03-24)
+  - stable `v0.36.0` (2026-04-01)
+  - preview `v0.37.0-preview.1` (2026-04-02, optional channel only)
+- Landing page update section and troubleshooting were refreshed to reflect the same compatibility posture:
+  - `docs/index.html`
+- Extension/package versions bumped:
+  - `gemini-extension.json`
+  - `package.json`
+
+### Structural Fit Note
+
+- OmG remains extension-native; updates are docs/prompt-policy compatibility adjustments without introducing additional runtime daemons or external services.
 
 ## v0.5.0 - Prompt Ops Hardening (2026-04-01)
 

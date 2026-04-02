@@ -56,20 +56,21 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.5.0
+## What's New in v0.6.0
 
-- Added Claude-derived prompt-ops hardening across OmG orchestration layers:
-  - critical-path vs sidecar delegation rules for safer parallel lanes
-  - read-before-modify and minimal-diff policy in planning/execution stages
-  - denied-tool/permission recovery contract (no blind retries)
-  - stricter verifier/reviewer evidence gates (`pass|fail|unknown` discipline)
-- Updated core prompt surfaces:
-  - `context/omg-core.md`
-  - `agents/{director,planner,executor,reviewer,verifier}.md`
-  - `commands/omg/{team-assemble,team,team-plan,team-exec,team-verify,team-fix,doctor}.toml`
-  - `skills/{plan,execute}/SKILL.md`
-- Fixed retained-skill diagnostics so `/omg:doctor` validates all current deep-work skills (`$omg-plan`, `$deep-dive` included)
-- Bumped extension/package version to `0.5.0` and refreshed README, Korean README, landing docs, and history
+- Synced OmG compatibility guidance with upstream Gemini CLI updates released in the last two weeks:
+  - stable `v0.35.0` (2026-03-24)
+  - stable `v0.36.0` (2026-04-01)
+  - preview `v0.37.0-preview.1` (2026-04-02, optional channel)
+- Updated runtime recommendations and operational notes for:
+  - native Git worktree sessions in stable channel
+  - stricter native sandbox paths/managers across macOS/Windows/Linux
+  - subagent registry/context behavior changes in recent stable releases
+- Hardened `/omg:doctor` diagnostics to call out runtime compatibility drift that can impact:
+  - worktree-parallel execution safety
+  - sandbox-denied loop recovery quality
+  - plan/subagent behavior assumptions under older runtimes
+- Bumped extension/package version to `0.6.0` and refreshed README, Korean README, landing docs, and history
 
 ## At A Glance
 
@@ -324,10 +325,16 @@ Disable only this hook:
 }
 ```
 
-## Gemini CLI Compatibility Notes (Reviewed: 2026-03-21)
+## Gemini CLI Compatibility Notes (Reviewed: 2026-04-03)
 
-- Recommended stable runtime: Gemini CLI `v0.33.0+` for stable hook lifecycle, subagent-policy context, and dirty-worktree handling.
-- Newer UX controls from Gemini CLI `v0.34.0-preview.0+`:
+- Recommended stable runtime: Gemini CLI `v0.36.0+`.
+  - This baseline includes stable native worktree sessions, stronger sandbox isolation defaults, and recent subagent orchestration improvements that OmG now assumes.
+- Recent stable updates with direct OmG impact:
+  - `v0.35.0` (2026-03-24): keyboard/vim ergonomics, `SandboxManager` + Linux bubblewrap/seccomp lane hardening, and JIT context discovery improvements.
+  - `v0.36.0` (2026-04-01): multi-registry subagent architecture, native macOS Seatbelt + Windows sandboxing, Git worktree support, and stronger subagent context/rejection handling.
+- Preview channel note:
+  - `v0.37.0-preview.1` (2026-04-02) adds plan-mode and sandbox experiments (for example untrusted-folder plan support and dynamic sandbox expansion), but OmG does not require preview channel features.
+- UX compatibility retained from `v0.34.0-preview.0+`:
   - direct skill invocation via `/skill-name`
   - footer customization via `/footer` (backed by `ui.footer.items`, `ui.footer.showLabels`, `ui.footer.hideCWD`, `ui.footer.hideSandboxStatus`, `ui.footer.hideModelInfo`)
 - OmG compatibility for slash skill invocation:
@@ -336,7 +343,6 @@ Disable only this hook:
 - Native `/plan` mode and OmG planning commands can coexist:
   - native: `/plan`
   - OmG staged flow: `/omg:team-plan`, `/omg:team-prd`
-- Preview-only features (for example extension manifest plan-directory support or experimental model steering docs from preview channel) are not required for OmG and are intentionally not enabled by default.
 
 ## Interface Map
 

@@ -21,11 +21,13 @@ Diagnostic protocol:
 5. Check state artifacts and drift risks under `.omg/state/` when available, including lane health, trust notes, and hook lifecycle policy.
 6. Detect common failure patterns:
    - extension not loaded in current session
+   - Gemini CLI runtime too old for current OmG assumptions (recommend `v0.36.0+`)
    - missing or stale root `GEMINI.md` import chain
    - command discovery mismatch
    - stale/missing state files
    - taskboard/workspace drift causing repeated replanning
    - dirty shared worktree or untrusted lane being reused for review/autonomous flow
+   - missing native worktree/sandbox capabilities expected by recent stable Gemini CLI updates
    - missing lane/subagent handoff context causing approval or verification drift
    - hook safety policy gaps for autonomous loops
    - hook lifecycle asymmetry (start without terminal outcome, blocked continuation skipping safety re-entry)

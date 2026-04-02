@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.5.0+</span>
+        <span class="badge">Latest Update v0.6.0+</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (Prompt Ops Hardening)</h2>
-      <p class="sub">OmG now applies Claude-derived orchestration guardrails inside Gemini CLI extension boundaries.</p>
+      <h2>Latest Update (Gemini CLI 2-Week Sync)</h2>
+      <p class="sub">OmG is now aligned with recent Gemini CLI stable releases (v0.35.0, v0.36.0) plus preview tracking for v0.37.0-preview.1.</p>
       <table>
         <thead>
           <tr>
@@ -550,32 +550,28 @@
         </thead>
         <tbody>
           <tr>
-            <td>Delegation policy</td>
-            <td>Split work into <code>critical path</code> and <code>sidecar</code> lanes so immediate blockers stay on the active lane.</td>
+            <td>Upstream compatibility window</td>
+            <td>Reviewed Gemini CLI updates from <code>2026-03-20</code> to <code>2026-04-03</code> and reflected stable-channel impact in OmG docs and diagnostics.</td>
           </tr>
           <tr>
-            <td>Edit discipline</td>
-            <td>Planning/execution prompts now enforce read-before-modify and minimal-diff behavior.</td>
+            <td>Stable baseline refresh</td>
+            <td>Raised recommended runtime baseline to <code>v0.36.0+</code> to match current assumptions around native worktree sessions, sandboxing, and subagent orchestration.</td>
           </tr>
           <tr>
-            <td>Denied action recovery</td>
-            <td>Permission/tool denials are promoted to explicit approval or fallback blockers instead of blind retries.</td>
+            <td>Doctor diagnostics hardening</td>
+            <td><code>/omg:doctor</code> now flags runtime compatibility drift (older CLI builds that miss current worktree/sandbox behavior assumptions).</td>
           </tr>
           <tr>
-            <td>Verification strictness</td>
-            <td>Reviewer/verifier gates now enforce evidence-first <code>pass/fail/unknown</code> decisions with adversarial edge checks.</td>
+            <td>Recent release mapping</td>
+            <td>Added explicit guidance for stable <code>v0.35.0</code> (keyboard/vim + sandbox/JIT context), stable <code>v0.36.0</code> (multi-registry, worktree, native sandbox), and preview <code>v0.37.0-preview.1</code> (optional).</td>
           </tr>
           <tr>
-            <td>Doctor coverage</td>
-            <td><code>/omg:doctor</code> now validates the full retained skill set including <code>$omg-plan</code> and <code>$deep-dive</code>.</td>
-          </tr>
-          <tr>
-            <td>Docs and version</td>
-            <td>README, Korean README, landing page, and history were updated with a package/extension version bump to <code>0.5.0</code>.</td>
+            <td>Version + docs refresh</td>
+            <td>README, Korean README, landing page, and changelog were updated with extension/package version bump to <code>0.6.0</code>.</td>
           </tr>
           <tr>
             <td>Extension boundary</td>
-            <td>The update stays inside Gemini CLI extension primitives (prompt, skill, file-state); no runtime daemon or external service was added.</td>
+            <td>All changes stay inside Gemini CLI extension primitives (prompt, skills, command policy, docs/state guidance) with no new daemon/service layer.</td>
           </tr>
         </tbody>
       </table>
@@ -1093,6 +1089,11 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
             <td><code>/omg:* not found</code></td>
             <td>Extension not loaded in current process</td>
             <td>Run <code>gemini extensions list</code> and restart session</td>
+          </tr>
+          <tr>
+            <td>Workspace/sandbox behavior differs from docs</td>
+            <td>Gemini CLI runtime is older than the current OmG compatibility baseline</td>
+            <td>Upgrade Gemini CLI to stable <code>v0.36.0+</code>, then rerun <code>/omg:doctor</code> and <code>/omg:workspace audit</code></td>
           </tr>
           <tr>
             <td><code>/plan</code> opens native plan mode when OmG planning skill was expected</td>
