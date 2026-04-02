@@ -440,7 +440,7 @@ oh-my-gemini-cli/
 - [oh-my-claudecode](https://github.com/Yeachan-Heo/oh-my-claudecode) - Claude Code CLI 하네스
 - [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode) - OpenCode 에이전트 하네스
 - [Claude Code 프롬프트 캐싱 교훈](https://news.hada.io/topic?id=26835) - 컨텍스트 엔지니어링 원리
-- [everything-claude-code](https://github.com/affaanmustafa/everything-claude-code) - Claude Code CLI 하네스
+- [everything-claude-code](https://github.com/affaan-m/everything-claude-code) - Claude Code CLI 하네스
 
 ## 문서
 
