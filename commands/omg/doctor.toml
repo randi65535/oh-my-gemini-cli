@@ -25,6 +25,7 @@ Diagnostic protocol:
    - missing or stale root `GEMINI.md` import chain
    - command discovery mismatch
    - stale/missing state files
+   - outdated depth flags (`--essential`, `--standard`, `--deep`) used instead of keywords (`low`, `medium`, `high`)
    - taskboard/workspace drift causing repeated replanning
    - dirty shared worktree or untrusted lane being reused for review/autonomous flow
    - missing native worktree/sandbox capabilities expected by recent stable Gemini CLI updates
