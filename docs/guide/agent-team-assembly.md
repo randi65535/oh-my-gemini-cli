@@ -64,9 +64,9 @@ Orchestration lane:
 
 Default role-to-model policy:
 
-- judgment and acceptance gates: `gemini-3.1-pro`
-- implementation-heavy execution: `gemini-3-flash`
-- broad low-risk exploration: `gemini-3.1-flash-lite`
+- judgment and acceptance gates: `gemini-3.1-pro-preview`
+- implementation-heavy execution: `gemini-3-flash-preview`
+- broad low-risk exploration: `gemini-3.1-flash-lite-preview`
 
 This keeps budget predictable while preserving quality at key decision points.
 

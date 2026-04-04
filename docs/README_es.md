@@ -79,7 +79,7 @@ Nota: los comandos de instalación/actualización de extensiones se ejecutan en 
 | Bloques principales | `GEMINI.md`, `agents/`, `commands/`, `skills/`, `context/` |
 | Caso de uso principal | Tareas complejas que requieren bucles planificar -> ejecutar -> revisar |
 | Superficie de control | Plano de control slash-command-first `/omg:*` + 8 `$skills` de deep-work (incluye alias `omg-plan`) + delegación a sub-agentes |
-| Estrategia de modelo por defecto | Puertas de juicio/aceptación en `gemini-3.1-pro`, implementación pesada en `gemini-3-flash`, exploración amplia de bajo riesgo en `gemini-3.1-flash-lite` |
+| Estrategia de modelo por defecto | Puertas de juicio/aceptación en `gemini-3.1-pro-preview`, implementación pesada en `gemini-3-flash-preview`, exploración amplia de bajo riesgo en `gemini-3.1-flash-lite-preview` |
 
 ## Por qué OmG
 
@@ -403,19 +403,19 @@ Las retained skills están limitadas intencionalmente a un conjunto compacto de 
 
 | Agente | Responsabilidad principal | Perfil de modelo preferido |
 | --- | --- | --- |
-| `omg-architect` | Límites del sistema, interfaces, mantenibilidad a largo plazo | `gemini-3.1-pro` |
-| `omg-planner` | Descomposición y secuenciación de tareas | `gemini-3.1-pro` |
-| `omg-product` | Bloqueo de alcance, no-objetivos y criterios medibles | `gemini-3.1-pro` |
-| `omg-executor` | Ciclos rápidos de implementación | `gemini-3-flash` |
-| `omg-reviewer` | Revisión de corrección y riesgo de regresión | `gemini-3.1-pro` |
-| `omg-verifier` | Evidencia de aceptación y validación de release-readiness | `gemini-3.1-pro` |
-| `omg-debugger` | Análisis de causa raíz y estrategia de parche | `gemini-3.1-pro` |
-| `omg-consensus` | Scoring de opciones y convergencia de decisiones | `gemini-3.1-pro` |
-| `omg-researcher` | Análisis y síntesis de opciones externas | `gemini-3.1-pro` |
-| `omg-director` | Enrutamiento de mensajes del equipo, resolución de conflictos y orquestación de ciclo de vida | `gemini-3.1-pro` |
-| `omg-consultant` | Criterios de análisis estratégico y framing de recomendaciones | `gemini-3.1-pro` |
-| `omg-editor` | Estructura final de entregable, consistencia y ajuste a audiencia | `gemini-3-flash` |
-| `omg-quick` | Correcciones tácticas pequeñas | `gemini-3.1-flash-lite` |
+| `omg-architect` | Límites del sistema, interfaces, mantenibilidad a largo plazo | `gemini-3.1-pro-preview` |
+| `omg-planner` | Descomposición y secuenciación de tareas | `gemini-3.1-pro-preview` |
+| `omg-product` | Bloqueo de alcance, no-objetivos y criterios medibles | `gemini-3.1-pro-preview` |
+| `omg-executor` | Ciclos rápidos de implementación | `gemini-3-flash-preview` |
+| `omg-reviewer` | Revisión de corrección y riesgo de regresión | `gemini-3.1-pro-preview` |
+| `omg-verifier` | Evidencia de aceptación y validación de release-readiness | `gemini-3.1-pro-preview` |
+| `omg-debugger` | Análisis de causa raíz y estrategia de parche | `gemini-3.1-pro-preview` |
+| `omg-consensus` | Scoring de opciones y convergencia de decisiones | `gemini-3.1-pro-preview` |
+| `omg-researcher` | Análisis y síntesis de opciones externas | `gemini-3.1-pro-preview` |
+| `omg-director` | Enrutamiento de mensajes del equipo, resolución de conflictos y orquestación de ciclo de vida | `gemini-3.1-pro-preview` |
+| `omg-consultant` | Criterios de análisis estratégico y framing de recomendaciones | `gemini-3.1-pro-preview` |
+| `omg-editor` | Estructura final de entregable, consistencia y ajuste a audiencia | `gemini-3-flash-preview` |
+| `omg-quick` | Correcciones tácticas pequeñas | `gemini-3.1-flash-lite-preview` |
 
 ## Modelo de capas de contexto
 
