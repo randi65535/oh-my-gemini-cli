@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.6.0+</span>
+        <span class="badge">Latest Update v0.7.0+</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -531,7 +531,7 @@
       <div class="stats">
         <div class="stat"><div class="n">13</div><div class="l">Sub-agents</div></div>
         <div class="stat"><div class="n">8</div><div class="l">Retained skills</div></div>
-        <div class="stat"><div class="n">40</div><div class="l">Namespaced commands</div></div>
+        <div class="stat"><div class="n">42</div><div class="l">Namespaced commands</div></div>
         <div class="stat"><div class="n">5</div><div class="l">Context layers</div></div>
       </div>
     </div>
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (Gemini CLI 2-Week Sync)</h2>
-      <p class="sub">OmG is now aligned with recent Gemini CLI stable releases (v0.35.0, v0.36.0) plus preview tracking for v0.37.0-preview.1.</p>
+      <h2>Latest Update (Model Selection Controls)</h2>
+      <p class="sub">OmG v0.7.0 adds explicit model-policy control so you can keep balanced lane defaults, switch to runtime auto selection, or pin a custom lane map.</p>
       <table>
         <thead>
           <tr>
@@ -550,28 +550,28 @@
         </thead>
         <tbody>
           <tr>
-            <td>Upstream compatibility window</td>
-            <td>Reviewed Gemini CLI updates from <code>2026-03-20</code> to <code>2026-04-03</code> and reflected stable-channel impact in OmG docs and diagnostics.</td>
+            <td>New command surface</td>
+            <td>Added <code>/omg:model</code> so operators can inspect or switch default model-selection strategy without rewriting workflow prompts.</td>
           </tr>
           <tr>
-            <td>Stable baseline refresh</td>
-            <td>Raised recommended runtime baseline to <code>v0.36.0+</code> to match current assumptions around native worktree sessions, sandboxing, and subagent orchestration.</td>
+            <td>Strategy presets</td>
+            <td>Supports <code>balanced</code>, <code>auto</code>, and <code>custom</code> profiles for planning/execution/quick/review lanes.</td>
           </tr>
           <tr>
-            <td>Doctor diagnostics hardening</td>
-            <td><code>/omg:doctor</code> now flags runtime compatibility drift (older CLI builds that miss current worktree/sandbox behavior assumptions).</td>
+            <td>Auto strategy path</td>
+            <td><code>/omg:model auto</code> delegates all lane model picks to Gemini runtime auto-model policy for users who want one automatic policy across tasks.</td>
           </tr>
           <tr>
-            <td>Recent release mapping</td>
-            <td>Added explicit guidance for stable <code>v0.35.0</code> (keyboard/vim + sandbox/JIT context), stable <code>v0.36.0</code> (multi-registry, worktree, native sandbox), and preview <code>v0.37.0-preview.1</code> (optional).</td>
+            <td>Persisted policy state</td>
+            <td>Model policy is stored in <code>.omg/state/model.json</code> so long sessions can reuse one strategy consistently.</td>
+          </tr>
+          <tr>
+            <td>Runtime boundary</td>
+            <td>OmG policy and Gemini runtime controls remain separate; runtime forcing still uses native model controls (for example <code>/model</code> or launch-time <code>--model</code> when supported).</td>
           </tr>
           <tr>
             <td>Version + docs refresh</td>
-            <td>README, Korean README, landing page, and changelog were updated with extension/package version bump to <code>0.6.0</code>.</td>
-          </tr>
-          <tr>
-            <td>Extension boundary</td>
-            <td>All changes stay inside Gemini CLI extension primitives (prompt, skills, command policy, docs/state guidance) with no new daemon/service layer.</td>
+            <td>README, Korean README, landing page, and changelog were updated with extension/package version bump to <code>0.7.0</code>.</td>
           </tr>
         </tbody>
       </table>
@@ -599,7 +599,7 @@ Structured Result
 
       <div>
         <h2>Model Allocation</h2>
-        <p class="sub">Role-aware split across <code>gemini-3.1-pro-preview</code>, <code>gemini-3-flash-preview</code>, and <code>gemini-3.1-flash-lite-preview</code> lanes.</p>
+        <p class="sub">Default balanced split across <code>gemini-3.1-pro-preview</code>, <code>gemini-3-flash-preview</code>, and <code>gemini-3.1-flash-lite-preview</code> lanes, with <code>/omg:model</code> overrides available.</p>
         <div class="chart">
           <div class="bar">
             <div class="bar-label"><span>Judgment &amp; Acceptance Gates (<code>gemini-3.1-pro-preview</code>)</span><span>60%</span></div>
@@ -614,6 +614,7 @@ Structured Result
             <div class="bar-track"><div class="bar-fill lite" style="width:15%"></div></div>
           </div>
         </div>
+        <p class="sub" style="margin-top:10px;">Need one policy for every task? Run <code>/omg:model auto</code> to hand lane model selection to Gemini runtime auto behavior.</p>
       </div>
     </div>
   </section>
@@ -695,6 +696,11 @@ Structured Result
             <td>Deep interview gets interrupted by auto nudges</td>
             <td>Manual pause of hooks during interview windows</td>
             <td><code>omg-learn-signal-after-agent</code> suppresses learn nudges automatically while <code>.omg/state/deep-interview.json</code> reports an active lock.</td>
+          </tr>
+          <tr>
+            <td>One global model policy across all tasks</td>
+            <td>Re-specify model intent repeatedly or accept lane-policy drift</td>
+            <td><code>/omg:model</code> persists <code>balanced|auto|custom</code> strategy in <code>.omg/state/model.json</code> and keeps lane defaults explicit.</td>
           </tr>
           <tr>
             <td>Task-specific guardrails</td>
@@ -909,6 +915,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
           <tr><td>Command</td><td><code>/omg:memory</code></td><td>Manage <code>MEMORY.md</code> index, topic notes, and rule packs</td></tr>
           <tr><td>Command</td><td><code>/omg:reasoning</code></td><td>Set global/teammate reasoning effort profile for depth and cost control</td></tr>
           <tr><td>Command</td><td><code>/omg:loop</code></td><td>Continue exec/verify/fix cycles until done or blocked</td></tr>
+          <tr><td>Command</td><td><code>/omg:model</code></td><td>Switch model-selection strategy (<code>balanced</code>/<code>auto</code>/<code>custom</code>)</td></tr>
           <tr><td>Command</td><td><code>/omg:approval</code></td><td>Switch approval posture (<code>suggest</code>/<code>auto</code>/<code>full-auto</code>)</td></tr>
           <tr><td>Command</td><td><code>/omg:team</code></td><td>Run full multi-agent lifecycle with optional assembled roster and compact taskboard sync</td></tr>
           <tr><td>Command</td><td><code>/omg:cancel</code></td><td>Harness-style safe cancel alias with resume handoff</td></tr>
@@ -982,6 +989,11 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
             <td>Set operator posture</td>
             <td><code>/omg:approval auto</code></td>
             <td>Explicit confirmation policy aligned to task risk</td>
+          </tr>
+          <tr>
+            <td>Set model policy</td>
+            <td><code>/omg:model auto</code> (or <code>/omg:model balanced|custom ...</code>)</td>
+            <td>Default lane model strategy pinned for the session/project, including optional runtime auto-model alignment</td>
           </tr>
           <tr>
             <td>Set alert posture</td>
@@ -1099,6 +1111,11 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
             <td><code>/plan</code> opens native plan mode when OmG planning skill was expected</td>
             <td>Built-in <code>/plan</code> and skill slash invocation names can collide in newer Gemini CLI versions</td>
             <td>Use <code>/omg-plan</code> (or <code>$omg-plan</code>) for OmG planning skill behavior, or <code>/omg:team-plan</code> for staged planning</td>
+          </tr>
+          <tr>
+            <td>You want Gemini Auto selection for every task</td>
+            <td>Balanced lane-specific policy is still active</td>
+            <td>Run <code>/omg:model auto</code>; if supported in your Gemini CLI build, also set runtime model mode (<code>/model auto</code> or <code>--model auto</code>).</td>
           </tr>
           <tr>
             <td>Autonomous flow confirms too often or too little</td>

@@ -56,21 +56,16 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.6.0
+## What's New in v0.7.0
 
-- Synced OmG compatibility guidance with upstream Gemini CLI updates released in the last two weeks:
-  - stable `v0.35.0` (2026-03-24)
-  - stable `v0.36.0` (2026-04-01)
-  - preview `v0.37.0-preview.1` (2026-04-02, optional channel)
-- Updated runtime recommendations and operational notes for:
-  - native Git worktree sessions in stable channel
-  - stricter native sandbox paths/managers across macOS/Windows/Linux
-  - subagent registry/context behavior changes in recent stable releases
-- Hardened `/omg:doctor` diagnostics to call out runtime compatibility drift that can impact:
-  - worktree-parallel execution safety
-  - sandbox-denied loop recovery quality
-  - plan/subagent behavior assumptions under older runtimes
-- Bumped extension/package version to `0.6.0` and refreshed README, Korean README, landing docs, and history
+- Added `/omg:model` to inspect or set OmG's default model-selection strategy.
+- Added strategy presets:
+  - `balanced`: lane-aware split (`gemini-3.1-pro-preview`, `gemini-3-flash-preview`, `gemini-3.1-flash-lite-preview`)
+  - `auto`: defer all lane selection to Gemini runtime auto-model policy
+  - `custom`: explicit per-lane model mapping for planning/execution/quick/review-verify
+- Model policy now persists in `.omg/state/model.json` for stable long-session behavior.
+- Clarified boundary between OmG orchestration strategy and Gemini runtime model controls (`/model`, launch-time `--model` when supported).
+- Bumped extension/package version to `0.7.0` and refreshed README, Korean README, landing docs, and history.
 
 ## At A Glance
 
@@ -80,7 +75,7 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 | Core building blocks | `GEMINI.md`, `agents/`, `commands/`, `skills/`, `context/` |
 | Main use case | Complex implementation tasks that need plan -> execute -> review loops |
 | Control surface | Slash-command-first `/omg:*` control plane + 8 deep-work `$skills` (including `omg-plan` alias) + sub-agent delegation |
-| Default model strategy | Judgment/acceptance gates on `gemini-3.1-pro-preview`, implementation-heavy work on `gemini-3-flash-preview`, broad low-risk exploration on `gemini-3.1-flash-lite-preview` |
+| Default model strategy | Configurable via `/omg:model` (`balanced` lane split by default, with optional `auto` or `custom` overrides) |
 
 ## Why OmG
 
@@ -378,6 +373,7 @@ Disable only this hook:
 | `/omg:team-fix` | Patch only verified failures | When verification fails |
 | `/omg:loop` | Enforce repeated `exec -> verify -> fix` cycles until done/blocker | Mid/late delivery when unresolved findings remain |
 | `/omg:mode` | Inspect or switch operating profile (`balanced/speed/deep/autopilot/ralph/ultrawork`) | At session start or posture change |
+| `/omg:model` | Inspect or switch model-selection strategy (`balanced/auto/custom`) | When setting one default model policy (for example Gemini Auto across all tasks) |
 | `/omg:approval` | Inspect or switch approval posture (`suggest/auto/full-auto`) | Before autonomous delivery loops or policy changes |
 | `/omg:autopilot` | Run iterative autonomous cycles with checkpoints | Complex autonomous delivery |
 | `/omg:ralph` | Enforce strict quality-gated orchestration | Release-critical tasks |
@@ -455,6 +451,7 @@ oh-my-gemini-cli/
 | `settings.filter is not a function` during install | Stale Gemini CLI runtime or stale cached extension metadata | Update Gemini CLI, uninstall extension, then reinstall from repository URL |
 | `/omg:*` command not found | Extension not loaded in current session | Run `gemini extensions list`, then restart Gemini CLI session |
 | `/plan` opens native plan mode when you wanted OmG planning skill | Name collision between built-in `/plan` and skill-slash invocation | Use `/omg-plan` (or `$omg-plan`) for the OmG planning skill, or use `/omg:team-plan` for staged workflow planning |
+| You want Gemini Auto selection for every task | Default lane-specific model policy is still active | Run `/omg:model auto`; if your Gemini CLI build exposes explicit model controls, align runtime too (`/model auto` or `--model auto`) |
 | Skill does not trigger | Only the retained deep-work skills are still shipped, or extension metadata is stale | Recheck the retained skill list in the README and reload the extension/session |
 | Team assembly keeps proposing but does not execute | Approval token missing in request | Reply with explicit approval (`yes`, `approve`, `go`, or `run`) |
 | Parallel execution keeps colliding or re-planning the same files | Workspace lanes are not explicit | Run `/omg:workspace status` or set lane/path ownership with `/omg:workspace` |

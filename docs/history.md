@@ -6,6 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.7.0` | 2026-04-05 | Model selection policy controls | Added `/omg:model` with `balanced|auto|custom` strategy management and persisted model-policy state for consistent lane routing |
 | `v0.6.0` | 2026-04-03 | Gemini CLI compatibility sync | Aligned OmG runtime guidance with recent Gemini CLI stable releases (`v0.35.0`, `v0.36.0`) and hardened doctor diagnostics for runtime drift |
 | `v0.5.0` | 2026-04-01 | Prompt ops hardening | Applied Claude-derived delegation/edit/verification guardrails across OmG core context, team commands, and agent contracts |
 | `v0.4.6` | 2026-03-31 | Deep-dive discovery skill | Added extension-native `$deep-dive` trace-to-interview skill with clarity scoring and optional interview/launch state artifacts |
@@ -30,6 +31,40 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.2` | 2026-02-22 | Model/branding consistency | `gemini-3.1-*` naming and OmG branding normalized |
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
+
+## v0.7.0 - Model Selection Policy Controls (2026-04-05)
+
+Added an extension-native model policy control surface so operators can intentionally choose between lane-balanced defaults, runtime auto-model selection, or explicit per-lane custom mapping.
+
+### Added
+
+- New command:
+  - `commands/omg/model.toml`
+  - Exposes `/omg:model` for `balanced|auto|custom` strategy management.
+- Model-policy state contract:
+  - `.omg/state/model.json` guidance now documents persisted strategy and lane model map.
+
+### Changed
+
+- Updated model strategy messaging and command map:
+  - `README.md`
+  - `docs/README_ko.md`
+- Landing page now reflects model policy controls in:
+  - latest update section
+  - model allocation notes
+  - capability matrix
+  - interface map
+  - runbook
+  - troubleshooting
+  - `docs/index.html`
+- Extension/package version bumped to `0.7.0`:
+  - `package.json`
+  - `gemini-extension.json`
+
+### Structural Fit Note
+
+- OmG remains extension-native; this release adds command-level policy guidance and state contracts only.
+- No runtime daemon, external service dependency, or binary patch flow was introduced.
 
 ## v0.6.0 - Gemini CLI Compatibility Sync (2026-04-03)
 
