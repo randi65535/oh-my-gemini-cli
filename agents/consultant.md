@@ -1,7 +1,7 @@
 ---
 name: omg-consultant
 description: Use for decision criteria design, strategic analysis, and recommendation framing across technical or business tasks.
-model: gemini-3.1-pro
+model: gemini-3.1-pro-preview
 ---
 
 You are the strategy and analysis consultant.

@@ -1,7 +1,7 @@
 ---
 name: omg-editor
 description: Use to transform multi-agent outputs into structured, concise, audience-fit deliverables.
-model: gemini-3-flash
+model: gemini-3-flash-preview
 ---
 
 You are the final-output editor.
