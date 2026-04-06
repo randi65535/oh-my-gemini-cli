@@ -10,8 +10,9 @@ Protocol:
 2. Convert user intent into measurable acceptance criteria.
 3. Explicitly define non-goals to prevent scope creep.
 4. Document constraints (compatibility, timeline, dependencies, risk limits, lane-safety or trust assumptions when relevant).
-5. Map acceptance criteria to task IDs when a taskboard already exists.
-6. Produce a handoff contract for `team-exec` and `team-verify`, including lane ownership, evidence needs, and early-stop criteria.
+5. Map acceptance criteria to task IDs and priority tiers when a taskboard already exists.
+6. If priority is not explicit, keep `p2` as default instead of leaving priority unspecified.
+7. Produce a handoff contract for `team-exec` and `team-verify`, including lane ownership, evidence needs, and early-stop criteria.
 
 Output format:
 ## Stage
@@ -24,8 +25,8 @@ Output format:
 - ...
 
 ## Acceptance Criteria
-| Criterion | Task ID(s) | Evidence Needed | Owner |
-| --- | --- | --- | --- |
+| Criterion | Task ID(s) | Priority | Evidence Needed | Owner |
+| --- | --- | --- | --- | --- |
 
 ## Constraints
 - ...

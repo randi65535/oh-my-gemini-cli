@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.7.0+</span>
+        <span class="badge">Latest Update v0.7.1+</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (Model Selection Controls)</h2>
-      <p class="sub">OmG v0.7.0 adds explicit model-policy control so you can keep balanced lane defaults, switch to runtime auto selection, or pin a custom lane map.</p>
+      <h2>Latest Update (Deterministic Taskboard + Fallback Routing)</h2>
+      <p class="sub">OmG v0.7.1 hardens extension-native operations with priority-safe task queues and explicit agent-unavailable fallback routing.</p>
       <table>
         <thead>
           <tr>
@@ -550,28 +550,28 @@
         </thead>
         <tbody>
           <tr>
-            <td>New command surface</td>
-            <td>Added <code>/omg:model</code> so operators can inspect or switch default model-selection strategy without rewriting workflow prompts.</td>
+            <td>Priority-safe taskboard</td>
+            <td><code>/omg:taskboard</code> now standardizes task priority with null-safe default <code>p2</code> and deterministic queue ordering (<code>p0 -&gt; p3</code>).</td>
           </tr>
           <tr>
-            <td>Strategy presets</td>
-            <td>Supports <code>balanced</code>, <code>auto</code>, and <code>custom</code> profiles for planning/execution/quick/review lanes.</td>
+            <td>Deterministic next selection</td>
+            <td><code>next</code>/<code>rebalance</code> now prefer dependency-ready + lane-safe tasks first, then priority, then stable task ID.</td>
           </tr>
           <tr>
-            <td>Auto strategy path</td>
-            <td><code>/omg:model auto</code> delegates all lane model picks to Gemini runtime auto-model policy for users who want one automatic policy across tasks.</td>
+            <td>Agent-unavailable recovery</td>
+            <td><code>team-exec</code> and <code>team</code> now define one-shot fallback routing when an assigned agent is unavailable (for example <code>agent not found</code>).</td>
           </tr>
           <tr>
-            <td>Persisted policy state</td>
-            <td>Model policy is stored in <code>.omg/state/model.json</code> so long sessions can reuse one strategy consistently.</td>
+            <td>Doctor guardrails</td>
+            <td><code>/omg:doctor</code> now flags missing/null task priorities and missing fallback-route policy before long autonomous loops.</td>
           </tr>
           <tr>
-            <td>Runtime boundary</td>
-            <td>OmG policy and Gemini runtime controls remain separate; runtime forcing still uses native model controls (for example <code>/model</code> or launch-time <code>--model</code> when supported).</td>
+            <td>Scope boundary</td>
+            <td>Changes stay extension-native (commands/context/state policy only), without adding external daemons or service dependencies.</td>
           </tr>
           <tr>
             <td>Version + docs refresh</td>
-            <td>README, Korean README, landing page, and changelog were updated with extension/package version bump to <code>0.7.0</code>.</td>
+            <td>README, Korean README, landing page, and changelog were updated with extension/package version bump to <code>0.7.1</code>.</td>
           </tr>
         </tbody>
       </table>
@@ -895,7 +895,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
         </thead>
         <tbody>
           <tr><td>Command</td><td><code>/omg:status</code></td><td>Snapshot progress, risk, and next actions</td></tr>
-          <tr><td>Command</td><td><code>/omg:doctor</code></td><td>Diagnose extension/team/workspace/hook readiness and generate remediation plan</td></tr>
+          <tr><td>Command</td><td><code>/omg:doctor</code></td><td>Diagnose extension/team/workspace/hook readiness, including priority and fallback-route drift</td></tr>
           <tr><td>Command</td><td><code>/omg:hud</code></td><td>Switch status visibility profile (<code>normal</code>/<code>compact</code>/<code>hidden</code>)</td></tr>
           <tr><td>Command</td><td><code>/omg:hud-on</code></td><td>Quick toggle to full HUD status view</td></tr>
           <tr><td>Command</td><td><code>/omg:hud-compact</code></td><td>Quick toggle to compact HUD status view</td></tr>
@@ -907,9 +907,9 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
           <tr><td>Command</td><td><code>/omg:notify</code></td><td>Configure approvals/blockers/verify/checkpoint/idle notification routing</td></tr>
           <tr><td>Command</td><td><code>/omg:intent</code></td><td>Classify request intent and route to the right stage</td></tr>
           <tr><td>Command</td><td><code>/omg:workspace</code></td><td>Set primary root, worktree/path lane ownership, and audit lane health</td></tr>
-          <tr><td>Command</td><td><code>/omg:taskboard</code></td><td>Maintain compact task ledger with stable IDs, verify state, and lane-health notes</td></tr>
+          <tr><td>Command</td><td><code>/omg:taskboard</code></td><td>Maintain compact task ledger with stable IDs, p0-p3 priority, deterministic next ordering, and verify state</td></tr>
           <tr><td>Command</td><td><code>/omg:recall</code></td><td>Recover prior decisions/evidence with state-first search and bounded history fallback</td></tr>
-          <tr><td>Command</td><td><code>/omg:team-assemble</code></td><td>Build a task-fit team roster and request execution approval</td></tr>
+          <tr><td>Command</td><td><code>/omg:team-assemble</code></td><td>Build a task-fit team roster, fallback map, and request execution approval</td></tr>
           <tr><td>Command</td><td><code>/omg:deep-init</code></td><td>Build project map and validation baseline before long sessions</td></tr>
           <tr><td>Command</td><td><code>/omg:rules</code></td><td>Activate task-conditional guardrail rule packs</td></tr>
           <tr><td>Command</td><td><code>/omg:memory</code></td><td>Manage <code>MEMORY.md</code> index, topic notes, and rule packs</td></tr>
@@ -917,7 +917,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
           <tr><td>Command</td><td><code>/omg:loop</code></td><td>Continue exec/verify/fix cycles until done or blocked</td></tr>
           <tr><td>Command</td><td><code>/omg:model</code></td><td>Switch model-selection strategy (<code>balanced</code>/<code>auto</code>/<code>custom</code>)</td></tr>
           <tr><td>Command</td><td><code>/omg:approval</code></td><td>Switch approval posture (<code>suggest</code>/<code>auto</code>/<code>full-auto</code>)</td></tr>
-          <tr><td>Command</td><td><code>/omg:team</code></td><td>Run full multi-agent lifecycle with optional assembled roster and compact taskboard sync</td></tr>
+          <tr><td>Command</td><td><code>/omg:team</code></td><td>Run full multi-agent lifecycle with optional assembled roster, deterministic queueing, and fallback rerouting</td></tr>
           <tr><td>Command</td><td><code>/omg:cancel</code></td><td>Harness-style safe cancel alias with resume handoff</td></tr>
           <tr><td>Command</td><td><code>/omg:optimize</code></td><td>Tune prompt/context quality and cost profile</td></tr>
           <tr><td>Command</td><td><code>/omg:cache</code></td><td>Inspect cache/context behavior and compact-state anchoring</td></tr>
@@ -1033,7 +1033,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
           <tr>
             <td>Sync task ledger</td>
             <td><code>/omg:taskboard sync</code></td>
-            <td>Compact source of truth for ready, blocked, done, and verified tasks</td>
+            <td>Compact source of truth for ready, blocked, done, and verified tasks with null-safe default priority</td>
           </tr>
           <tr>
             <td>Refresh memory</td>
@@ -1148,6 +1148,11 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
             <td>Done status keeps drifting after long loops</td>
             <td>No compact task source of truth or missing verifier signoff</td>
             <td>Run <code>/omg:taskboard sync</code>, then rerun <code>/omg:team-verify</code> to close remaining task IDs</td>
+          </tr>
+          <tr>
+            <td><code>taskboard next</code> keeps switching targets unexpectedly</td>
+            <td>Missing task priority values or unstable queue ordering assumptions</td>
+            <td>Run <code>/omg:taskboard sync</code> (fills default <code>p2</code>) then <code>/omg:taskboard rebalance</code></td>
           </tr>
           <tr>
             <td>Setup health is unclear before a long run</td>

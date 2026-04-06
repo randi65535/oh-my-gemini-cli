@@ -18,15 +18,16 @@ Protocol:
 8. Run adversarial checks for regression/security edge-cases where applicable.
 9. Classify issues as blocker, major, or minor.
 10. Produce targeted fix list for `team-fix`, anchored to task IDs and termination reasons when applicable.
-11. If filesystem tools are available, update `.omg/state/taskboard.md`.
+11. Order the fix backlog by priority first (`p0` -> `p3`), then severity.
+12. If filesystem tools are available, update `.omg/state/taskboard.md`.
 
 Output format:
 ## Stage
 - team-verify
 
 ## Acceptance Matrix
-| Criterion | Task ID(s) | Status (pass/fail/unknown) | Evidence | Owner |
-| --- | --- | --- | --- | --- |
+| Criterion | Task ID(s) | Priority | Status (pass/fail/unknown) | Evidence | Owner |
+| --- | --- | --- | --- | --- | --- |
 
 ## Review Findings
 - ...

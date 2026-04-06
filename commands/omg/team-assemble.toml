@@ -31,10 +31,12 @@ Protocol:
 6. Define collaboration protocol:
    - classify tasks into critical path vs sidecar parallel lanes
    - keep immediate blockers on the active lane; parallelize only independent sidecars
+   - use deterministic execution ordering (`p0` -> `p3`) with default `p2` when priority is unknown
    - explicit message flow between lanes
    - workspace/worktree lane ownership when `.omg/state/workspace.json` exists
    - lane cleanliness/trust notes when `.omg/state/workspace.json` exists
    - explicit subagent handoff schema (`owner`, `lane`, `evidence`, `termination`)
+   - agent-unavailable fallback map (for example `omg-executor` -> `omg-quick` once for low-risk slices)
    - avoid duplicate unresolved delegation across lanes
    - trigger conditions for verify/fix loops
    - anti-slop quality gate before final delivery

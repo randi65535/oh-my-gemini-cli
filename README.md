@@ -56,16 +56,20 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.7.0
+## What's New in v0.7.1
 
-- Added `/omg:model` to inspect or set OmG's default model-selection strategy.
-- Added strategy presets:
-  - `balanced`: lane-aware split (`gemini-3.1-pro-preview`, `gemini-3-flash-preview`, `gemini-3.1-flash-lite-preview`)
-  - `auto`: defer all lane selection to Gemini runtime auto-model policy
-  - `custom`: explicit per-lane model mapping for planning/execution/quick/review-verify
-- Model policy now persists in `.omg/state/model.json` for stable long-session behavior.
-- Clarified boundary between OmG orchestration strategy and Gemini runtime model controls (`/model`, launch-time `--model` when supported).
-- Bumped extension/package version to `0.7.0` and refreshed README, Korean README, landing docs, and history.
+- Added deterministic task selection policy to OmG task flow:
+  - dependency-ready + lane-safe first
+  - priority order (`p0 -> p1 -> p2 -> p3`)
+  - stable task-id tie-breaker
+- Added null-safe task priority default (`p2`) to prevent missing-priority drift in long taskboard loops.
+- Added agent-unavailable fallback contract (`agent not found` style failures):
+  - low-risk execution fallback to `omg-quick`
+  - high-risk/architecture-sensitive reroute to `omg-director` before retry
+- Expanded doctor diagnostics for:
+  - missing/null priority causing unstable `next` behavior
+  - missing fallback routing for unavailable execution/review agents
+- Bumped extension/package version to `0.7.1` and refreshed README, Korean README, landing docs, and history.
 
 ## At A Glance
 
@@ -346,7 +350,7 @@ Disable only this hook:
 | Command | Purpose | Typical timing |
 | --- | --- | --- |
 | `/omg:status` | Summarize progress, risks, and next actions | Start/end of a work session |
-| `/omg:doctor` | Run extension/team/workspace/hook readiness diagnostics and remediation plan | Before long autonomous runs or when setup seems broken |
+| `/omg:doctor` | Run extension/team/workspace/hook readiness diagnostics, including priority/fallback-route drift checks | Before long autonomous runs or when setup seems broken |
 | `/omg:hud` | Inspect or switch visual HUD profile (`normal`, `compact`, `hidden`) | Before long sessions or when terminal density changes |
 | `/omg:hud-on` | Quick toggle HUD to full visual mode | When returning to full status boards |
 | `/omg:hud-compact` | Quick toggle HUD to compact mode | During dense implementation loops |
@@ -360,16 +364,16 @@ Disable only this hook:
 | `/omg:rules` | Activate task-conditional guardrail rule packs | Before implementation on migration/security/performance-sensitive work |
 | `/omg:memory` | Maintain MEMORY index, topic files, and path-aware rule packs | During long sessions or when decisions/rules drift |
 | `/omg:workspace` | Inspect, audit, or set primary root, worktree/path lanes, and collision boundaries | Before parallel implementation or multi-root work |
-| `/omg:taskboard` | Maintain a compact task ledger with stable IDs and verifier-backed completion state | After planning and throughout long exec/verify loops |
+| `/omg:taskboard` | Maintain a compact task ledger with stable IDs, `p0-p3` priority, deterministic `next`, and verifier-backed completion state | After planning and throughout long exec/verify loops |
 | `/omg:recall` | Recover prior decisions/evidence with state-first search and bounded history fallback | When you need past rationale quickly without replaying full transcripts |
 | `/omg:reasoning` | Set global reasoning effort and teammate overrides (`low/medium/high/xhigh`) | Before expensive planning/review loops or when depth is role-dependent |
 | `/omg:deep-init` | Build deep project map and validation baseline for long sessions | At project kickoff or when onboarding into unfamiliar codebases |
-| `/omg:team-assemble` | Dynamically compose a role-fit team with approval gate and lane-specific reasoning map | Before `/omg:team` on cross-domain or non-standard tasks |
+| `/omg:team-assemble` | Dynamically compose a role-fit team with approval gate, lane-specific reasoning map, and fallback routing hints | Before `/omg:team` on cross-domain or non-standard tasks |
 | `/omg:team` | Execute full stage pipeline (`team-assemble? -> plan -> prd -> taskboard -> exec -> verify -> fix`) | Complex feature or refactor delivery |
 | `/omg:team-plan` | Build dependency-aware execution plan | Before implementation |
 | `/omg:team-prd` | Lock measurable acceptance criteria and constraints | After planning, before coding |
-| `/omg:team-exec` | Implement a scoped delivery slice with explicit lane/subagent handoff | Main implementation loop |
-| `/omg:team-verify` | Validate acceptance criteria, regressions, and anti-slop quality gate | After each execution slice |
+| `/omg:team-exec` | Implement one highest-priority ready slice with explicit lane/subagent handoff and single-shot fallback reroute | Main implementation loop |
+| `/omg:team-verify` | Validate acceptance criteria, regressions, and anti-slop quality gate, then emit priority-ordered fix backlog | After each execution slice |
 | `/omg:team-fix` | Patch only verified failures | When verification fails |
 | `/omg:loop` | Enforce repeated `exec -> verify -> fix` cycles until done/blocker | Mid/late delivery when unresolved findings remain |
 | `/omg:mode` | Inspect or switch operating profile (`balanced/speed/deep/autopilot/ralph/ultrawork`) | At session start or posture change |
@@ -455,6 +459,7 @@ oh-my-gemini-cli/
 | Skill does not trigger | Only the retained deep-work skills are still shipped, or extension metadata is stale | Recheck the retained skill list in the README and reload the extension/session |
 | Team assembly keeps proposing but does not execute | Approval token missing in request | Reply with explicit approval (`yes`, `approve`, `go`, or `run`) |
 | Parallel execution keeps colliding or re-planning the same files | Workspace lanes are not explicit | Run `/omg:workspace status` or set lane/path ownership with `/omg:workspace` |
+| `taskboard next` keeps jumping between tasks unpredictably | Missing priority values or unstable queue ordering | Run `/omg:taskboard sync` (fills default `p2`), then `/omg:taskboard rebalance` |
 | Review or automation is about to run on a dirty/untrusted lane | Shared worktree hygiene is unclear | Run `/omg:workspace audit`, isolate the lane if needed, and only then continue verify/review steps |
 | Done status keeps drifting after long loops | No compact task source of truth or missing verifier signoff | Run `/omg:taskboard sync`, then rerun `/omg:team-verify` to close remaining IDs |
 | You cannot remember why a decision was made earlier | Prior rationale is buried in long session history | Run `/omg:recall "<keyword>" scope=state` first, then widen to `scope=recent` only if needed |

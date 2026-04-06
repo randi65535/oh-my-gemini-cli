@@ -6,6 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.7.1` | 2026-04-06 | Deterministic taskboard and fallback routing | Added null-safe task priority defaults (`p2`), deterministic `next` ordering, and one-shot agent-unavailable fallback routing across team execution stages |
 | `v0.7.0` | 2026-04-05 | Model selection policy controls | Added `/omg:model` with `balanced|auto|custom` strategy management and persisted model-policy state for consistent lane routing |
 | `v0.6.0` | 2026-04-03 | Gemini CLI compatibility sync | Aligned OmG runtime guidance with recent Gemini CLI stable releases (`v0.35.0`, `v0.36.0`) and hardened doctor diagnostics for runtime drift |
 | `v0.5.0` | 2026-04-01 | Prompt ops hardening | Applied Claude-derived delegation/edit/verification guardrails across OmG core context, team commands, and agent contracts |
@@ -31,6 +32,45 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.2` | 2026-02-22 | Model/branding consistency | `gemini-3.1-*` naming and OmG branding normalized |
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
+
+## v0.7.1 - Deterministic Taskboard and Fallback Routing (2026-04-06)
+
+Hardened OmG's extension-native task orchestration with deterministic queueing and agent-unavailable fallback handling.
+
+### Added
+
+- Priority-aware taskboard policy with null-safe defaults:
+  - `commands/omg/taskboard.toml`
+  - `commands/omg/team-plan.toml`
+  - `commands/omg/team-prd.toml`
+  - Uses explicit `p0|p1|p2|p3` ordering and defaults missing priority to `p2`.
+- Agent-unavailable fallback routing contract (`agent not found` style recovery):
+  - `commands/omg/team-exec.toml`
+  - `commands/omg/team-assemble.toml`
+  - `commands/omg/team.toml`
+  - Adds one-shot fallback reroute (`omg-executor` -> `omg-quick` for low-risk slices, otherwise reroute via `omg-director`).
+
+### Changed
+
+- Verification/fix ordering now keeps priority context explicit:
+  - `commands/omg/team-verify.toml`
+  - `commands/omg/team-fix.toml`
+- Runtime diagnostics now detect task-priority/fallback drift:
+  - `commands/omg/doctor.toml`
+  - `commands/omg/status.toml`
+  - `context/omg-core.md`
+- README, Korean README, and landing page refreshed for the new taskboard/fallback workflow:
+  - `README.md`
+  - `docs/README_ko.md`
+  - `docs/index.html`
+- Extension/package version bumped to `0.7.1`:
+  - `package.json`
+  - `gemini-extension.json`
+
+### Structural Fit Note
+
+- OmG remains extension-native; this release adds command/state-policy hardening only.
+- No runtime daemon, external worker service, or binary patch flow was introduced.
 
 ## v0.7.0 - Model Selection Policy Controls (2026-04-05)
 

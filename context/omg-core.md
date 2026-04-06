@@ -52,7 +52,9 @@ OmG adds a role-driven workflow layer to Gemini CLI.
 - **Read Before Modify**: Read target files or state first; avoid blind edits.
 - **Minimal Diff**: Prefer editing existing files over creating new files unless scope explicitly requires new files.
 - **Critical-Path Focus**: Complete immediate blocking work before adding speculative side tasks.
+- **Deterministic Queue**: For task execution order, prefer dependency-ready + lane-safe tasks first, then priority (`p0` -> `p3`), then stable task ID.
 - **Permission Recovery**: If a tool/action is denied, do not retry unchanged; request approval or switch to a safe fallback plan.
+- **Agent Recovery**: If a lane agent is unavailable, reroute once to a mapped fallback lane and record why.
 - **Concise Success Path**: Keep normal-success reporting compact and expand only blocker or early-stop branches.
 
 ## Command Response Contract

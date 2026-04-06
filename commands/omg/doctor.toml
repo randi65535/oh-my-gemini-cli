@@ -25,11 +25,13 @@ Diagnostic protocol:
    - missing or stale root `GEMINI.md` import chain
    - command discovery mismatch
    - stale/missing state files
+   - taskboard entries with missing/null priority causing nondeterministic `next` selection
    - outdated depth flags (`--essential`, `--standard`, `--deep`) used instead of keywords (`low`, `medium`, `high`)
    - taskboard/workspace drift causing repeated replanning
    - dirty shared worktree or untrusted lane being reused for review/autonomous flow
    - missing native worktree/sandbox capabilities expected by recent stable Gemini CLI updates
    - missing lane/subagent handoff context causing approval or verification drift
+   - no fallback route when assigned execution/review agent is unavailable
    - hook safety policy gaps for autonomous loops
    - hook lifecycle asymmetry (start without terminal outcome, blocked continuation skipping safety re-entry)
    - repeated denied tool calls without escalation path
