@@ -57,18 +57,21 @@ gemini extensions list
 
 참고: 설치/업데이트 명령은 대화형 슬래시 명령 모드가 아니라 터미널 모드(`gemini extensions ...`)에서 실행합니다.
 
-## v0.7.1의 새로운 내용
+## v0.7.2의 새로운 내용
 
-- task 실행 선택 규칙을 결정적으로 강화했습니다.
-  - dependency-ready + lane-safe 우선
-  - priority 순서 (`p0 -> p1 -> p2 -> p3`)
-  - 동순위는 안정적인 task ID 순서로 고정
-- task priority 누락 시 `p2`를 기본값으로 채워 null 기반 드리프트를 방지합니다.
-- 실행/리뷰 lane에서 에이전트가 unavailable(`agent not found`)일 때 단일 fallback 경로를 추가했습니다.
-  - 저위험 구현 슬라이스: `omg-quick` 1회 재시도
-  - 고위험/아키텍처 민감 슬라이스: `omg-director`로 재배정 후 진행
-- `/omg:doctor`가 우선순위 누락과 fallback 라우팅 부재를 추가 진단합니다.
-- 패키지/확장 버전을 `0.7.1`로 올리고 README/한국어 README/랜딩/히스토리를 갱신했습니다.
+- OmG 확장 구조에 맞는 워크플로우/런타임 위생 개선을 반영했습니다.
+- learn-signal 훅 알림 쿨다운을 추가했습니다 (`hooks/scripts/learn.js`):
+  - 새 설정 키: `prompt_cooldown_minutes` (기본값 `45`)
+  - 짧은 간격의 연속 세션에서 `/omg:learn` 안내가 과도하게 반복되지 않도록 억제
+  - 기존 deep-interview lock 억제 및 transcript 중복 방지 동작은 유지
+- 릴리즈 메타데이터 동기화 유틸리티를 추가했습니다:
+  - `scripts/sync-version.js`로 `package.json`과 `gemini-extension.json` 버전을 동기화
+  - `scripts/check-version.js`에서 sync 스크립트 존재 여부까지 검증
+  - `.github/workflows/version-check.yml`이 버전 점검 스크립트 변경에도 실행되도록 보강
+- 확장 워크플로우 단계 순서 가이드를 보강했습니다:
+  - `commands/omg/intent.toml`
+  - `commands/omg/doctor.toml`
+- 패키지/확장 버전을 `0.7.2`로 올리고 README/한국어 README/랜딩/히스토리를 갱신했습니다.
 
 ## 한눈에 보기
 
@@ -440,7 +443,6 @@ oh-my-gemini-cli/
 ## 영감을 받은 프로젝트
 
 - [Gemini CLI](https://github.com/google-gemini/gemini-cli) - Google의 오픈소스 AI 터미널 에이전트
-- [oh-my-codex](https://github.com/Yeachan-Heo/oh-my-codex) - OpenAI Codex CLI 하네스
 - [oh-my-claudecode](https://github.com/Yeachan-Heo/oh-my-claudecode) - Claude Code CLI 하네스
 - [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode) - OpenCode 에이전트 하네스
 - [Claude Code 프롬프트 캐싱 교훈](https://news.hada.io/topic?id=26835) - 컨텍스트 엔지니어링 원리

@@ -6,11 +6,15 @@ on:
     paths:
       - 'package.json'
       - 'gemini-extension.json'
+      - 'scripts/check-version.js'
+      - 'scripts/sync-version.js'
   pull_request:
     branches: [ main ]
     paths:
       - 'package.json'
       - 'gemini-extension.json'
+      - 'scripts/check-version.js'
+      - 'scripts/sync-version.js'
 
 jobs:
   check-version:

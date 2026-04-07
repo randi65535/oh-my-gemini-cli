@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.7.1+</span>
+        <span class="badge">Latest Update v0.7.2+</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (Deterministic Taskboard + Fallback Routing)</h2>
-      <p class="sub">OmG v0.7.1 hardens extension-native operations with priority-safe task queues and explicit agent-unavailable fallback routing.</p>
+      <h2>Latest Update (Workflow + Runtime Hygiene)</h2>
+      <p class="sub">OmG v0.7.2 focuses on extension-native workflow and runtime hygiene improvements for long-session stability.</p>
       <table>
         <thead>
           <tr>
@@ -550,28 +550,28 @@
         </thead>
         <tbody>
           <tr>
-            <td>Priority-safe taskboard</td>
-            <td><code>/omg:taskboard</code> now standardizes task priority with null-safe default <code>p2</code> and deterministic queue ordering (<code>p0 -&gt; p3</code>).</td>
+            <td>Learn-signal cooldown</td>
+            <td><code>hooks/scripts/learn.js</code> now applies cross-session nudge cooldown via <code>prompt_cooldown_minutes</code> (default <code>45</code>) to reduce repetitive <code>/omg:learn</code> prompts.</td>
           </tr>
           <tr>
-            <td>Deterministic next selection</td>
-            <td><code>next</code>/<code>rebalance</code> now prefer dependency-ready + lane-safe tasks first, then priority, then stable task ID.</td>
+            <td>Release metadata sync</td>
+            <td>New <code>scripts/sync-version.js</code> synchronizes <code>package.json</code> and <code>gemini-extension.json</code> versions from one command.</td>
           </tr>
           <tr>
-            <td>Agent-unavailable recovery</td>
-            <td><code>team-exec</code> and <code>team</code> now define one-shot fallback routing when an assigned agent is unavailable (for example <code>agent not found</code>).</td>
+            <td>Version contract hardening</td>
+            <td><code>scripts/check-version.js</code> now validates both version parity and sync-script availability, and <code>.github/workflows/version-check.yml</code> now watches version-script changes too.</td>
           </tr>
           <tr>
-            <td>Doctor guardrails</td>
-            <td><code>/omg:doctor</code> now flags missing/null task priorities and missing fallback-route policy before long autonomous loops.</td>
+            <td>Workflow-order diagnostics</td>
+            <td><code>/omg:intent</code> and <code>/omg:doctor</code> guidance now stresses staged order (<code>team-plan -&gt; team-prd -&gt; taskboard -&gt; exec/verify/fix</code>) and detects drift.</td>
           </tr>
           <tr>
             <td>Scope boundary</td>
-            <td>Changes stay extension-native (commands/context/state policy only), without adding external daemons or service dependencies.</td>
+            <td>Changes stay extension-native (commands/hooks/scripts/state-policy only), without adding external daemons or service dependencies.</td>
           </tr>
           <tr>
             <td>Version + docs refresh</td>
-            <td>README, Korean README, landing page, and changelog were updated with extension/package version bump to <code>0.7.1</code>.</td>
+            <td>README, Korean README, landing page, and changelog were updated with extension/package version bump to <code>0.7.2</code>.</td>
           </tr>
         </tbody>
       </table>

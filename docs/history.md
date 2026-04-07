@@ -6,6 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.7.2` | 2026-04-07 | Workflow/runtime hygiene | Added learn-signal cooldown control, release metadata sync utility, and stronger staged-workflow diagnostics |
 | `v0.7.1` | 2026-04-06 | Deterministic taskboard and fallback routing | Added null-safe task priority defaults (`p2`), deterministic `next` ordering, and one-shot agent-unavailable fallback routing across team execution stages |
 | `v0.7.0` | 2026-04-05 | Model selection policy controls | Added `/omg:model` with `balanced|auto|custom` strategy management and persisted model-policy state for consistent lane routing |
 | `v0.6.0` | 2026-04-03 | Gemini CLI compatibility sync | Aligned OmG runtime guidance with recent Gemini CLI stable releases (`v0.35.0`, `v0.36.0`) and hardened doctor diagnostics for runtime drift |
@@ -32,6 +33,42 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.2` | 2026-02-22 | Model/branding consistency | `gemini-3.1-*` naming and OmG branding normalized |
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
+
+## v0.7.2 - Workflow and Runtime Hygiene (2026-04-07)
+
+Applied extension-structure-compatible workflow/runtime hygiene improvements for OmG.
+
+### Added
+
+- Learn-signal cooldown control for reduced nudge noise:
+  - `hooks/scripts/learn.js`
+  - new config key: `prompt_cooldown_minutes` (default `45`)
+  - suppresses repeated `/omg:learn` nudges across short back-to-back sessions while preserving deep-interview lock suppression and transcript dedupe behavior.
+- Version sync utility for release hygiene:
+  - `scripts/sync-version.js`
+  - syncs `package.json` and `gemini-extension.json` version metadata from one command.
+
+### Changed
+
+- Version consistency check now also validates sync-script availability:
+  - `scripts/check-version.js`
+- Version-check workflow now triggers on release script changes:
+  - `.github/workflows/version-check.yml`
+- Intent/doctor guidance now emphasizes staged workflow order and drift checks:
+  - `commands/omg/intent.toml`
+  - `commands/omg/doctor.toml`
+- README, Korean README, and landing page refreshed for `v0.7.2`:
+  - `README.md`
+  - `docs/README_ko.md`
+  - `docs/index.html`
+- Extension/package version bumped to `0.7.2`:
+  - `package.json`
+  - `gemini-extension.json`
+
+### Structural Fit Note
+
+- OmG remains extension-native.
+- Imported changes are limited to prompt/hook/script/documentation surfaces and do not introduce runtime daemons or external worker services.
 
 ## v0.7.1 - Deterministic Taskboard and Fallback Routing (2026-04-06)
 
@@ -202,7 +239,7 @@ Adapted OmG to recent one-week `oh-my-claudecode` skill direction by adding an e
 
 ## v0.4.5 - Deep-Interview Lock Nudge Suppression (2026-03-30)
 
-Adapted OmG hook behavior to recent one-week `oh-my-codex` deep-interview safety direction: when deep-interview lock state is active, automated learn nudges are suppressed so interview flow can continue without interruptions.
+Adapted OmG hook behavior for deep-interview safety: when deep-interview lock state is active, automated learn nudges are suppressed so interview flow can continue without interruptions.
 
 ### Added
 

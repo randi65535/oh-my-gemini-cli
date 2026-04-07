@@ -28,6 +28,8 @@ Protocol:
 
 Routing hints:
 - depth keywords (`low`, `medium`, `high`) detected -> `/omg:interview` (via `interview`) [Note: Flags like `--deep` are deprecated and replaced by keywords]
+- canonical staged flow when implementation is expected ->
+  `/omg:team-plan` -> `/omg:team-prd` -> `/omg:taskboard sync` -> `/omg:team-exec` -> `/omg:team-verify` -> `/omg:team-fix`
 - multi-root, dirty-lane, or worktree-sensitive implementation -> `/omg:workspace` (use `/omg:workspace audit` when lane health or trust is unclear)
 - dynamic multi-role team setup -> `/omg:team-assemble`
 - planning ambiguity -> `/omg:team-plan` or `$plan`

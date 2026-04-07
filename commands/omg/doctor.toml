@@ -32,8 +32,10 @@ Diagnostic protocol:
    - missing native worktree/sandbox capabilities expected by recent stable Gemini CLI updates
    - missing lane/subagent handoff context causing approval or verification drift
    - no fallback route when assigned execution/review agent is unavailable
+   - workflow-order drift (execution requested before plan/prd acceptance on non-trivial tasks)
    - hook safety policy gaps for autonomous loops
    - hook lifecycle asymmetry (start without terminal outcome, blocked continuation skipping safety re-entry)
+   - repeated learn nudges due missing cooldown policy in `.omg/rules/learn.json`
    - repeated denied tool calls without escalation path
 7. Produce concrete remediation actions in priority order.
 8. If filesystem tools are available, write/update `.omg/state/doctor.md`.

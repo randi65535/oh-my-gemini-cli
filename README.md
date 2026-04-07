@@ -56,20 +56,21 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.7.1
+## What's New in v0.7.2
 
-- Added deterministic task selection policy to OmG task flow:
-  - dependency-ready + lane-safe first
-  - priority order (`p0 -> p1 -> p2 -> p3`)
-  - stable task-id tie-breaker
-- Added null-safe task priority default (`p2`) to prevent missing-priority drift in long taskboard loops.
-- Added agent-unavailable fallback contract (`agent not found` style failures):
-  - low-risk execution fallback to `omg-quick`
-  - high-risk/architecture-sensitive reroute to `omg-director` before retry
-- Expanded doctor diagnostics for:
-  - missing/null priority causing unstable `next` behavior
-  - missing fallback routing for unavailable execution/review agents
-- Bumped extension/package version to `0.7.1` and refreshed README, Korean README, landing docs, and history.
+- Applied workflow/runtime hygiene improvements compatible with OmG's extension-first architecture.
+- Added learn-signal nudge cooldown in `hooks/scripts/learn.js`:
+  - new config key: `prompt_cooldown_minutes` (default: `45`)
+  - prevents repeated `/omg:learn` nudges across short back-to-back sessions
+  - keeps existing deep-interview lock suppression and transcript dedupe behavior
+- Added release metadata sync utility:
+  - `scripts/sync-version.js` now ships and syncs `package.json` + `gemini-extension.json` versions
+  - `scripts/check-version.js` now also validates the sync script presence
+  - `.github/workflows/version-check.yml` now triggers when version-check scripts change
+- Refined extension workflow guidance for staged execution order in:
+  - `commands/omg/intent.toml`
+  - `commands/omg/doctor.toml`
+- Bumped extension/package version to `0.7.2` and refreshed README, Korean README, landing docs, and history.
 
 ## At A Glance
 
@@ -482,7 +483,6 @@ Extension behavior is manifest-driven through Gemini CLI extension primitives.
 ## Inspiration
 
 - [Gemini CLI](https://github.com/google-gemini/gemini-cli) - Google's open-source AI terminal agent
-- [oh-my-codex](https://github.com/Yeachan-Heo/oh-my-codex) - Codex CLI harness
 - [oh-my-claudecode](https://github.com/Yeachan-Heo/oh-my-claudecode) - Claude Code CLI harness
 - [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode) - OpenCode agent harness
 - [Claude Code Prompt Caching](https://news.hada.io/topic?id=26835) - Context engineering principles
