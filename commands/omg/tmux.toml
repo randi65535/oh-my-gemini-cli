@@ -1,0 +1,53 @@
+description = "Manage tmux sessions from the terminal: list, attach, create, kill, or send commands to a session."
+prompt = """
+Run OmG tmux session manager.
+
+Input:
+$ARGUMENTS
+
+Supported actions:
+- `list` (or no argument): list all active tmux sessions with index, name, and window count.
+- `new [name]`: create a new named tmux session. Use a safe identifier (alphanumeric, dash, underscore).
+- `attach <name|index>`: attach to an existing tmux session by name or index.
+- `detach`: detach the current client from its tmux session.
+- `kill <name|index>`: kill a tmux session by name or index. Prompt for confirmation before executing.
+- `send <name|index> <command>`: send a shell command to the target session's active pane.
+- `status`: show full session detail (windows, panes, active pane command) for all sessions.
+- `rename <old-name> <new-name>`: rename a tmux session.
+
+Execution protocol:
+1. Parse the requested action and target from $ARGUMENTS.
+2. If no action or `list`, run: `tmux ls` (handle "no server running" gracefully — report no active sessions).
+3. For `new [name]`:
+   - If no name is provided, generate one: `omg-YYYYMMDD-HHMMSS` (e.g., `omg-20260408-141500`).
+   - Run: `tmux new-session -d -s <name>` (detached; OmG runs inside Gemini CLI, not a raw TTY).
+   - Confirm creation with the full session name.
+4. For `attach <name|index>`:
+   - Run: `tmux attach-session -t <name|index>`.
+   - Note: attachment opens an interactive terminal; instruct the user that this will switch terminal control to the tmux session.
+5. For `detach`:
+   - Run: `tmux detach-client`.
+6. For `kill <name|index>`:
+   - State the target session name/index and ask for explicit confirmation before proceeding.
+   - On confirmation, run: `tmux kill-session -t <name|index>`.
+7. For `send <name|index> <command>`:
+   - Run: `tmux send-keys -t <name|index> "<command>" Enter`.
+   - Capture and return any visible output via `tmux capture-pane -p -t <name|index>` after a short delay.
+8. For `status`:
+   - Run: `tmux list-sessions -F "#{session_name}  windows=#{session_windows}  created=#{session_created_string}  attached=#{session_attached}"`.
+   - For each session, also run `tmux list-windows -t <name>` to show window details.
+9. For `rename <old> <new>`:
+   - Run: `tmux rename-session -t <old> <new>`.
+   - Confirm the rename.
+
+Safety rules:
+- Never kill a session without explicit user confirmation.
+- When running `send`, escape shell metacharacters in the command before passing to `tmux send-keys`.
+- If tmux is not installed, report: "tmux is not available on this system. Install it with your package manager (e.g. `apt install tmux` or `brew install tmux`)."
+- If no tmux server is running, report: "No active tmux server. Use `/omg:tmux new` to start a session."
+
+Response format:
+- Report action taken, command executed, and result.
+- For `list` / `status`, render a compact table.
+- Suggest a logical next action (e.g., after `new`, suggest `attach`; after `kill`, suggest `list`).
+"""
