@@ -1,0 +1,93 @@
+description = "Launch and manage background parallel Gemini CLI execution via tmux."
+prompt = """
+Run OmG `parallel` manager.
+
+Input:
+$ARGUMENTS
+
+Protocol:
+1. Parse requested action:
+   - `launch <task-description>` or `launch --shards=<n> <task-description>`
+   - `status [session-id]`
+   - `collect [session-id]`
+   - `kill [session-id]`
+   - `list`
+2. Prerequisites check:
+   - Verify tmux is available: `tmux -V`.
+   - Verify Gemini CLI is available: `gemini --version` or `gemini -v`.
+   - If either is missing, stop and report the missing dependency with an install hint.
+3. For `launch`:
+   a. Decompose the task into independent shards (default 2–4; override with `--shards=<n>`).
+      - Only create shards that are truly independent: no git branch conflicts, no shared file writes.
+      - If shards cannot be made independent, stop and recommend `/omg:loop` for sequential execution instead.
+   b. Generate a unique session ID: `omg-par-<unix-timestamp>` (for example `omg-par-1733051234`).
+   c. Create output directory: `mkdir -p .omg/state/parallel/<session-id>`.
+   d. Create a detached tmux session: `tmux new-session -d -s <session-id>`.
+   e. Write each shard prompt to: `.omg/state/parallel/<session-id>/shard-<n>.prompt.md`.
+   f. For shard index 0, send to window 0; for each subsequent shard n≥1, create window first:
+      `tmux new-window -t <session-id>` then send keys.
+   g. In each window n, launch Gemini and append a completion marker on exit:
+      `tmux send-keys -t <session-id>:<n> 'gemini -p "$(cat .omg/state/parallel/<session-id>/shard-<n>.prompt.md)" > .omg/state/parallel/<session-id>/shard-<n>.output.md 2>&1; echo SHARD_DONE_<n> >> .omg/state/parallel/<session-id>/done.log' Enter`
+   h. Persist session metadata to `.omg/state/parallel.json` (append to `sessions` array).
+   i. Report session ID, shard plan, output directory, and the resume command.
+4. For `status`:
+   a. Read `.omg/state/parallel.json`; if no ID given, show all sessions.
+   b. For each active session, check tmux liveness:
+      `tmux list-windows -t <session-id> 2>/dev/null`
+   c. Count completion markers:
+      `grep -c SHARD_DONE .omg/state/parallel/<session-id>/done.log 2>/dev/null || echo 0`
+   d. Derive per-shard status: done (marker present), running (tmux window alive), pending, or error (output file contains error text).
+   e. Report compact status table + session health + next suggested command.
+5. For `collect`:
+   a. Verify all shards are done: done marker count must equal shard count.
+      If not all done yet, report remaining count and suggest re-running `status` later.
+   b. Read each `.omg/state/parallel/<session-id>/shard-<n>.output.md`.
+   c. Synthesize a merged summary from all shard outputs aligned to the original objective.
+   d. Write the synthesis to `.omg/state/parallel/<session-id>/merged.md`.
+   e. Update session status to `collected` in `.omg/state/parallel.json`.
+   f. Report the synthesis with inline evidence from shard outputs.
+6. For `kill`:
+   a. Kill the tmux session: `tmux kill-session -t <session-id>`.
+   b. Update session status to `killed` in `.omg/state/parallel.json`.
+   c. Keep all output files intact for later inspection.
+   d. Report which session was killed and which shards had completed.
+7. For `list`:
+   a. Read `.omg/state/parallel.json`.
+   b. Show all sessions: ID, status, shard count, created time, and tmux session name.
+   c. If the file is missing or empty, report no active sessions.
+8. Safety rules:
+   - Never create shards that write to the same file paths simultaneously.
+   - Cap active parallel sessions at 4 to avoid resource exhaustion; block `launch` when at capacity.
+   - Always write shard output under `.omg/state/parallel/<session-id>/` — never to the workspace root.
+   - Keep tmux session names ≤ 50 characters to avoid platform limits.
+   - Initialize `.omg/state/parallel.json` with `{ "sessions": [], "source": "omg:parallel" }` when missing.
+
+Suggested `parallel.json` shape:
+{
+  "sessions": [
+    {
+      "id": "omg-par-1733051234",
+      "tmux_session": "omg-par-1733051234",
+      "created_at": "<ISO-8601>",
+      "objective": "<original task description>",
+      "shard_count": 3,
+      "status": "running|collected|killed",
+      "output_dir": ".omg/state/parallel/omg-par-1733051234",
+      "shards": [
+        {
+          "index": 0,
+          "summary": "<brief shard description>",
+          "prompt_file": ".omg/state/parallel/omg-par-1733051234/shard-0.prompt.md",
+          "output_file": ".omg/state/parallel/omg-par-1733051234/shard-0.output.md",
+          "status": "pending|running|done|error"
+        }
+      ]
+    }
+  ],
+  "source": "omg:parallel"
+}
+
+Response:
+- Keep it concise and operator-facing.
+- Include `Parallel Status`, `Session Map` (for list), `Shard Plan` (for launch), `Progress` (for status/collect), and `Next Command`.
+"""
