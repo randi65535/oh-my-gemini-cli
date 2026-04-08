@@ -73,9 +73,13 @@ function sessionExists(sessionId) {
 
 /** create <session-id> <shard-count> */
 function cmdCreate(sessionId, shardCountStr) {
-  const shardCount = Number.parseInt(shardCountStr, 10);
-  if (!sessionId || !Number.isFinite(shardCount) || shardCount < 1) {
+  if (!sessionId || shardCountStr === undefined) {
     process.stderr.write("usage: create <session-id> <shard-count>\n");
+    process.exit(1);
+  }
+  const shardCount = Number.parseInt(shardCountStr, 10);
+  if (!Number.isFinite(shardCount) || shardCount < 1) {
+    process.stderr.write(`[omg:parallel] error: shard-count must be a positive integer, got "${shardCountStr}"\n`);
     process.exit(1);
   }
   if (sessionId.length > 50) {

@@ -30,6 +30,7 @@
     "hooks/",
     "skills/",
     "context/",
+    "scripts/tmux-parallel.js",
     "README.md",
     "docs/",
     "LICENSE"

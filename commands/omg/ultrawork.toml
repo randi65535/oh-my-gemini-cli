@@ -1,29 +1,97 @@
-description = "Run high-throughput batch delivery mode for many independent tasks with periodic quality gates."
+description = "Run high-throughput batch delivery mode for many independent tasks with periodic quality gates. Supports optional --tmux flag for background parallel execution via tmux."
 prompt = """
 Run OmG `ultrawork` mode.
 
 Objective:
 $ARGUMENTS
 
-Ultrawork protocol:
-1. Decompose work into independent shards.
-2. Group shards by risk and dependency.
-3. Delegate fast implementation slices to `omg-executor`/`omg-quick`.
-4. Run periodic verification gates with `omg-reviewer` every batch.
-5. Keep a rollback-aware summary for each shard.
+Execution mode selection:
+- Default (no flag): run shards inline, sequentially within this session.
+- `--tmux`: launch each shard as a background Gemini CLI process in a separate tmux window
+  (requires tmux and gemini CLI available on the host).
 
-Rules:
+Ultrawork protocol:
+1. Detect `--tmux` flag in $ARGUMENTS. Strip it from the objective before processing.
+2. Decompose work into independent shards (target 2–6 per batch).
+3. Group shards by risk and dependency; mark critical-path vs. sidecar-parallel shards.
+4. Delegate fast implementation slices to `omg-executor`/`omg-quick` (inline mode)
+   or launch background tmux sessions (--tmux mode — see below).
+5. Run periodic verification gates with `omg-reviewer` every batch.
+6. Keep a rollback-aware summary for each shard.
+
+Inline mode rules:
 - Do not merge unverified critical shards.
 - Keep each shard bounded and reversible.
 - Escalate cross-shard coupling risks.
 
+--tmux background parallel mode:
+When `--tmux` is present, execute these steps instead of inline delegation:
+
+Prerequisites:
+- Verify tmux is installed: `tmux -V`. Stop and report if missing.
+- Verify Gemini CLI is reachable: `gemini --version`. Stop and report if missing.
+- Only parallelize shards that are truly independent: no overlapping file writes, no shared git branches.
+- Cap active parallel tmux sessions at 4 to avoid resource exhaustion.
+
+Launch sequence:
+a. Generate a session ID: `omg-par-<unix-timestamp>` (for example `omg-par-1733051234`).
+b. Create output directory: `mkdir -p .omg/state/parallel/<session-id>`.
+c. Write each shard prompt to `.omg/state/parallel/<session-id>/shard-<n>.prompt.md`.
+d. Create a detached tmux session: `tmux new-session -d -s <session-id>`.
+e. Window 0 is created automatically. For shards n≥1, run: `tmux new-window -t <session-id>`.
+f. In each window n, launch Gemini and append a completion marker on exit:
+   `tmux send-keys -t <session-id>:<n> 'gemini -p "$(cat .omg/state/parallel/<session-id>/shard-<n>.prompt.md)" > .omg/state/parallel/<session-id>/shard-<n>.output.md 2>&1; echo SHARD_DONE_<n> >> .omg/state/parallel/<session-id>/done.log' Enter`
+g. Persist session metadata to `.omg/state/parallel.json` (append to `sessions` array).
+   Initialize with `{ "sessions": [], "source": "omg:parallel" }` if the file is missing.
+
+Monitoring (--tmux mode):
+- Check tmux liveness: `tmux list-windows -t <session-id> 2>/dev/null`.
+- Count completions: `grep -c SHARD_DONE .omg/state/parallel/<session-id>/done.log 2>/dev/null || echo 0`.
+
+Collection (--tmux mode):
+- Verify all shards are done (completion count equals shard count).
+- Read each `.omg/state/parallel/<session-id>/shard-<n>.output.md`.
+- Synthesize a merged summary and write to `.omg/state/parallel/<session-id>/merged.md`.
+- Update session status to `collected` in `.omg/state/parallel.json`.
+- Run the verification gate after collection, same as inline mode.
+
+Cleanup (--tmux mode):
+- Kill the tmux session after collection: `tmux kill-session -t <session-id>`.
+- Update session status to `killed` in `.omg/state/parallel.json`.
+- Keep all output files under `.omg/state/parallel/<session-id>/` for auditability.
+
+Suggested `parallel.json` shape:
+{
+  "sessions": [
+    {
+      "id": "omg-par-1733051234",
+      "tmux_session": "omg-par-1733051234",
+      "created_at": "<ISO-8601>",
+      "objective": "<shard batch description>",
+      "shard_count": 3,
+      "status": "running|collected|killed",
+      "output_dir": ".omg/state/parallel/omg-par-1733051234",
+      "shards": [
+        {
+          "index": 0,
+          "summary": "<brief shard description>",
+          "prompt_file": ".omg/state/parallel/omg-par-1733051234/shard-0.prompt.md",
+          "output_file": ".omg/state/parallel/omg-par-1733051234/shard-0.output.md",
+          "status": "pending|running|done|error"
+        }
+      ]
+    }
+  ],
+  "source": "omg:parallel"
+}
+
 Output format:
 ## Mode
-- ultrawork
+- ultrawork (inline | tmux-parallel)
 
 ## Shard Plan
-| Shard | Scope | Owner | Risk | Verify Gate |
-| --- | --- | --- | --- | --- |
+| Shard | Scope | Owner | Risk | Verify Gate | Tmux Window |
+| --- | --- | --- | --- | --- | --- |
 
 ## Throughput Log
 - ...

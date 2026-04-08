@@ -56,6 +56,14 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
+## What's New in v0.7.3
+
+- Added tmux-backed background parallel execution:
+  - `/omg:ultrawork --tmux` launches each shard as a background Gemini CLI process in a separate tmux window instead of running shards inline.
+  - New `$parallel` deep-work skill provides a focused protocol for decomposing, launching, monitoring, and collecting independent tmux shards.
+  - New `scripts/tmux-parallel.js` helper utility manages tmux session lifecycle (create, send, status, capture, kill, list) and persists session metadata to `.omg/state/parallel.json`.
+  - `context/omg-core.md` updated: `$parallel` added to the retained deep-work skill set; Parallel Rule now explicitly references `--tmux` mode.
+
 ## What's New in v0.7.2
 
 - Applied workflow/runtime hygiene improvements compatible with OmG's extension-first architecture.
@@ -216,6 +224,44 @@ Example flow:
 /omg:taskboard next
 /omg:recall "why was auth lane blocked" scope=state
 ```
+
+## Background Parallel Execution (tmux)
+
+Use `--tmux` with `/omg:ultrawork` when you want multiple independent shards to run as background Gemini CLI processes in separate tmux windows — freeing the main session for other work while shards execute.
+
+**Prerequisites:** `tmux` and `gemini` CLI must be available on the host.
+
+**When to use:**
+- Research on several independent topics simultaneously
+- Generating or analysing independent modules/files in parallel
+- Large backlogs where each shard has zero overlap with others
+
+**Quick example:**
+
+```text
+/omg:ultrawork --tmux "analyse security, performance, and accessibility of the current codebase"
+```
+
+OmG will:
+1. Decompose into 3 independent shards (security / performance / accessibility)
+2. Create a tmux session `omg-par-<id>` with 3 windows
+3. Launch `gemini -p "<shard_prompt>" > shard-<n>.output.md` in each window
+4. Write session metadata to `.omg/state/parallel.json`
+5. Periodically check completion markers (`SHARD_DONE_<n>` in `done.log`)
+6. Collect and synthesize shard outputs into `merged.md` when all finish
+
+Use the `$parallel` skill for fine-grained control over decomposition, monitoring, and collection:
+
+```text
+$parallel
+```
+
+The `scripts/tmux-parallel.js` helper is available for direct shell-level tmux session management (create / send / status / capture / kill / list).
+
+**Safety rules:**
+- Maximum 4 active tmux sessions at once.
+- Never parallelize shards that write to the same file paths or git branches.
+- All shard output lands under `.omg/state/parallel/<session-id>/` — never in the workspace root.
 
 ## Workspace Hygiene and Hook Symmetry
 
@@ -382,7 +428,7 @@ Disable only this hook:
 | `/omg:approval` | Inspect or switch approval posture (`suggest/auto/full-auto`) | Before autonomous delivery loops or policy changes |
 | `/omg:autopilot` | Run iterative autonomous cycles with checkpoints | Complex autonomous delivery |
 | `/omg:ralph` | Enforce strict quality-gated orchestration | Release-critical tasks |
-| `/omg:ultrawork` | Throughput mode for batched independent tasks | Large backlogs |
+| `/omg:ultrawork` | Throughput mode for batched independent tasks; add `--tmux` to run shards as background Gemini CLI processes in separate tmux windows | Large backlogs or when you want true background parallelism |
 | `/omg:consensus` | Converge on one option from multiple designs | Decision-heavy moments |
 | `/omg:launch` | Initialize persistent lifecycle state for long tasks | Beginning of long sessions |
 | `/omg:checkpoint` | Save compact checkpoint and resume hint with taskboard/workspace references | Mid-session handoff |
@@ -405,6 +451,7 @@ Retained skills are intentionally limited to a compact deep-work set so the exte
 | `$research` | Explore options/tradeoffs | Decision-oriented comparison |
 | `$deep-dive` | Run trace-to-interview discovery before planning | Clarity score, assumption ledger, and launch brief |
 | `$context-optimize` | Improve context structure | Compression and signal-to-noise adjustments |
+| `$parallel` | Decompose independent work into tmux-backed background Gemini CLI shards and synthesize outputs | Session map, shard plan, and merged collection summary |
 
 ### Sub-agents
 
@@ -460,6 +507,8 @@ oh-my-gemini-cli/
 | Skill does not trigger | Only the retained deep-work skills are still shipped, or extension metadata is stale | Recheck the retained skill list in the README and reload the extension/session |
 | Team assembly keeps proposing but does not execute | Approval token missing in request | Reply with explicit approval (`yes`, `approve`, `go`, or `run`) |
 | Parallel execution keeps colliding or re-planning the same files | Workspace lanes are not explicit | Run `/omg:workspace status` or set lane/path ownership with `/omg:workspace` |
+| `tmux` shards started with `--tmux` are not completing | Shard prompts have overlapping file writes or tmux session was killed | Check `.omg/state/parallel/<id>/done.log` for `SHARD_DONE_<n>` markers; run `node scripts/tmux-parallel.js status <id>` or kill the stale session with `node scripts/tmux-parallel.js kill <id>` and relaunch |
+| `tmux: command not found` when using `--tmux` | tmux is not installed on the host | Install tmux (`brew install tmux`, `apt install tmux`, etc.) and re-run |
 | `taskboard next` keeps jumping between tasks unpredictably | Missing priority values or unstable queue ordering | Run `/omg:taskboard sync` (fills default `p2`), then `/omg:taskboard rebalance` |
 | Review or automation is about to run on a dirty/untrusted lane | Shared worktree hygiene is unclear | Run `/omg:workspace audit`, isolate the lane if needed, and only then continue verify/review steps |
 | Done status keeps drifting after long loops | No compact task source of truth or missing verifier signoff | Run `/omg:taskboard sync`, then rerun `/omg:team-verify` to close remaining IDs |

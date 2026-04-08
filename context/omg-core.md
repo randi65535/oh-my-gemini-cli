@@ -6,7 +6,7 @@ OmG adds a role-driven workflow layer to Gemini CLI.
 
 - Use `/omg:*` commands for operational control.
 - Keep always-on context thin; heavy procedure belongs in the invoked command, not here.
-- Retained deep-work skills are limited to: `$plan`, `$omg-plan`, `$execute`, `$prd`, `$ralplan`, `$research`, `$deep-dive`, `$context-optimize`.
+- Retained deep-work skills are limited to: `$plan`, `$omg-plan`, `$execute`, `$prd`, `$ralplan`, `$research`, `$deep-dive`, `$context-optimize`, `$parallel`.
 
 ## Default Flow (Hybrid Routing)
 
@@ -14,7 +14,7 @@ OmG adds a role-driven workflow layer to Gemini CLI.
 - **Clarification**: `interview` (if depth flags detected or scope is ambiguous) -> `team-plan` -> `team-prd`.
 - **Execution**: `taskboard` -> `team-exec` -> `team-verify` -> `team-fix`.
 - **Loop**: Repeat `exec -> verify -> fix` until acceptance. Use `loop` for subsequent slices.
-- **Parallel Rule**: Keep immediate blockers on the active lane; delegate only independent sidecar tasks in parallel.
+- **Parallel Rule**: Keep immediate blockers on the active lane; delegate only independent sidecar tasks in parallel. Use `$parallel` skill or `/omg:ultrawork --tmux` for background tmux-backed parallel execution of truly independent shards.
 
 ## System Map: Modes, Controls & Agents
 
@@ -45,7 +45,7 @@ OmG adds a role-driven workflow layer to Gemini CLI.
   - **Implicit Adoption**: On read, the file content overrides any stale internal context immediately.
   - **Update Policy**: Update the file (`write_file`) only when tangible changes (facts, score, prompt) occur.
 - **Summarization**: Read only files needed for the current step and summarize before handoff.
-- **Persistence**: Use `.omg/state/*`, `MEMORY.md`, `.omg/memory/*`, `.omg/rules/*`, `.omg/hooks/*`, or `.omg/notify/*`.
+- **Persistence**: Use `.omg/state/*`, `MEMORY.md`, `.omg/memory/*`, `.omg/rules/*`, `.omg/hooks/*`, or `.omg/notify/*`. Parallel session metadata lives in `.omg/state/parallel.json` and shard outputs under `.omg/state/parallel/<session-id>/`.
 
 ## Execution Discipline
 
