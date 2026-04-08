@@ -1,53 +1,81 @@
-description = "Manage tmux sessions from the terminal: list, attach, create, kill, or send commands to a session."
+description = "Automatically dispatch tasks to parallel background tmux sessions and aggregate results."
 prompt = """
-Run OmG tmux session manager.
+Run OmG tmux parallel background executor.
 
 Input:
 $ARGUMENTS
 
-Supported actions:
-- `list` (or no argument): list all active tmux sessions with index, name, and window count.
-- `new [name]`: create a new named tmux session. Use a safe identifier (alphanumeric, dash, underscore).
-- `attach <name|index>`: attach to an existing tmux session by name or index.
-- `detach`: detach the current client from its tmux session.
-- `kill <name|index>`: kill a tmux session by name or index. Prompt for confirmation before executing.
-- `send <name|index> <command>`: send a shell command to the target session's active pane.
-- `status`: show full session detail (windows, panes, active pane command) for all sessions.
-- `rename <old-name> <new-name>`: rename a tmux session.
+## Purpose
 
-Execution protocol:
-1. Parse the requested action and target from $ARGUMENTS.
-2. If no action or `list`, run: `tmux ls` (handle "no server running" gracefully — report no active sessions).
-3. For `new [name]`:
-   - If no name is provided, generate one: `omg-YYYYMMDD-HHMMSS` (e.g., `omg-20260408-141500`).
-   - Run: `tmux new-session -d -s <name>` (detached; OmG runs inside Gemini CLI, not a raw TTY).
-   - Confirm creation with the full session name.
-4. For `attach <name|index>`:
-   - Run: `tmux attach-session -t <name|index>`.
-   - Note: attachment opens an interactive terminal; instruct the user that this will switch terminal control to the tmux session.
-5. For `detach`:
-   - Run: `tmux detach-client`.
-6. For `kill <name|index>`:
-   - State the target session name/index and ask for explicit confirmation before proceeding.
-   - On confirmation, run: `tmux kill-session -t <name|index>`.
-7. For `send <name|index> <command>`:
-   - Run: `tmux send-keys -t <name|index> "<command>" Enter`.
-   - Capture and return any visible output via `tmux capture-pane -p -t <name|index>` after a short delay.
-8. For `status`:
-   - Run: `tmux list-sessions -F "#{session_name}  windows=#{session_windows}  created=#{session_created_string}  attached=#{session_attached}"`.
-   - For each session, also run `tmux list-windows -t <name>` to show window details.
-9. For `rename <old> <new>`:
-   - Run: `tmux rename-session -t <old> <new>`.
-   - Confirm the rename.
+Automatically fan-out independent tasks across tmux background sessions so they run in parallel without blocking the current Gemini CLI session. Results are polled and aggregated once all jobs finish.
 
-Safety rules:
-- Never kill a session without explicit user confirmation.
-- When running `send`, escape shell metacharacters in the command before passing to `tmux send-keys`.
-- If tmux is not installed, report: "tmux is not available on this system. Install it with your package manager (e.g. `apt install tmux` or `brew install tmux`)."
-- If no tmux server is running, report: "No active tmux server. Use `/omg:tmux new` to start a session."
+## Supported actions
 
-Response format:
-- Report action taken, command executed, and result.
-- For `list` / `status`, render a compact table.
-- Suggest a logical next action (e.g., after `new`, suggest `attach`; after `kill`, suggest `list`).
+- `run <task1> ;; <task2> ;; ...` — fan-out commands to separate tmux windows in one session, run in parallel.
+- `status [session]` — poll all active omg-managed tmux windows and report per-job exit status + tail output.
+- `collect [session]` — wait for all windows to finish, collect exit codes and output, print a summary table.
+- `clean [session]` — kill the omg-managed session and free resources after all jobs are done.
+- `list` — list all active omg-managed sessions (`omg-parallel-*`).
+
+## Execution protocol
+
+### `run` (default when tasks are provided)
+1. Parse the task list from $ARGUMENTS. Tasks are separated by `;;`.
+2. Sanitize each task string: strip leading/trailing whitespace; reject empty strings.
+3. If tmux is not installed, abort immediately with: "tmux is not available. Install via `apt install tmux` or `brew install tmux`."
+4. Generate a session name: `omg-parallel-YYYYMMDD-HHMMSS`.
+5. Create a detached tmux session: `tmux new-session -d -s <session>`.
+6. For task index 0: run in the initial window (window 0). Rename window to `job-0`:
+   `tmux rename-window -t <session>:0 job-0`
+   `tmux send-keys -t <session>:job-0 "<task0>" Enter`
+7. For each additional task (index i ≥ 1): create a new window and start the job immediately:
+   `tmux new-window -t <session> -n job-<i>`
+   `tmux send-keys -t <session>:job-<i> "<task>" Enter`
+8. All windows start at the same moment — they run fully in parallel in the background.
+9. Record the session name and window count.
+10. Return immediately after dispatching all jobs. Do NOT wait for completion.
+11. Output:
+   - session name
+   - list of job-<i> → command mappings
+   - how to poll: `/omg:tmux status <session>`
+   - how to collect results: `/omg:tmux collect <session>`
+
+### `status [session]`
+1. If no session given, auto-detect the most recent `omg-parallel-*` session.
+2. For each window in the session:
+   a. Check if the pane's shell process is still running: `tmux list-panes -t <session>:<window> -F "#{pane_pid} #{pane_current_command}"`
+   b. Capture last 5 lines of output: `tmux capture-pane -p -t <session>:<window> | tail -5`
+3. Report a table: `job | pid | running | last output`.
+4. If all jobs have exited, suggest `/omg:tmux collect <session>`.
+
+### `collect [session]`
+1. If no session given, auto-detect the most recent `omg-parallel-*` session.
+2. Poll every window: wait until `pane_current_command` returns to the shell (i.e., job finished).
+3. For each window, capture full output: `tmux capture-pane -p -e -t <session>:<window>`.
+4. Report summary table:
+   | job | command | exit-code | output (last 10 lines) |
+5. Mark each job: ✅ success (exit 0) / ❌ failed (exit ≠ 0).
+6. Report total: N succeeded, M failed.
+7. Suggest `/omg:tmux clean <session>` if all jobs are done.
+
+### `clean [session]`
+1. Kill the session: `tmux kill-session -t <session>`.
+2. Confirm cleanup.
+
+### `list`
+1. Run: `tmux ls 2>/dev/null | grep omg-parallel`
+2. If none found: "No active omg-parallel sessions."
+3. Otherwise, render a compact table of session name, windows, and created time.
+
+## Safety rules
+- Only manage sessions whose names start with `omg-parallel-`. Never touch user sessions with other names.
+- Never block the caller — all job dispatch is fire-and-forget via `tmux send-keys`.
+- Do not confirm before `run`; do confirm before `clean` (destructive).
+- If a task string contains single quotes, escape them before passing to `tmux send-keys`.
+
+## Response format
+- Keep output compact and operator-facing.
+- After `run`: show dispatch table + next command.
+- After `collect`: show result table with ✅/❌ per job + aggregated pass/fail counts.
 """
+

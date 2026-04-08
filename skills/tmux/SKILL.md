@@ -1,57 +1,71 @@
 ---
 name = "tmux"
-description = "Connect to, manage, and automate tmux terminal sessions from within Gemini CLI."
+description = "Automatically fan-out independent tasks to parallel background tmux windows and aggregate results."
 ---
 
 ## Purpose
 
-Use this skill when the user needs to work with tmux sessions: listing, attaching, creating, killing, or sending commands to terminal sessions.
+Use this skill when multiple independent shell tasks need to run at the same time without blocking the Gemini CLI session. tmux windows are the execution substrate: each task gets its own window, all start simultaneously in the background, and results are collected once everything finishes.
 
 ## Trigger
 
-- User asks to connect to a tmux session or terminal
-- User wants to list or manage running tmux sessions
-- User wants to run a long-lived background process in an isolated terminal
-- User wants to send commands to or inspect a running terminal pane
+- User wants to run multiple commands in parallel in the background
+- A task list has independent items with no dependency between them
+- Long-running processes (build, test, lint, install) should not block the current session
+- `team-exec` or `ultrawork` has sidecar-parallelizable tasks that can be offloaded
 
 ## Workflow
 
-1. Detect whether tmux is installed (`which tmux` or `tmux -V`).
-2. List existing sessions (`tmux ls`) and report the current state.
-3. Parse the user's intent:
-   - **Connect / attach**: identify the target session by name or index and run `tmux attach-session -t <target>`.
-   - **Create new session**: run `tmux new-session -d -s <name>` (detached) so it persists after Gemini CLI exits.
-   - **Kill session**: confirm the target, then run `tmux kill-session -t <target>`.
-   - **Send command**: run `tmux send-keys -t <target> "<command>" Enter`, then capture output with `tmux capture-pane -p -t <target>`.
-   - **Inspect panes/windows**: use `tmux list-windows -t <target>` and `tmux list-panes -t <target>`.
-4. Confirm each destructive action with the user before proceeding.
-5. After the operation, list sessions again to show updated state.
+1. **Verify tmux**: `which tmux` or `tmux -V`. Abort with install instructions if missing.
+2. **Parse tasks**: split the input on `;;` to get an ordered list of commands.
+3. **Create session**: `tmux new-session -d -s omg-parallel-YYYYMMDD-HHMMSS`
+4. **Dispatch in parallel**:
+   - Window 0 gets task 0 (rename to `job-0`).
+   - For each additional task i, run `tmux new-window -t <session> -n job-<i>` then `tmux send-keys ... Enter`.
+   - All windows fire at the same instant — fully parallel, fully background.
+5. **Return immediately** after dispatch. Report the session name and a `/omg:tmux status` command to poll.
+6. **Poll** (via `status`): inspect `pane_current_command` per window to detect running vs. finished.
+7. **Collect** (via `collect`): capture full pane output per window, report ✅/❌ per job.
+8. **Clean** (via `clean`): kill the session once all jobs are done.
 
 ## Output Template
 
 ```markdown
-## tmux State
-- installed: yes/no
-- server running: yes/no
-- sessions: <count>
+## Dispatch
+- session: omg-parallel-20260408-142300
+- jobs: 3
 
-## Sessions
-| # | Name | Windows | Attached |
-|---|------|---------|----------|
-| 0 | main | 3 | yes |
+| job   | command                        |
+|-------|-------------------------------|
+| job-0 | npm run test                  |
+| job-1 | npm run lint                  |
+| job-2 | npm run build                 |
 
-## Action Taken
-- command: `tmux attach-session -t main`
-- result: ...
+All 3 jobs started in background. Session is detached.
 
-## Next Steps
-- ...
+## Poll
+`/omg:tmux status omg-parallel-20260408-142300`
+
+## Collect results when done
+`/omg:tmux collect omg-parallel-20260408-142300`
+```
+
+```markdown
+## Results — omg-parallel-20260408-142300
+
+| job   | result | last output                          |
+|-------|--------|--------------------------------------|
+| job-0 | ✅     | All tests passed (42/42)             |
+| job-1 | ✅     | No lint errors found                 |
+| job-2 | ❌     | Error: module not found              |
+
+Summary: 2 succeeded / 1 failed
 ```
 
 ## Notes
 
-- Gemini CLI runs inside a non-interactive pseudo-terminal, so `tmux attach-session` transfers control to the tmux session's TTY. Warn the user that this will leave the Gemini CLI session.
-- Use `tmux new-session -d` (detached mode) when creating sessions so the background process persists.
-- To run a multi-step shell workflow inside a session, prefer `tmux send-keys` in sequence over a single compound command.
-- Escalate to `/omg:tmux status` to show full session and pane details.
-- Use `$execute` for coding tasks that need to be run inside a specific tmux session.
+- Use `;;` as the task separator in `/omg:tmux run`.
+- Sessions are scoped under `omg-parallel-*` prefix — user sessions are never touched.
+- This skill is the preferred execution backend when `team-plan` marks tasks as `sidecar parallelizable`.
+- For sequential tasks with dependencies, keep using `team-exec` with `loop`.
+- Use `$execute` for single-task code changes; use `$tmux` when you need to run N independent jobs at once.
