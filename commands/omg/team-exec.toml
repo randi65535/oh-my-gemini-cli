@@ -7,25 +7,28 @@ $ARGUMENTS
 
 Protocol:
 1. Confirm current accepted scope from `team-prd`.
-2. Read `.omg/state/taskboard.md` and `.omg/state/workspace.json` when available, then confirm the active lane owner plus cleanliness/trust notes.
-3. Pull only one smallest-ready task slice using deterministic ordering:
+2. Enforce execution preconditions:
+   - require a dependency-aware task graph (`team-plan` output) and accepted criteria (`team-prd` output)
+   - if either is missing, stop this slice as `blocked` and route to `/omg:team-plan` or `/omg:team-prd` first
+3. Read `.omg/state/taskboard.md` and `.omg/state/workspace.json` when available, then confirm the active lane owner plus cleanliness/trust notes.
+4. Pull only one smallest-ready task slice using deterministic ordering:
    - dependency-ready tasks only
    - lane-safe first (`clean + trusted + handoff-ready`)
    - highest priority first (`p0` -> `p1` -> `p2` -> `p3`)
    - stable task id tie-breaker
-4. Read target files before editing and preserve existing conventions.
-5. Delegate implementation to `omg-executor` with explicit lane/subagent context.
-6. If the requested implementation agent is unavailable (for example "agent not found"), retry once with fallback routing:
+5. Read target files before editing and preserve existing conventions.
+6. Delegate implementation to `omg-executor` with explicit lane/subagent context.
+7. If the requested implementation agent is unavailable (for example "agent not found"), retry once with fallback routing:
    - low-risk slice -> `omg-quick`
    - architecture-sensitive or high-risk slice -> `omg-director` for reassignment before retry
    - never loop fallback retries
-7. Prefer editing existing files; create new files only when required by accepted scope.
-8. Keep each execution slice small and reviewable; keep the success path terse unless the slice stops early or blocks.
-9. Record changed files, workspace lane, rationale, and any early-stop or blocked termination reason.
-10. Include checks/tests performed for this slice.
-11. If lane health is unsafe for review or automation, call it out and recommend `/omg:workspace audit` or isolated worktree use.
-12. If permissions/tools are denied, stop this slice as blocked and emit explicit approval/fallback needs.
-13. If filesystem tools are available, update `.omg/state/taskboard.md`.
+8. Prefer editing existing files; create new files only when required by accepted scope.
+9. Keep each execution slice small and reviewable; keep the success path terse unless the slice stops early or blocks.
+10. Record changed files, workspace lane, rationale, and any early-stop or blocked termination reason.
+11. Include checks/tests performed for this slice.
+12. If lane health is unsafe for review or automation, call it out and recommend `/omg:workspace audit` or isolated worktree use.
+13. If permissions/tools are denied, stop this slice as blocked and emit explicit approval/fallback needs.
+14. If filesystem tools are available, update `.omg/state/taskboard.md`.
 
 Output format:
 ## Stage

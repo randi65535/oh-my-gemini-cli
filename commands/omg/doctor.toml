@@ -28,11 +28,14 @@ Diagnostic protocol:
    - taskboard entries with missing/null priority causing nondeterministic `next` selection
    - outdated depth flags (`--essential`, `--standard`, `--deep`) used instead of keywords (`low`, `medium`, `high`)
    - taskboard/workspace drift causing repeated replanning
+   - execution requested without confirmed `team-plan` + `team-prd` readiness artifacts
    - dirty shared worktree or untrusted lane being reused for review/autonomous flow
    - missing native worktree/sandbox capabilities expected by recent stable Gemini CLI updates
    - missing lane/subagent handoff context causing approval or verification drift
    - no fallback route when assigned execution/review agent is unavailable
    - workflow-order drift (execution requested before plan/prd acceptance on non-trivial tasks)
+   - stale `skill-active` markers left behind after `stop`/`cancel`
+   - missing or stale `.omg/state/cancel-signal.json` during resume handoff
    - hook safety policy gaps for autonomous loops
    - hook lifecycle asymmetry (start without terminal outcome, blocked continuation skipping safety re-entry)
    - repeated learn nudges due missing cooldown policy in `.omg/rules/learn.json`

@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.7.2+</span>
+        <span class="badge">Latest Update v0.7.3+</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (Workflow + Runtime Hygiene)</h2>
-      <p class="sub">OmG v0.7.2 focuses on extension-native workflow and runtime hygiene improvements for long-session stability.</p>
+      <h2>Latest Update (Stage-Gate + Runtime Signal Hardening)</h2>
+      <p class="sub">OmG v0.7.3 strengthens staged execution safety and runtime state signals for long multi-lane sessions.</p>
       <table>
         <thead>
           <tr>
@@ -550,20 +550,20 @@
         </thead>
         <tbody>
           <tr>
-            <td>Learn-signal cooldown</td>
-            <td><code>hooks/scripts/learn.js</code> now applies cross-session nudge cooldown via <code>prompt_cooldown_minutes</code> (default <code>45</code>) to reduce repetitive <code>/omg:learn</code> prompts.</td>
+            <td>Workspace-aware usage monitor</td>
+            <td><code>hooks/scripts/after-agent-usage.js</code> now supports <code>OMG_USAGE_CWD_MODE</code> (<code>off|leaf|parent-leaf|full</code>) and emits compact <code>cwd=...</code> context in usage lines.</td>
           </tr>
           <tr>
-            <td>Release metadata sync</td>
-            <td>New <code>scripts/sync-version.js</code> synchronizes <code>package.json</code> and <code>gemini-extension.json</code> versions from one command.</td>
+            <td>Stop/cancel cleanup safety</td>
+            <td><code>/omg:stop</code> and <code>/omg:cancel</code> contracts now clear stale <code>skill-active</code> markers and persist <code>.omg/state/cancel-signal.json</code> for deterministic resume handoff.</td>
           </tr>
           <tr>
-            <td>Version contract hardening</td>
-            <td><code>scripts/check-version.js</code> now validates both version parity and sync-script availability, and <code>.github/workflows/version-check.yml</code> now watches version-script changes too.</td>
+            <td>Execution stage gate</td>
+            <td><code>/omg:team-exec</code> now blocks implementation slices when required <code>team-plan</code>/<code>team-prd</code> readiness artifacts are missing.</td>
           </tr>
           <tr>
             <td>Workflow-order diagnostics</td>
-            <td><code>/omg:intent</code> and <code>/omg:doctor</code> guidance now stresses staged order (<code>team-plan -&gt; team-prd -&gt; taskboard -&gt; exec/verify/fix</code>) and detects drift.</td>
+            <td><code>/omg:doctor</code> now flags execution-before-readiness, stale <code>skill-active</code>, and missing/stale <code>cancel-signal</code> drift before autonomous loops.</td>
           </tr>
           <tr>
             <td>Scope boundary</td>
@@ -571,7 +571,7 @@
           </tr>
           <tr>
             <td>Version + docs refresh</td>
-            <td>README, Korean README, landing page, and changelog were updated with extension/package version bump to <code>0.7.2</code>.</td>
+            <td>README, Korean README, landing page, and changelog were updated with extension/package version bump to <code>0.7.3</code>.</td>
           </tr>
         </tbody>
       </table>

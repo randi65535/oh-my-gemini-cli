@@ -66,6 +66,7 @@ OmG adds a role-driven workflow layer to Gemini CLI.
 ## Safety & Integrity
 
 - **Pre-requisites**: Do not start implementation if scope or acceptance criteria are missing.
+- **Stage Gate**: Keep `team-exec` blocked until both `team-plan` (task graph) and `team-prd` (acceptance criteria) are confirmed.
 - **Validation**: Never claim completion or mark work done without verification evidence.
 - **Isolation**: Isolate dirty/untrusted worktrees before autonomous review or verification.
 - **Denied Actions**: Treat denied permissions/tool calls as a workflow event; re-plan or escalate explicitly.

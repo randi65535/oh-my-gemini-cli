@@ -56,21 +56,20 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.7.2
+## What's New in v0.7.3
 
-- Applied workflow/runtime hygiene improvements compatible with OmG's extension-first architecture.
-- Added learn-signal nudge cooldown in `hooks/scripts/learn.js`:
-  - new config key: `prompt_cooldown_minutes` (default: `45`)
-  - prevents repeated `/omg:learn` nudges across short back-to-back sessions
-  - keeps existing deep-interview lock suppression and transcript dedupe behavior
-- Added release metadata sync utility:
-  - `scripts/sync-version.js` now ships and syncs `package.json` + `gemini-extension.json` versions
-  - `scripts/check-version.js` now also validates the sync script presence
-  - `.github/workflows/version-check.yml` now triggers when version-check scripts change
-- Refined extension workflow guidance for staged execution order in:
-  - `commands/omg/intent.toml`
-  - `commands/omg/doctor.toml`
-- Bumped extension/package version to `0.7.2` and refreshed README, Korean README, landing docs, and history.
+- Added workspace-aware usage monitor output in `hooks/scripts/after-agent-usage.js`:
+  - new env knob: `OMG_USAGE_CWD_MODE=off|leaf|parent-leaf|full`
+  - default mode is `parent-leaf` and appends compact `cwd=...` context to each usage line
+  - improves lane/worktree identification in parallel sessions
+- Hardened stop/cancel state cleanup for safer resume:
+  - `commands/omg/stop.toml` and `commands/omg/cancel.toml` now clear stale `skill-active` markers
+  - stop/cancel now persist `.omg/state/cancel-signal.json` alongside checkpoint artifacts
+- Added stricter staged-execution gate and diagnostics:
+  - `commands/omg/team-exec.toml` blocks execution when `team-plan`/`team-prd` readiness artifacts are missing
+  - `commands/omg/doctor.toml` now detects stale `skill-active`/cancel-signal drift and missing stage readiness
+  - `context/omg-core.md` now enforces the same stage gate in core safety policy
+- Bumped extension/package version to `0.7.3` and refreshed README, Korean README, landing docs, and history.
 
 ## At A Glance
 
@@ -261,9 +260,11 @@ OmG now ships an extension hook that prints a compact token-usage line after eac
 - State artifact: `.omg/state/quota-watch.json` (turn counter, latest usage snapshot, and last processed transcript fingerprint)
 - Optional state root override: `OMG_STATE_ROOT=<dir>` (absolute path or path relative to session `cwd`)
 - Optional quiet hook output: `OMG_HOOKS_QUIET=1`
+- Optional cwd hint mode: `OMG_USAGE_CWD_MODE=off|leaf|parent-leaf|full` (default: `parent-leaf`)
 
 What it shows automatically:
 
+- compact cwd/worktree hint (`cwd=<parent/leaf>` by default)
 - latest turn token totals (input/output/cached/total)
 - session cumulative tokens
 - cumulative tokens for the latest active model
@@ -284,6 +285,12 @@ Example (store monitor state outside default `.omg/state`):
 
 ```bash
 export OMG_STATE_ROOT=.omg/state-local
+```
+
+Example (show full cwd path in usage lines):
+
+```bash
+export OMG_USAGE_CWD_MODE=full
 ```
 
 Disable only this hook:
@@ -483,7 +490,6 @@ Extension behavior is manifest-driven through Gemini CLI extension primitives.
 ## Inspiration
 
 - [Gemini CLI](https://github.com/google-gemini/gemini-cli) - Google's open-source AI terminal agent
-- [oh-my-claudecode](https://github.com/Yeachan-Heo/oh-my-claudecode) - Claude Code CLI harness
 - [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode) - OpenCode agent harness
 - [Claude Code Prompt Caching](https://news.hada.io/topic?id=26835) - Context engineering principles
 - [everything-claude-code](https://github.com/affaan-m/everything-claude-code) - Claude Code CLI harness

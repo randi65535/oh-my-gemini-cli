@@ -4,6 +4,7 @@
  *
  * This hook reads the active Gemini transcript file and prints a compact
  * token-usage line after each completed agent turn.
+ * It can include a compact cwd/worktree hint for multi-lane sessions.
  *
  * Repeated hook retries against the same transcript snapshot are treated as
  * already delivered so the usage line stays idempotent.
@@ -16,6 +17,7 @@ import path from "node:path";
 const DEFAULT_STATE_RELATIVE_PATH = path.join(".omg", "state", "quota-watch.json");
 const QUIET_HOOKS_ENV = "OMG_HOOKS_QUIET";
 const STATE_ROOT_ENV = "OMG_STATE_ROOT";
+const CWD_MODE_ENV = "OMG_USAGE_CWD_MODE";
 
 function readStdinText() {
   return new Promise((resolve) => {
@@ -71,6 +73,44 @@ function hashText(text) {
 
 function formatNumber(value) {
   return new Intl.NumberFormat("en-US").format(asNumber(value));
+}
+
+function normalizeDisplayPath(value) {
+  return String(value).replace(/\\/g, "/");
+}
+
+function resolveCwdMode() {
+  const raw = typeof process.env[CWD_MODE_ENV] === "string"
+    ? process.env[CWD_MODE_ENV].trim().toLowerCase()
+    : "";
+  if (raw === "off" || raw === "leaf" || raw === "parent-leaf" || raw === "full") {
+    return raw;
+  }
+  return "parent-leaf";
+}
+
+function formatCwdLabel(cwd, mode) {
+  if (mode === "off") {
+    return "";
+  }
+
+  const resolved = path.resolve(cwd || ".");
+  const leaf = path.basename(resolved);
+
+  if (mode === "full") {
+    return normalizeDisplayPath(resolved);
+  }
+
+  if (mode === "leaf") {
+    return leaf || normalizeDisplayPath(resolved);
+  }
+
+  const parent = path.basename(path.dirname(resolved));
+  if (parent && leaf && parent !== leaf) {
+    return `${normalizeDisplayPath(parent)}/${normalizeDisplayPath(leaf)}`;
+  }
+
+  return leaf || normalizeDisplayPath(resolved);
 }
 
 function readState(statePath) {
@@ -151,9 +191,10 @@ function buildUsageFromTranscript(transcript) {
   };
 }
 
-function buildMonitorLine(usage, turnCount) {
+function buildMonitorLine(usage, turnCount, cwdLabel) {
   return [
     `[OMG][USAGE][TURN ${turnCount}]`,
+    ...(cwdLabel ? [`cwd=${cwdLabel}`] : []),
     `turn=${formatNumber(usage.latest.total)} tok`,
     `(in ${formatNumber(usage.latest.input)} / out ${formatNumber(usage.latest.output)} / cache ${formatNumber(usage.latest.cached)})`,
     `session=${formatNumber(usage.session.total)} tok`,
@@ -197,6 +238,8 @@ async function main() {
 
   const statePath = resolveStatePath(cwd);
   const quietHooks = isTruthy(process.env[QUIET_HOOKS_ENV]);
+  const cwdMode = resolveCwdMode();
+  const cwdLabel = formatCwdLabel(cwd, cwdMode);
   const prevState = readState(statePath);
   let line;
   let nextTurnCount = prevState.last_session_id === sessionId ? asNumber(prevState.turn_count) : 0;
@@ -220,7 +263,7 @@ async function main() {
     const transcript = safeJsonParse(transcriptRaw, null);
     const usage = buildUsageFromTranscript(transcript);
     if (usage) {
-      line = buildMonitorLine(usage, nextTurnCount);
+      line = buildMonitorLine(usage, nextTurnCount, cwdLabel);
       writeState(statePath, {
         turn_count: nextTurnCount,
         last_session_id: sessionId,
@@ -229,6 +272,8 @@ async function main() {
         last_model: usage.latest.model,
         last_turn_total_tokens: usage.latest.total,
         last_session_total_tokens: usage.session.total,
+        cwd_mode: cwdMode,
+        last_cwd_label: cwdLabel,
         updated_at: new Date().toISOString(),
       });
     }
@@ -245,12 +290,19 @@ async function main() {
   }
 
   if (!line) {
-    line = `[OMG][USAGE][TURN ${nextTurnCount}] usage=unavailable remaining=/stats model`;
+    line = [
+      `[OMG][USAGE][TURN ${nextTurnCount}]`,
+      ...(cwdLabel ? [`cwd=${cwdLabel}`] : []),
+      "usage=unavailable",
+      "remaining=/stats model",
+    ].join(" ");
     writeState(statePath, {
       turn_count: nextTurnCount,
       last_session_id: sessionId,
       last_event_key: eventKey,
       ...(lastTranscriptHash ? { last_transcript_hash: lastTranscriptHash } : {}),
+      cwd_mode: cwdMode,
+      last_cwd_label: cwdLabel,
       updated_at: new Date().toISOString(),
     });
   }

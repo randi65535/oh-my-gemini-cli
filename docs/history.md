@@ -6,6 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.7.3` | 2026-04-08 | Stage-gate and runtime signal hardening | Added workspace-aware usage monitor cwd hints, stop/cancel skill-state cleanup signals, and stricter staged execution readiness checks |
 | `v0.7.2` | 2026-04-07 | Workflow/runtime hygiene | Added learn-signal cooldown control, release metadata sync utility, and stronger staged-workflow diagnostics |
 | `v0.7.1` | 2026-04-06 | Deterministic taskboard and fallback routing | Added null-safe task priority defaults (`p2`), deterministic `next` ordering, and one-shot agent-unavailable fallback routing across team execution stages |
 | `v0.7.0` | 2026-04-05 | Model selection policy controls | Added `/omg:model` with `balanced|auto|custom` strategy management and persisted model-policy state for consistent lane routing |
@@ -33,6 +34,47 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.2` | 2026-02-22 | Model/branding consistency | `gemini-3.1-*` naming and OmG branding normalized |
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
+
+## v0.7.3 - Stage-Gate and Runtime Signal Hardening (2026-04-08)
+
+Focused on extension-native reliability improvements for multi-lane execution, cancellation recovery, and deterministic resume behavior.
+
+### Added
+
+- Workspace-aware usage monitor context:
+  - `hooks/scripts/after-agent-usage.js`
+  - new runtime knob: `OMG_USAGE_CWD_MODE=off|leaf|parent-leaf|full` (default `parent-leaf`)
+  - usage lines now emit compact `cwd=...` context for easier lane/worktree identification in parallel sessions.
+- Stop/cancel signal persistence contract:
+  - `commands/omg/stop.toml`
+  - `commands/omg/cancel.toml`
+  - stop/cancel flows now explicitly persist `.omg/state/cancel-signal.json` for deterministic resume handoff.
+
+### Changed
+
+- Stop/cancel flows now clear stale `skill-active` markers when no skill is actively running:
+  - `commands/omg/stop.toml`
+  - `commands/omg/cancel.toml`
+- Staged execution now enforces prerequisite readiness before implementation:
+  - `commands/omg/team-exec.toml`
+  - blocks execution slices when `team-plan` task graph or `team-prd` acceptance artifacts are missing.
+- Doctor diagnostics now detect additional workflow drift:
+  - `commands/omg/doctor.toml`
+  - checks for stale `skill-active`, stale/missing `cancel-signal`, and execution-before-readiness drift.
+- Core safety policy now codifies the same stage gate:
+  - `context/omg-core.md`
+- README, Korean README, and landing page refreshed for `v0.7.3`:
+  - `README.md`
+  - `docs/README_ko.md`
+  - `docs/index.html`
+- Extension/package version bumped to `0.7.3`:
+  - `package.json`
+  - `gemini-extension.json`
+
+### Structural Fit Note
+
+- OmG remains extension-native.
+- Changes are limited to command contracts, hook runtime behavior, and documentation/state guidance without new daemons or external service dependencies.
 
 ## v0.7.2 - Workflow and Runtime Hygiene (2026-04-07)
 
@@ -213,7 +255,7 @@ Adapted operational prompt patterns from the public Claude Code system-prompt br
 
 ## v0.4.6 - Deep-Dive Discovery Skill (2026-03-31)
 
-Adapted OmG to recent one-week `oh-my-claudecode` skill direction by adding an extension-native discovery stage that runs trace-first analysis and escalates to interview prompts only when ambiguity remains.
+Added an extension-native discovery stage that runs trace-first analysis and escalates to interview prompts only when ambiguity remains.
 
 ### Added
 
