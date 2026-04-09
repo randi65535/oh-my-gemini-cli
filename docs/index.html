@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.7.3+</span>
+        <span class="badge">Docs Sync 2026-04-09</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (Stage-Gate + Runtime Signal Hardening)</h2>
-      <p class="sub">OmG v0.7.3 strengthens staged execution safety and runtime state signals for long multi-lane sessions.</p>
+      <h2>Compatibility Review (Gemini CLI 2-Week Sync)</h2>
+      <p class="sub">Reviewed upstream Gemini CLI changes published from 2026-03-26 through 2026-04-09 and refreshed OmG guidance around stable, preview, and nightly behavior.</p>
       <table>
         <thead>
           <tr>
@@ -550,28 +550,28 @@
         </thead>
         <tbody>
           <tr>
-            <td>Workspace-aware usage monitor</td>
-            <td><code>hooks/scripts/after-agent-usage.js</code> now supports <code>OMG_USAGE_CWD_MODE</code> (<code>off|leaf|parent-leaf|full</code>) and emits compact <code>cwd=...</code> context in usage lines.</td>
+            <td>Recommended stable baseline</td>
+            <td>OmG now documents Gemini CLI <code>v0.37.0+</code> as the preferred stable runtime because recent sandbox, worktree, and subagent/skill propagation fixes materially improve long multi-lane sessions.</td>
           </tr>
           <tr>
-            <td>Stop/cancel cleanup safety</td>
-            <td><code>/omg:stop</code> and <code>/omg:cancel</code> contracts now clear stale <code>skill-active</code> markers and persist <code>.omg/state/cancel-signal.json</code> for deterministic resume handoff.</td>
+            <td>Stable-channel impact</td>
+            <td><code>v0.37.0</code> adds dynamic Linux sandbox expansion + worktree support, Windows sandbox expansion, plan-mode policy relaxations, role-specific <code>/stats</code> metrics, skill instructions in subagent prompts, and cross-platform terminal-bell notifications.</td>
           </tr>
           <tr>
-            <td>Execution stage gate</td>
-            <td><code>/omg:team-exec</code> now blocks implementation slices when required <code>team-plan</code>/<code>team-prd</code> readiness artifacts are missing.</td>
+            <td>Preview-channel watch</td>
+            <td><code>v0.38.0-preview.0</code> improves slash-command refresh after <code>/skills reload</code>, allows explicit <code>web_fetch</code> in plan mode with ask-user policy, turns default loading phrases off, and expands memory extraction flows.</td>
           </tr>
           <tr>
-            <td>Workflow-order diagnostics</td>
-            <td><code>/omg:doctor</code> now flags execution-before-readiness, stale <code>skill-active</code>, and missing/stale <code>cancel-signal</code> drift before autonomous loops.</td>
+            <td>Nightly watchlist</td>
+            <td>Recent nightlies add Windows directory-junction skill linking, <code>/memory inbox</code>, <code>Ctrl+G</code> replacing <code>Ctrl+X</code>, and a rollback of <code>terminalBuffer=true</code> after regressions. OmG does not require these yet, but operators may notice them first on nightly.</td>
+          </tr>
+          <tr>
+            <td>Operator guidance</td>
+            <td>If slash skills look stale after a runtime update, reload the registry with <code>/skills reload</code> on newer builds or restart the session before treating it as an OmG extension failure.</td>
           </tr>
           <tr>
             <td>Scope boundary</td>
-            <td>Changes stay extension-native (commands/hooks/scripts/state-policy only), without adding external daemons or service dependencies.</td>
-          </tr>
-          <tr>
-            <td>Version + docs refresh</td>
-            <td>README, Korean README, landing page, and changelog were updated with extension/package version bump to <code>0.7.3</code>.</td>
+            <td>This sync is documentation-only. OmG remains extension-native and does not need command or runtime-surface changes to stay compatible with the reviewed upstream releases.</td>
           </tr>
         </tbody>
       </table>
@@ -981,6 +981,11 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
             <td>Extension appears in active extension list</td>
           </tr>
           <tr>
+            <td>Refresh slash registry</td>
+            <td><code>/skills reload</code> (newer builds) or restart Gemini CLI</td>
+            <td>Slash-command inventory is refreshed after runtime or extension updates before deeper troubleshooting starts</td>
+          </tr>
+          <tr>
             <td>Doctor preflight</td>
             <td><code>/omg:doctor</code> (or <code>/omg:doctor team</code>)</td>
             <td>Readiness findings with prioritized remediation before autonomy</td>
@@ -1105,7 +1110,12 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
           <tr>
             <td>Workspace/sandbox behavior differs from docs</td>
             <td>Gemini CLI runtime is older than the current OmG compatibility baseline</td>
-            <td>Upgrade Gemini CLI to stable <code>v0.36.0+</code>, then rerun <code>/omg:doctor</code> and <code>/omg:workspace audit</code></td>
+            <td>Upgrade Gemini CLI to stable <code>v0.37.0+</code>, then rerun <code>/omg:doctor</code> and <code>/omg:workspace audit</code></td>
+          </tr>
+          <tr>
+            <td>Slash command list looks stale after an update</td>
+            <td>Interactive skill/command registry was not refreshed after runtime or extension changes</td>
+            <td>Run <code>/skills reload</code> on newer builds, or restart Gemini CLI if you are still on an older stable runtime</td>
           </tr>
           <tr>
             <td><code>/plan</code> opens native plan mode when OmG planning skill was expected</td>
@@ -1164,6 +1174,11 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
             <td>Skill files not loaded in active extension context</td>
             <td>Confirm <code>skills/*/SKILL.md</code> files and reload CLI</td>
           </tr>
+          <tr>
+            <td>Windows skill linking differs across machines</td>
+            <td>Gemini CLI builds in the last two weeks changed how Windows skill links are handled</td>
+            <td>Prefer stable <code>v0.37.0+</code>; if you track preview/nightly, note that newer builds moved toward directory-junction based skill linking</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -1178,7 +1193,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
         <a href="./guide/agent-team-assembly.md">Team Assembly Guide</a>
         <a href="./guide/hook-engineering.md">Hook Engineering Guide</a>
       </div>
-      <div>Built for official Gemini CLI Extensions workflow.</div>
+      <div>Built for official Gemini CLI Extensions workflow. Compatibility reviewed against upstream releases through 2026-04-09.</div>
     </div>
   </footer>
 

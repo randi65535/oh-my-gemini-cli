@@ -332,20 +332,24 @@ Disable only this hook:
 }
 ```
 
-## Gemini CLI Compatibility Notes (Reviewed: 2026-04-03)
+## Gemini CLI Compatibility Notes (Reviewed: 2026-04-09)
 
-- Recommended stable runtime: Gemini CLI `v0.36.0+`.
-  - This baseline includes stable native worktree sessions, stronger sandbox isolation defaults, and recent subagent orchestration improvements that OmG now assumes.
+- Recommended stable runtime: Gemini CLI `v0.37.0+`.
+  - This baseline includes stable dynamic Linux worktree sandbox support, Windows sandbox expansion improvements, plan-mode policy relaxations that reduce false blockers, and more reliable skill/subagent instruction propagation that OmG now benefits from.
 - Recent stable updates with direct OmG impact:
-  - `v0.35.0` (2026-03-24): keyboard/vim ergonomics, `SandboxManager` + Linux bubblewrap/seccomp lane hardening, and JIT context discovery improvements.
   - `v0.36.0` (2026-04-01): multi-registry subagent architecture, native macOS Seatbelt + Windows sandboxing, Git worktree support, and stronger subagent context/rejection handling.
+  - `v0.37.0` (2026-04-08): dynamic Linux sandbox expansion + worktree support, Windows sandbox dynamic expansion, plan-mode write-policy relaxations, skill-system instructions injected into subagent prompts, global env allowlist fixes, cross-platform terminal-bell notifications, and role-specific `/stats` metrics.
 - Preview channel note:
-  - `v0.37.0-preview.1` (2026-04-02) adds plan-mode and sandbox experiments (for example untrusted-folder plan support and dynamic sandbox expansion), but OmG does not require preview channel features.
+  - `v0.38.0-preview.0` (2026-04-08) improves extension UX around `/skills reload` slash-command refresh, explicitly allows `web_fetch` in plan mode with ask-user policy, changes default loading phrases to `off`, and expands memory extraction flows. OmG does not require preview-only features, but these are useful for operators who rely on slash skills or plan-heavy sessions.
+- Nightly watchlist from the same review window:
+  - 2026-04-07 to 2026-04-08 nightlies add Windows skill-linking via directory junctions, `/memory inbox`, `Ctrl+G` replacing `Ctrl+X`, and a rollback of `terminalBuffer=true` after regressions. These are not OmG requirements, but Windows users and power users may notice the behavior changes first on nightly.
 - UX compatibility retained from `v0.34.0-preview.0+`:
   - direct skill invocation via `/skill-name`
   - footer customization via `/footer` (backed by `ui.footer.items`, `ui.footer.showLabels`, `ui.footer.hideCWD`, `ui.footer.hideSandboxStatus`, `ui.footer.hideModelInfo`)
 - OmG compatibility for slash skill invocation:
   - use `/omg-plan` (or `$omg-plan`) when you want the OmG planning skill without colliding with native `/plan`.
+- Slash registry refresh guidance:
+  - if OmG skills or slash aliases look stale right after a Gemini CLI/runtime update, run `/skills reload` on newer builds or restart the session before assuming the extension is broken.
 - Policy engine migration: if your wrapper scripts still pass `--allowed-tools`, migrate to `--policy` profiles (`--allowed-tools` was deprecated in Gemini CLI `v0.30.0`).
 - Native `/plan` mode and OmG planning commands can coexist:
   - native: `/plan`
@@ -462,9 +466,11 @@ oh-my-gemini-cli/
 | --- | --- | --- |
 | `settings.filter is not a function` during install | Stale Gemini CLI runtime or stale cached extension metadata | Update Gemini CLI, uninstall extension, then reinstall from repository URL |
 | `/omg:*` command not found | Extension not loaded in current session | Run `gemini extensions list`, then restart Gemini CLI session |
+| Slash command or skill list looks stale after runtime/extension refresh | Interactive registry was not refreshed after update | Run `/skills reload` on newer Gemini CLI builds, or restart the session if the runtime is still on older stable |
 | `/plan` opens native plan mode when you wanted OmG planning skill | Name collision between built-in `/plan` and skill-slash invocation | Use `/omg-plan` (or `$omg-plan`) for the OmG planning skill, or use `/omg:team-plan` for staged workflow planning |
 | You want Gemini Auto selection for every task | Default lane-specific model policy is still active | Run `/omg:model auto`; if your Gemini CLI build exposes explicit model controls, align runtime too (`/model auto` or `--model auto`) |
 | Skill does not trigger | Only the retained deep-work skills are still shipped, or extension metadata is stale | Recheck the retained skill list in the README and reload the extension/session |
+| Windows skill linking or extension reload behaves differently across machines | Different Gemini CLI builds handle skill links differently | Prefer stable `v0.37.0+`; if you track nightly/preview, note that newer builds moved Windows skill linking toward directory junctions |
 | Team assembly keeps proposing but does not execute | Approval token missing in request | Reply with explicit approval (`yes`, `approve`, `go`, or `run`) |
 | Parallel execution keeps colliding or re-planning the same files | Workspace lanes are not explicit | Run `/omg:workspace status` or set lane/path ownership with `/omg:workspace` |
 | `taskboard next` keeps jumping between tasks unpredictably | Missing priority values or unstable queue ordering | Run `/omg:taskboard sync` (fills default `p2`), then `/omg:taskboard rebalance` |
