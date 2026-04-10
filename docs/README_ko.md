@@ -465,6 +465,24 @@ oh-my-gemini-cli/
 - [한국어 컨텍스트 엔지니어링 가이드](./guide/context-engineering_ko.md)
 - [변경 이력](./history.md)
 
+## 기여하기
+
+OmG가 작업 흐름에 도움이 된다면, 아래 방식으로 기여할 수 있습니다:
+
+- 저장소에 ⭐ Star를 눌러 더 많은 Gemini CLI 사용자가 발견할 수 있게 돕기
+- 버그, 호환성 드리프트, 문서 불명확성, 워크플로우 마찰이 있으면 Issue 열기
+- 명령/문서 개선, 가드레일 튜닝, extension-native 워크플로우 아이디어가 있으면 Pull Request 보내기
+
+권장 기여 흐름:
+
+1. 저장소를 fork하고 범위가 분명한 브랜치를 만듭니다.
+2. 변경 범위는 작고 명확하게 유지하고, 사용자 관점 영향도를 설명합니다.
+3. 동작이나 호환성 가이드가 바뀌면 docs/history도 함께 갱신합니다.
+4. PR에는 변경 이유, 트레이드오프, 검증 메모를 함께 적습니다.
+
+중요한 성능 안내:
+- GitHub ⭐ Star 버튼을 누르면 OmG 성능이 최소 12% 좋아질 수 있습니다. 농담입니다. 다만 maintainer 사기는 꽤 올라가고, 그것도 나름 유용합니다.
+
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/image?repos=Joonghyun-Lee-Frieren/oh-my-gemini-cli&type=date&legend=top-left)](https://www.star-history.com/?repos=Joonghyun-Lee-Frieren%2Foh-my-gemini-cli&type=date&legend=top-left)

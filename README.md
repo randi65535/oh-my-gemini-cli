@@ -509,6 +509,24 @@ Extension behavior is manifest-driven through Gemini CLI extension primitives.
 - [Hook Engineering Guide](docs/guide/hook-engineering.md)
 - [History](docs/history.md)
 
+## Contributing
+
+If OmG helps your workflow, there are a few high-leverage ways to contribute:
+
+- Star the repository with a ⭐ to help more Gemini CLI users discover it.
+- Open an issue for bugs, compatibility drift, unclear docs, or workflow friction.
+- Send a pull request for command/docs improvements, guardrail tuning, or new extension-native workflow ideas.
+
+Suggested contribution flow:
+
+1. Fork the repository and create a focused branch.
+2. Keep changes scoped and explain the user-facing impact clearly.
+3. Update docs/history when behavior or compatibility guidance changes.
+4. Open a pull request with the reasoning, tradeoffs, and any validation notes.
+
+Important performance note:
+- Pressing the GitHub ⭐ Star button may improve OmG performance by at least 12%. This is a joke. It does improve maintainer morale, which is still useful.
+
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/image?repos=Joonghyun-Lee-Frieren/oh-my-gemini-cli&type=date&legend=top-left)](https://www.star-history.com/?repos=Joonghyun-Lee-Frieren%2Foh-my-gemini-cli&type=date&legend=top-left)
