@@ -6,7 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
-| `Unreleased` | 2026-04-09 | Gemini CLI compatibility docs refresh | Reviewed upstream changes from 2026-03-26 to 2026-04-09 and refreshed README, Korean README, landing page, and troubleshooting guidance for `v0.37.0` stable plus `v0.38.0-preview.0` watchpoints |
+| `v0.7.4` | 2026-04-13 | Baseline-aware lane guardrails | Added baseline branch/HEAD anchors to workspace/taskboard/team flows so branch drift is caught before execution or review |
 | `v0.7.3` | 2026-04-08 | Stage-gate and runtime signal hardening | Added workspace-aware usage monitor cwd hints, stop/cancel skill-state cleanup signals, and stricter staged execution readiness checks |
 | `v0.7.2` | 2026-04-07 | Workflow/runtime hygiene | Added learn-signal cooldown control, release metadata sync utility, and stronger staged-workflow diagnostics |
 | `v0.7.1` | 2026-04-06 | Deterministic taskboard and fallback routing | Added null-safe task priority defaults (`p2`), deterministic `next` ordering, and one-shot agent-unavailable fallback routing across team execution stages |
@@ -36,32 +36,37 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
 
-## Unreleased - Gemini CLI Compatibility Docs Refresh (2026-04-09)
+## v0.7.4 - Baseline-Aware Lane Guardrails (2026-04-13)
 
-Reviewed upstream Gemini CLI changelog/release activity from 2026-03-26 through 2026-04-09 and updated OmG's compatibility guidance without changing extension runtime behavior.
+Reviewed recent `oh-my-codex` changelog activity from the last two weeks and imported the most compatible workflow-safety ideas into OmG's Gemini Extensions model.
 
 ### Changed
 
-- Refreshed compatibility baseline from `v0.36.0+` to `v0.37.0+` in the main docs:
+- Added lane baseline branch/HEAD anchors to state and handoff guidance:
+  - `commands/omg/workspace.toml`
+  - `commands/omg/taskboard.toml`
+  - `commands/omg/team-plan.toml`
+  - `commands/omg/team-prd.toml`
+  - `commands/omg/team-exec.toml`
+  - `commands/omg/team.toml`
+- Added baseline integrity as a core execution safety rule:
+  - `context/omg-core.md`
+- Expanded status/doctor coverage for baseline drift:
+  - `commands/omg/status.toml`
+  - `commands/omg/doctor.toml`
+- Refreshed docs to explain baseline-aware lane guardrails and updated release metadata:
   - `README.md`
   - `docs/README_ko.md`
-- Documented newly relevant upstream impact areas:
-  - stable `v0.37.0` (2026-04-08)
-  - preview `v0.38.0-preview.0` (2026-04-08, optional channel)
-  - recent nightly watchpoints from 2026-04-07 to 2026-04-08
-- Added operator guidance for slash-registry refresh after runtime/extension updates:
-  - `/skills reload` on newer builds
-  - session restart fallback on older stable builds
-- Expanded troubleshooting with:
-  - stale slash-command inventory after updates
-  - Windows skill-link behavior variance across recent Gemini CLI builds
-- Refreshed landing page compatibility summary, runbook, and troubleshooting matrix:
   - `docs/index.html`
+  - `docs/history.md`
+  - `package.json`
+  - `gemini-extension.json`
 
 ### Structural Fit Note
 
 - OmG remains extension-native.
-- This update is documentation-only and does not change command contracts, hooks, or package metadata.
+- Imported ideas were limited to prompt/state-policy surfaces that fit Gemini CLI extensions cleanly.
+- No daemon, binary helper, or runtime shim was introduced.
 
 ## v0.7.3 - Stage-Gate and Runtime Signal Hardening (2026-04-08)
 

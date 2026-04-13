@@ -22,6 +22,7 @@ Protocol:
    - status (`todo`, `ready`, `in-progress`, `blocked`, `done`, `verified`)
    - dependency
    - worktree or path scope when relevant
+   - baseline branch/commit anchor when relevant for the active lane
    - lane health note when workspace audit marks `dirty`, `untrusted`, or `needs-review`
    - verification evidence pointer
 3. Null-safe priority policy:
@@ -41,11 +42,11 @@ Protocol:
 
 Suggested `taskboard.md` shape:
 # Taskboard
-| Task ID | Priority | Status | Owner | Dependency | Worktree | Lane Health | Summary | Evidence |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| T1 | p1 | ready | omg-executor | - | root | clean | add config parser | pending verify |
+| Task ID | Priority | Status | Owner | Dependency | Worktree | Baseline | Lane Health | Summary | Evidence |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| T1 | p1 | ready | omg-executor | - | root | main@abc1234 | clean | add config parser | pending verify |
 
 Response:
 - Keep it concise and operator-facing.
-- Include `Board Summary`, `Priority Queue`, `Ready Tasks`, `Blocked Tasks`, `Verification Queue`, and `Next Command`.
+- Include `Board Summary`, `Priority Queue`, `Ready Tasks`, `Blocked Tasks`, `Verification Queue`, `Baseline Drift Risks`, and `Next Command`.
 """

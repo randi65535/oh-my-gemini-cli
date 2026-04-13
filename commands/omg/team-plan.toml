@@ -11,13 +11,14 @@ Protocol:
 3. Delegate decomposition to `omg-planner`.
 4. Delegate architecture-sensitive risks to `omg-architect`.
 5. Build a phased task graph with stable task IDs, priorities, owners, dependencies, workspace lanes, and lane-health assumptions.
-6. Priority policy:
+6. For each task lane, capture the expected baseline branch or HEAD anchor when known so later execution/review can detect drift.
+7. Priority policy:
    - assign each task one priority tier (`p0`, `p1`, `p2`, `p3`)
    - use `p2` when priority is not explicitly justified
-7. Mark tasks as critical-path, sequential, or sidecar parallelizable, and note when isolated worktrees or explicit handoffs are required.
-8. Define verification checkpoints per phase.
-9. List 3-5 critical files most relevant for implementation.
-10. If filesystem tools are available, seed/update `.omg/state/taskboard.md`.
+8. Mark tasks as critical-path, sequential, or sidecar parallelizable, and note when isolated worktrees or explicit handoffs are required.
+9. Define verification checkpoints per phase.
+10. List 3-5 critical files most relevant for implementation.
+11. If filesystem tools are available, seed/update `.omg/state/taskboard.md`.
 
 Output format:
 ## Stage
@@ -27,8 +28,8 @@ Output format:
 - ...
 
 ## Task Graph
-| Task ID | Priority | Task | Owner | Dependency | Path Type (critical/sequential/sidecar) | Worktree | Lane Notes | Validation |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Task ID | Priority | Task | Owner | Dependency | Path Type (critical/sequential/sidecar) | Worktree | Baseline | Lane Notes | Validation |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 
 ## Critical Files
 - ...

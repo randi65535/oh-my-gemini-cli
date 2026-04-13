@@ -16,6 +16,7 @@ Protocol:
    - primary workspace root
    - optional worktree/path lanes
    - owner or lane affinity
+   - baseline branch or HEAD anchor when known
    - lane health (`clean`, `dirty`, `unknown`)
    - trust status (`trusted`, `untrusted`, `unknown`)
    - handoff readiness (`ready`, `needs-review`, `blocked`)
@@ -26,7 +27,8 @@ Protocol:
    - record only active lanes and health notes needed for the current task
 4. Recommend separate worktrees only when parallel implementation would otherwise conflict, or when dirty/untrusted lanes need isolation before review or automation.
 5. When runtime behavior indicates Gemini CLI `v0.36.0+` capabilities, prefer native Git worktree lanes for parallel execution; otherwise keep explicit path-lane ownership with stricter collision notes.
-6. If filesystem tools are available, write/update `.omg/state/workspace.json`.
+6. When a lane maps to a branch/worktree, record the expected baseline branch and a compact baseline commit/HEAD hint when available.
+7. If filesystem tools are available, write/update `.omg/state/workspace.json`.
 
 Suggested `workspace.json` shape:
 {
@@ -37,6 +39,10 @@ Suggested `workspace.json` shape:
       "path": ".",
       "owner": "omg-director",
       "purpose": "merge-ready baseline",
+      "baseline": {
+        "branch": "main",
+        "commit": "abc1234"
+      },
       "health": {
         "cleanliness": "clean",
         "trusted": "trusted",
@@ -50,5 +56,5 @@ Suggested `workspace.json` shape:
 
 Response:
 - Keep it concise and operator-facing.
-- Include `Workspace Status`, `Lane Map`, `Lane Health`, `Collision Risks`, and `Next Command`.
+- Include `Workspace Status`, `Lane Map`, `Lane Health`, `Baseline Anchors`, `Collision Risks`, and `Next Command`.
 """

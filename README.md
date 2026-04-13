@@ -56,20 +56,18 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.7.3
+## What's New in v0.7.4
 
-- Added workspace-aware usage monitor output in `hooks/scripts/after-agent-usage.js`:
-  - new env knob: `OMG_USAGE_CWD_MODE=off|leaf|parent-leaf|full`
-  - default mode is `parent-leaf` and appends compact `cwd=...` context to each usage line
-  - improves lane/worktree identification in parallel sessions
-- Hardened stop/cancel state cleanup for safer resume:
-  - `commands/omg/stop.toml` and `commands/omg/cancel.toml` now clear stale `skill-active` markers
-  - stop/cancel now persist `.omg/state/cancel-signal.json` alongside checkpoint artifacts
-- Added stricter staged-execution gate and diagnostics:
-  - `commands/omg/team-exec.toml` blocks execution when `team-plan`/`team-prd` readiness artifacts are missing
-  - `commands/omg/doctor.toml` now detects stale `skill-active`/cancel-signal drift and missing stage readiness
-  - `context/omg-core.md` now enforces the same stage gate in core safety policy
-- Bumped extension/package version to `0.7.3` and refreshed README, Korean README, landing docs, and history.
+- Added baseline-aware lane guardrails inspired by a recent `oh-my-codex` changelog review:
+  - `commands/omg/workspace.toml` now records per-lane baseline branch/HEAD anchors when known
+  - `commands/omg/taskboard.toml` and `commands/omg/team-plan.toml` now carry baseline metadata forward with task slices
+  - `commands/omg/team-prd.toml`, `commands/omg/team-exec.toml`, and `commands/omg/team.toml` now treat baseline expectations as part of execution handoff safety
+- Hardened drift detection and operator visibility:
+  - `commands/omg/team-exec.toml` now blocks a slice when the active lane appears to have drifted from its recorded baseline in a task-breaking way
+  - `commands/omg/status.toml` now surfaces baseline-anchor drift risk
+  - `commands/omg/doctor.toml` now checks missing or drifted lane baseline anchors
+  - `context/omg-core.md` now codifies baseline integrity as a core execution rule
+- Bumped extension/package version to `0.7.4` and refreshed README, Korean README, landing docs, and history.
 
 ## At A Glance
 
@@ -199,9 +197,10 @@ Activation note:
 Use `workspace` and `taskboard` when work spans multiple roots, multiple implementation lanes, or long verify/fix loops.
 
 - `/omg:workspace` keeps the primary root plus optional worktree/path lanes in `.omg/state/workspace.json`.
+- Each lane can also carry a compact baseline branch/HEAD anchor so handoffs and resume flows can detect unexpected branch drift before implementation or review.
 - `/omg:workspace audit` checks lane cleanliness, trust status, and handoff readiness before parallel execution, review, or automation.
-- `/omg:taskboard` keeps stable task IDs, owners, dependencies, statuses (`todo`, `ready`, `in-progress`, `blocked`, `done`, `verified`), lane-health notes, and evidence pointers in `.omg/state/taskboard.md`.
-- `team-plan` seeds stable task IDs plus lane assumptions, `team-exec` pulls the smallest ready slice with explicit lane/subagent context, and `team-verify` marks tasks verified only with evidence plus safe lane state.
+- `/omg:taskboard` keeps stable task IDs, owners, dependencies, statuses (`todo`, `ready`, `in-progress`, `blocked`, `done`, `verified`), baseline anchors, lane-health notes, and evidence pointers in `.omg/state/taskboard.md`.
+- `team-plan` seeds stable task IDs plus lane assumptions and baseline anchors, `team-exec` pulls the smallest ready slice with explicit lane/subagent context and baseline checks, and `team-verify` marks tasks verified only with evidence plus safe lane state.
 - `checkpoint` and `status` can reference these files instead of replaying the whole chat, which improves cache stability and reduces token waste.
 - `/omg:recall "<query>"` performs state-first recall and bounded fallback search, so you can recover prior rationale without replaying full transcripts.
 
@@ -376,7 +375,7 @@ Disable only this hook:
 | `/omg:rules` | Activate task-conditional guardrail rule packs | Before implementation on migration/security/performance-sensitive work |
 | `/omg:memory` | Maintain MEMORY index, topic files, and path-aware rule packs | During long sessions or when decisions/rules drift |
 | `/omg:workspace` | Inspect, audit, or set primary root, worktree/path lanes, and collision boundaries | Before parallel implementation or multi-root work |
-| `/omg:taskboard` | Maintain a compact task ledger with stable IDs, `p0-p3` priority, deterministic `next`, and verifier-backed completion state | After planning and throughout long exec/verify loops |
+| `/omg:taskboard` | Maintain a compact task ledger with stable IDs, `p0-p3` priority, deterministic `next`, baseline anchors, and verifier-backed completion state | After planning and throughout long exec/verify loops |
 | `/omg:recall` | Recover prior decisions/evidence with state-first search and bounded history fallback | When you need past rationale quickly without replaying full transcripts |
 | `/omg:reasoning` | Set global reasoning effort and teammate overrides (`low/medium/high/xhigh`) | Before expensive planning/review loops or when depth is role-dependent |
 | `/omg:deep-init` | Build deep project map and validation baseline for long sessions | At project kickoff or when onboarding into unfamiliar codebases |
@@ -475,6 +474,7 @@ oh-my-gemini-cli/
 | Parallel execution keeps colliding or re-planning the same files | Workspace lanes are not explicit | Run `/omg:workspace status` or set lane/path ownership with `/omg:workspace` |
 | `taskboard next` keeps jumping between tasks unpredictably | Missing priority values or unstable queue ordering | Run `/omg:taskboard sync` (fills default `p2`), then `/omg:taskboard rebalance` |
 | Review or automation is about to run on a dirty/untrusted lane | Shared worktree hygiene is unclear | Run `/omg:workspace audit`, isolate the lane if needed, and only then continue verify/review steps |
+| Execution slice looks correct but the lane is on the wrong branch/HEAD | Baseline anchor drifted since planning or handoff | Re-run `/omg:workspace audit`, confirm the intended baseline, then realign the lane or refresh `/omg:team-plan` before continuing |
 | Done status keeps drifting after long loops | No compact task source of truth or missing verifier signoff | Run `/omg:taskboard sync`, then rerun `/omg:team-verify` to close remaining IDs |
 | You cannot remember why a decision was made earlier | Prior rationale is buried in long session history | Run `/omg:recall "<keyword>" scope=state` first, then widen to `scope=recent` only if needed |
 | Hooks seem to miss terminal events or fire twice after continuation | Hook lifecycle symmetry is not explicit | Run `/omg:hooks-validate`, then fix lifecycle policy before re-enabling autonomous loops |

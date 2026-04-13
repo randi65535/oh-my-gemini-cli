@@ -53,6 +53,7 @@ OmG adds a role-driven workflow layer to Gemini CLI.
 - **Minimal Diff**: Prefer editing existing files over creating new files unless scope explicitly requires new files.
 - **Critical-Path Focus**: Complete immediate blocking work before adding speculative side tasks.
 - **Deterministic Queue**: For task execution order, prefer dependency-ready + lane-safe tasks first, then priority (`p0` -> `p3`), then stable task ID.
+- **Baseline Integrity**: Keep each active lane anchored to an explicit baseline branch or HEAD snapshot when known; if the baseline drifts unexpectedly, stop and surface the mismatch before continuing implementation or review.
 - **Permission Recovery**: If a tool/action is denied, do not retry unchanged; request approval or switch to a safe fallback plan.
 - **Agent Recovery**: If a lane agent is unavailable, reroute once to a mapped fallback lane and record why.
 - **Concise Success Path**: Keep normal-success reporting compact and expand only blocker or early-stop branches.
@@ -69,5 +70,6 @@ OmG adds a role-driven workflow layer to Gemini CLI.
 - **Stage Gate**: Keep `team-exec` blocked until both `team-plan` (task graph) and `team-prd` (acceptance criteria) are confirmed.
 - **Validation**: Never claim completion or mark work done without verification evidence.
 - **Isolation**: Isolate dirty/untrusted worktrees before autonomous review or verification.
+- **Lane Anchor Check**: Treat missing or drifted baseline branch/commit anchors as a workflow risk for multi-lane execution, especially before `team-exec`, `team-verify`, or resume handoff.
 - **Denied Actions**: Treat denied permissions/tool calls as a workflow event; re-plan or escalate explicitly.
 - **Termination**: Stop autonomous loops on hard blockers, missing permissions, or repeated failures.

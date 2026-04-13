@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>oh-my-gemini-cli | Extension-first workflow pack for Gemini CLI</title>
-  <meta name="description" content="oh-my-gemini-cli is an extension-first, context-engineering-powered multi-agent workflow pack for Gemini CLI with lane health audits, hook lifecycle symmetry, and cache-stable taskboards.">
+  <meta name="description" content="oh-my-gemini-cli is an extension-first, context-engineering-powered multi-agent workflow pack for Gemini CLI with lane health audits, baseline-aware taskboards, and cache-stable state anchors.">
   <style>
     :root {
       --bg: #f4f8f6;
@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Docs Sync 2026-04-09</span>
+        <span class="badge">Latest Update v0.7.4</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Compatibility Review (Gemini CLI 2-Week Sync)</h2>
-      <p class="sub">Reviewed upstream Gemini CLI changes published from 2026-03-26 through 2026-04-09 and refreshed OmG guidance around stable, preview, and nightly behavior.</p>
+      <h2>Latest Update (Baseline-Aware Lane Guardrails)</h2>
+      <p class="sub">OmG v0.7.4 imports the most compatible ideas from a recent oh-my-codex changelog review and adapts them to Gemini Extensions as baseline-aware lane safety rules.</p>
       <table>
         <thead>
           <tr>
@@ -550,28 +550,28 @@
         </thead>
         <tbody>
           <tr>
-            <td>Recommended stable baseline</td>
-            <td>OmG now documents Gemini CLI <code>v0.37.0+</code> as the preferred stable runtime because recent sandbox, worktree, and subagent/skill propagation fixes materially improve long multi-lane sessions.</td>
+            <td>Workspace baseline anchors</td>
+            <td><code>/omg:workspace</code> can now carry a compact baseline branch/HEAD anchor per lane so parallel handoffs and resume flows have an explicit starting point.</td>
           </tr>
           <tr>
-            <td>Stable-channel impact</td>
-            <td><code>v0.37.0</code> adds dynamic Linux sandbox expansion + worktree support, Windows sandbox expansion, plan-mode policy relaxations, role-specific <code>/stats</code> metrics, skill instructions in subagent prompts, and cross-platform terminal-bell notifications.</td>
+            <td>Taskboard continuity</td>
+            <td><code>/omg:taskboard</code> and <code>/omg:team-plan</code> now keep baseline metadata attached to slices so branch drift becomes visible instead of implicit.</td>
           </tr>
           <tr>
-            <td>Preview-channel watch</td>
-            <td><code>v0.38.0-preview.0</code> improves slash-command refresh after <code>/skills reload</code>, allows explicit <code>web_fetch</code> in plan mode with ask-user policy, turns default loading phrases off, and expands memory extraction flows.</td>
+            <td>Execution guardrail</td>
+            <td><code>/omg:team-exec</code> now treats baseline drift as a blocker when it changes task assumptions, routing the operator back to audit or replanning instead of silently continuing on the wrong branch.</td>
           </tr>
           <tr>
-            <td>Nightly watchlist</td>
-            <td>Recent nightlies add Windows directory-junction skill linking, <code>/memory inbox</code>, <code>Ctrl+G</code> replacing <code>Ctrl+X</code>, and a rollback of <code>terminalBuffer=true</code> after regressions. OmG does not require these yet, but operators may notice them first on nightly.</td>
+            <td>Doctor and status visibility</td>
+            <td><code>/omg:doctor</code> and <code>/omg:status</code> now surface missing or drifted baseline anchors alongside existing lane-health and workflow-order diagnostics.</td>
           </tr>
           <tr>
-            <td>Operator guidance</td>
-            <td>If slash skills look stale after a runtime update, reload the registry with <code>/skills reload</code> on newer builds or restart the session before treating it as an OmG extension failure.</td>
+            <td>Source review</td>
+            <td>This release was informed by <code>oh-my-codex</code> changes published during the prior two-week window, but only imports ideas that fit Gemini CLI's extension-native command/state model.</td>
           </tr>
           <tr>
             <td>Scope boundary</td>
-            <td>This sync is documentation-only. OmG remains extension-native and does not need command or runtime-surface changes to stay compatible with the reviewed upstream releases.</td>
+            <td>Changes remain extension-native: prompt contracts, state guidance, taskboard/workspace shape, and docs only. No daemon, binary, or runtime shim was added.</td>
           </tr>
         </tbody>
       </table>
@@ -680,7 +680,7 @@ Structured Result
           <tr>
             <td>Done criteria discipline</td>
             <td>Premature completion risk</td>
-            <td><code>/omg:taskboard</code> + <code>/omg:team-verify</code> keep stable task IDs and verifier-backed completion evidence</td>
+            <td><code>/omg:taskboard</code> + <code>/omg:team-verify</code> keep stable task IDs, baseline anchors, and verifier-backed completion evidence</td>
           </tr>
           <tr>
             <td>Prior-decision recall</td>
@@ -810,7 +810,7 @@ Structured Result
           </thead>
           <tbody>
             <tr><td><code>/omg:workspace</code></td><td>Track primary root, optional worktree/path lanes, collision boundaries, and lane health.</td></tr>
-            <tr><td><code>/omg:taskboard</code></td><td>Track stable task IDs, owners, dependencies, verifier-backed completion, and lane-health notes.</td></tr>
+            <tr><td><code>/omg:taskboard</code></td><td>Track stable task IDs, owners, dependencies, baseline anchors, verifier-backed completion, and lane-health notes.</td></tr>
             <tr><td><code>/omg:recall</code></td><td>Recover prior rationale from compact state first, then widen to bounded recent history only when required.</td></tr>
             <tr><td><code>/omg:checkpoint</code></td><td>Resume from compact state references instead of replaying full chat history.</td></tr>
             <tr><td><code>/omg:cache</code></td><td>Audit whether compact state anchors are actually keeping cache prefixes stable.</td></tr>
@@ -907,7 +907,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
           <tr><td>Command</td><td><code>/omg:notify</code></td><td>Configure approvals/blockers/verify/checkpoint/idle notification routing</td></tr>
           <tr><td>Command</td><td><code>/omg:intent</code></td><td>Classify request intent and route to the right stage</td></tr>
           <tr><td>Command</td><td><code>/omg:workspace</code></td><td>Set primary root, worktree/path lane ownership, and audit lane health</td></tr>
-          <tr><td>Command</td><td><code>/omg:taskboard</code></td><td>Maintain compact task ledger with stable IDs, p0-p3 priority, deterministic next ordering, and verify state</td></tr>
+          <tr><td>Command</td><td><code>/omg:taskboard</code></td><td>Maintain compact task ledger with stable IDs, p0-p3 priority, deterministic next ordering, baseline anchors, and verify state</td></tr>
           <tr><td>Command</td><td><code>/omg:recall</code></td><td>Recover prior decisions/evidence with state-first search and bounded history fallback</td></tr>
           <tr><td>Command</td><td><code>/omg:team-assemble</code></td><td>Build a task-fit team roster, fallback map, and request execution approval</td></tr>
           <tr><td>Command</td><td><code>/omg:deep-init</code></td><td>Build project map and validation baseline before long sessions</td></tr>
@@ -1038,7 +1038,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
           <tr>
             <td>Sync task ledger</td>
             <td><code>/omg:taskboard sync</code></td>
-            <td>Compact source of truth for ready, blocked, done, and verified tasks with null-safe default priority</td>
+            <td>Compact source of truth for ready, blocked, done, and verified tasks with null-safe default priority plus lane baseline anchors</td>
           </tr>
           <tr>
             <td>Refresh memory</td>
@@ -1165,6 +1165,11 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
             <td>Run <code>/omg:taskboard sync</code> (fills default <code>p2</code>) then <code>/omg:taskboard rebalance</code></td>
           </tr>
           <tr>
+            <td>Execution is happening on the wrong branch or HEAD</td>
+            <td>Lane baseline drifted after planning, handoff, or resume</td>
+            <td>Run <code>/omg:workspace audit</code>, confirm the intended baseline anchor, then realign the lane or refresh <code>/omg:team-plan</code> before continuing</td>
+          </tr>
+          <tr>
             <td>Setup health is unclear before a long run</td>
             <td>State/config drift accumulated across sessions</td>
             <td>Run <code>/omg:doctor</code> and apply remediation list</td>
@@ -1193,7 +1198,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
         <a href="./guide/agent-team-assembly.md">Team Assembly Guide</a>
         <a href="./guide/hook-engineering.md">Hook Engineering Guide</a>
       </div>
-      <div>Built for official Gemini CLI Extensions workflow. Compatibility reviewed against upstream releases through 2026-04-09.</div>
+      <div>Built for official Gemini CLI Extensions workflow. Baseline-aware lane guardrails refreshed through v0.7.4.</div>
     </div>
   </footer>
 
