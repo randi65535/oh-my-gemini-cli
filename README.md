@@ -23,7 +23,7 @@ OmG extends Gemini CLI from a single-session assistant into a structured, role-d
 
 
 <p align="center">
-  <img src="resources/image/omg_logo_02.jpg" alt="OmG Logo" width="280" />
+  <img src="resources/image/omg_logo_02.jpg" alt="OmG Logo" width="420" />
 </p>
 
 ## Quick Start
@@ -58,7 +58,7 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 
 ## What's New in v0.7.4
 
-- Added baseline-aware lane guardrails inspired by a recent `oh-my-codex` changelog review:
+- Added baseline-aware lane guardrails:
   - `commands/omg/workspace.toml` now records per-lane baseline branch/HEAD anchors when known
   - `commands/omg/taskboard.toml` and `commands/omg/team-plan.toml` now carry baseline metadata forward with task slices
   - `commands/omg/team-prd.toml`, `commands/omg/team-exec.toml`, and `commands/omg/team.toml` now treat baseline expectations as part of execution handoff safety

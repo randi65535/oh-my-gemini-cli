@@ -38,7 +38,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 ## v0.7.4 - Baseline-Aware Lane Guardrails (2026-04-13)
 
-Reviewed recent `oh-my-codex` changelog activity from the last two weeks and imported the most compatible workflow-safety ideas into OmG's Gemini Extensions model.
+Strengthened OmG's multi-lane workflow safety by making branch/HEAD baselines explicit across workspace, taskboard, planning, and execution handoffs.
 
 ### Changed
 
@@ -65,7 +65,7 @@ Reviewed recent `oh-my-codex` changelog activity from the last two weeks and imp
 ### Structural Fit Note
 
 - OmG remains extension-native.
-- Imported ideas were limited to prompt/state-policy surfaces that fit Gemini CLI extensions cleanly.
+- Changes are limited to prompt/state-policy surfaces that fit Gemini CLI extensions cleanly.
 - No daemon, binary helper, or runtime shim was introduced.
 
 ## v0.7.3 - Stage-Gate and Runtime Signal Hardening (2026-04-08)
