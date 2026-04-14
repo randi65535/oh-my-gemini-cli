@@ -12,21 +12,30 @@ Protocol:
    - `profile <strict|balanced|fast>`
    - `events`
 2. Manage native event triggers:
-   - `session-start`
-   - `stage-transition`
-   - `pre-verify`
-   - `post-verify`
-   - `checkpoint-save`
-   - `blocker-raised`
-   - `session-stop`
-3. Manage derived signals (opt-in, state-driven):
-   - `context-drift`
-   - `risk-spike`
-   - `loop-stall`
-   - `token-burst`
-   - `blocker-repeat`
-   - `agent-blocked`
-   - `agent-finished-early`
+   - `SessionStart`
+   - `SessionEnd`
+   - `BeforeAgent`
+   - `AfterAgent`
+   - `BeforeModel`
+   - `AfterModel`
+   - `BeforeToolSelection`
+   - `BeforeTool`
+   - `AfterTool`
+   - `PreCompress`
+   - `Notification`
+3. Manage derived signals (opt-in, state-driven mapping):
+   - `stage-transition` (from AfterAgent)
+   - `blocker-raised` (from AfterAgent)
+   - `agent-blocked` (from AfterAgent)
+   - `agent-finished-early` (from AfterAgent)
+   - `pre-verify` (from BeforeTool)
+   - `post-verify` (from AfterTool)
+   - `checkpoint-save` (from AfterTool)
+   - `blocker-repeat` (from Notification)
+   - `loop-stall` (from Notification/AfterAgent)
+   - `risk-spike` (from Notification/AfterAgent)
+   - `context-drift` (from PreCompress)
+   - `token-burst` (from AfterModel)
 4. Build deterministic execution lanes:
    - `P0-safety` (permission/risk guardrails)
    - `P1-quality` (tests/docs/acceptance checks)
@@ -50,7 +59,7 @@ Suggested `hooks.json` shape:
 {
   "enabled": true,
   "profile": "balanced",
-  "native_events": ["session-start", "stage-transition", "pre-verify", "post-verify", "checkpoint-save", "blocker-raised", "session-stop"],
+  "native_events": ["SessionStart", "SessionEnd", "BeforeAgent", "AfterAgent", "BeforeModel", "AfterModel", "BeforeToolSelection", "BeforeTool", "AfterTool", "PreCompress", "Notification"],
   "derived_signals": {
     "context-drift": true,
     "risk-spike": true,
@@ -58,7 +67,12 @@ Suggested `hooks.json` shape:
     "token-burst": false,
     "blocker-repeat": true,
     "agent-blocked": true,
-    "agent-finished-early": true
+    "agent-finished-early": true,
+    "stage-transition": true,
+    "pre-verify": true,
+    "post-verify": true,
+    "checkpoint-save": true,
+    "blocker-raised": true
   },
   "lanes": {
     "P0-safety": { "timeout_ms": 400, "debounce_ms": 0 },

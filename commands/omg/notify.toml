@@ -14,24 +14,25 @@ Protocol:
    - `events`
    - `template <compact|detailed|incident>`
    - `idle <minutes>`
-2. Supported event groups:
-   - `approval-needed`
-   - `team-approved`
-   - `verify-passed`
-   - `verify-failed`
+2. Supported event groups (mapped to hooks):
+   - `SessionStart` / `SessionEnd` (lifecycle)
+   - `agent-blocked` (including approval-needed)
+   - `post-verify` (outcome-based: passed/failed)
    - `blocker-raised`
-   - `checkpoint-saved`
-   - `idle-watchdog`
-   - `session-stop`
+   - `checkpoint-save`
+   - `loop-stall` (high priority)
+   - `context-drift` (high priority)
+   - `risk-spike` (incident trigger)
+   - `idle-watchdog` (timer-based)
 3. Supported channels:
    - `desktop` (host OS notification adapter)
    - `terminal-bell`
    - `file` (append summaries to `.omg/state/notify.log`)
    - `webhook` (external bridge managed outside OmG)
 4. Apply notification posture rules:
-   - `quiet`: only `approval-needed`, `verify-failed`, `blocker-raised`, `session-stop`
-   - `balanced`: quiet + `team-approved`, `checkpoint-saved`
-   - `watchdog`: balanced + `idle-watchdog`
+   - `quiet`: `SessionEnd`, `agent-blocked`, `blocker-raised`, `loop-stall`, `risk-spike`
+   - `balanced`: quiet + `post-verify` (failed), `checkpoint-save`, `context-drift`
+   - `watchdog`: balanced + `post-verify` (passed), `idle-watchdog`
 5. Enforce extension boundary:
    - OmG manages trigger policy, templates, and state artifacts.
    - Actual OS/webhook delivery must be handled by Gemini host hooks, shell scripts, or project-specific bridges.
@@ -60,14 +61,15 @@ Suggested `notify.json` shape:
   "template": "compact",
   "idle_watchdog_minutes": 15,
   "events": {
-    "approval-needed": ["terminal-bell"],
-    "team-approved": ["file"],
-    "verify-passed": ["file"],
-    "verify-failed": ["terminal-bell", "file"],
+    "SessionEnd": ["terminal-bell", "file"],
+    "agent-blocked": ["terminal-bell", "file"],
+    "post-verify": ["file"],
     "blocker-raised": ["terminal-bell", "file"],
-    "checkpoint-saved": ["file"],
-    "idle-watchdog": [],
-    "session-stop": ["terminal-bell", "file"]
+    "checkpoint-save": ["file"],
+    "loop-stall": ["terminal-bell", "file"],
+    "context-drift": ["file"],
+    "risk-spike": ["terminal-bell", "file"],
+    "idle-watchdog": []
   },
   "external_dispatch_requires_opt_in": true,
   "worker_sessions_external_dispatch": false,
