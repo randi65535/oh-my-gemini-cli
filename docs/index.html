@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>oh-my-gemini-cli | Extension-first workflow pack for Gemini CLI</title>
-  <meta name="description" content="oh-my-gemini-cli is an extension-first, context-engineering-powered multi-agent workflow pack for Gemini CLI with lane health audits, baseline-aware taskboards, and cache-stable state anchors.">
+  <meta name="description" content="oh-my-gemini-cli is an extension-first, context-engineering-powered multi-agent workflow pack for Gemini CLI with hook-stable usage tracking, baseline-aware taskboards, and cache-stable state anchors.">
   <style>
     :root {
       --bg: #f4f8f6;
@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.7.4</span>
+        <span class="badge">Latest Update v0.7.5</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (Baseline-Aware Lane Guardrails)</h2>
-      <p class="sub">OmG v0.7.4 imports the most compatible ideas from a recent oh-my-codex changelog review and adapts them to Gemini Extensions as baseline-aware lane safety rules.</p>
+      <h2>Latest Update (Hook Stability + Usage-State Hygiene)</h2>
+      <p class="sub">OmG v0.7.5 strengthens AfterAgent reliability by splitting usage state more safely and making duplicate hook registration easier to diagnose.</p>
       <table>
         <thead>
           <tr>
@@ -550,28 +550,28 @@
         </thead>
         <tbody>
           <tr>
-            <td>Workspace baseline anchors</td>
-            <td><code>/omg:workspace</code> can now carry a compact baseline branch/HEAD anchor per lane so parallel handoffs and resume flows have an explicit starting point.</td>
+            <td>Usage-state split</td>
+            <td><code>hooks/scripts/after-agent-usage.js</code> now persists usage state by model and provider so mixed-model sessions keep cleaner cumulative accounting.</td>
           </tr>
           <tr>
-            <td>Taskboard continuity</td>
-            <td><code>/omg:taskboard</code> and <code>/omg:team-plan</code> now keep baseline metadata attached to slices so branch drift becomes visible instead of implicit.</td>
+            <td>Quota-watch state shape</td>
+            <td><code>.omg/state/quota-watch.json</code> can now retain per-model and per-provider session totals in addition to the latest turn snapshot and dedupe fingerprint.</td>
           </tr>
           <tr>
-            <td>Execution guardrail</td>
-            <td><code>/omg:team-exec</code> now treats baseline drift as a blocker when it changes task assumptions, routing the operator back to audit or replanning instead of silently continuing on the wrong branch.</td>
+            <td>Duplicate-hook diagnostics</td>
+            <td><code>/omg:hooks</code>, <code>/omg:hooks-validate</code>, and <code>/omg:doctor</code> now call out extension/manual hook coexistence that can make AfterAgent signals appear twice.</td>
           </tr>
           <tr>
-            <td>Doctor and status visibility</td>
-            <td><code>/omg:doctor</code> and <code>/omg:status</code> now surface missing or drifted baseline anchors alongside existing lane-health and workflow-order diagnostics.</td>
-          </tr>
-          <tr>
-            <td>Source review</td>
-            <td>This release was informed by <code>oh-my-codex</code> changes published during the prior two-week window, but only imports ideas that fit Gemini CLI's extension-native command/state model.</td>
+            <td>Operator guidance</td>
+            <td>Repeated usage or learn-hook output should now point operators toward hook registration cleanup first, instead of blind state purges or repeated retries.</td>
           </tr>
           <tr>
             <td>Scope boundary</td>
-            <td>Changes remain extension-native: prompt contracts, state guidance, taskboard/workspace shape, and docs only. No daemon, binary, or runtime shim was added.</td>
+            <td>Changes stay extension-native: hook script behavior, diagnostics prompts, state guidance, and docs only.</td>
+          </tr>
+          <tr>
+            <td>Release refresh</td>
+            <td>README, Korean README, landing page, changelog, package metadata, and extension metadata were updated together for <code>v0.7.5</code>.</td>
           </tr>
         </tbody>
       </table>
@@ -1145,6 +1145,11 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
             <td>Run <code>/omg:hooks-validate</code>, then fix lifecycle policy before re-enabling autonomous loops</td>
           </tr>
           <tr>
+            <td>Usage or learn-hook messages appear twice</td>
+            <td>OmG hooks may be registered through both extension-managed and manual hook paths</td>
+            <td>Run <code>/omg:hooks status</code> and <code>/omg:hooks-validate</code>, then keep one authoritative OmG hook registration path per event</td>
+          </tr>
+          <tr>
             <td>Output feels generic or repetitive</td>
             <td>Reasoning posture and quality gate too weak for target artifact</td>
             <td>Raise <code>/omg:reasoning</code> (optionally teammate overrides) and rerun <code>/omg:team-verify</code></td>
@@ -1198,7 +1203,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
         <a href="./guide/agent-team-assembly.md">Team Assembly Guide</a>
         <a href="./guide/hook-engineering.md">Hook Engineering Guide</a>
       </div>
-      <div>Built for official Gemini CLI Extensions workflow. Baseline-aware lane guardrails refreshed through v0.7.4.</div>
+      <div>Built for official Gemini CLI Extensions workflow. Hook stability and usage-state hygiene refreshed through v0.7.5.</div>
     </div>
   </footer>
 

@@ -56,18 +56,16 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.7.4
+## What's New in v0.7.5
 
-- Added baseline-aware lane guardrails:
-  - `commands/omg/workspace.toml` now records per-lane baseline branch/HEAD anchors when known
-  - `commands/omg/taskboard.toml` and `commands/omg/team-plan.toml` now carry baseline metadata forward with task slices
-  - `commands/omg/team-prd.toml`, `commands/omg/team-exec.toml`, and `commands/omg/team.toml` now treat baseline expectations as part of execution handoff safety
-- Hardened drift detection and operator visibility:
-  - `commands/omg/team-exec.toml` now blocks a slice when the active lane appears to have drifted from its recorded baseline in a task-breaking way
-  - `commands/omg/status.toml` now surfaces baseline-anchor drift risk
-  - `commands/omg/doctor.toml` now checks missing or drifted lane baseline anchors
-  - `context/omg-core.md` now codifies baseline integrity as a core execution rule
-- Bumped extension/package version to `0.7.4` and refreshed README, Korean README, landing docs, and history.
+- Hardened AfterAgent usage-state stability for mixed-model sessions:
+  - `hooks/scripts/after-agent-usage.js` now persists usage state split by model and provider
+  - `.omg/state/quota-watch.json` can now retain `session_totals_by_model` and `session_totals_by_provider`
+  - reduces state thrash when long sessions switch between multiple model variants
+- Expanded hook diagnostics for duplicate registration risk:
+  - `commands/omg/hooks.toml`, `commands/omg/hooks-validate.toml`, and `commands/omg/doctor.toml` now call out duplicate OmG hook registration and mixed manual/extension hook paths
+  - helps explain repeated AfterAgent output before operators start deleting state blindly
+- Bumped extension/package version to `0.7.5` and refreshed README, Korean README, landing docs, and history.
 
 ## At A Glance
 
@@ -256,7 +254,7 @@ OmG now ships an extension hook that prints a compact token-usage line after eac
 
 - Hook entrypoint: `hooks/hooks.json` (`AfterAgent` -> `omg-quota-watch-after-agent`)
 - Script: `hooks/scripts/after-agent-usage.js`
-- State artifact: `.omg/state/quota-watch.json` (turn counter, latest usage snapshot, and last processed transcript fingerprint)
+- State artifact: `.omg/state/quota-watch.json` (turn counter, latest usage snapshot, last processed transcript fingerprint, and session totals split by model/provider)
 - Optional state root override: `OMG_STATE_ROOT=<dir>` (absolute path or path relative to session `cwd`)
 - Optional quiet hook output: `OMG_HOOKS_QUIET=1`
 - Optional cwd hint mode: `OMG_USAGE_CWD_MODE=off|leaf|parent-leaf|full` (default: `parent-leaf`)
@@ -478,6 +476,7 @@ oh-my-gemini-cli/
 | Done status keeps drifting after long loops | No compact task source of truth or missing verifier signoff | Run `/omg:taskboard sync`, then rerun `/omg:team-verify` to close remaining IDs |
 | You cannot remember why a decision was made earlier | Prior rationale is buried in long session history | Run `/omg:recall "<keyword>" scope=state` first, then widen to `scope=recent` only if needed |
 | Hooks seem to miss terminal events or fire twice after continuation | Hook lifecycle symmetry is not explicit | Run `/omg:hooks-validate`, then fix lifecycle policy before re-enabling autonomous loops |
+| Usage hook or learn hook appears to fire twice | OmG hook registration may be duplicated across extension-managed and manual hook paths | Run `/omg:hooks status` and `/omg:hooks-validate`, then keep one authoritative OmG hook registration path per event |
 | Output is verbose, generic, or repetitive | Reasoning/gate posture too weak for the target artifact | Raise `/omg:reasoning` effort (optionally teammate overrides) and rerun `/omg:team-verify` |
 | Existing launch scripts use `--allowed-tools` | Flag deprecated in newer Gemini CLI | Replace with policy profiles via `--policy` and re-run |
 | Autonomous flow confirms too often (or too little) | Approval posture not aligned to task risk | Run `/omg:approval suggest|auto|full-auto` and recheck guardrails |

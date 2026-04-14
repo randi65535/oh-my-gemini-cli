@@ -14,11 +14,14 @@ Validation checklist:
    - each agent-entry path has one terminal outcome (`completed`, `blocked`, or `stopped`)
    - blocked continuations re-enter `P0-safety` before `P1` or `P2`
    - terminal hooks do not double-fire after retry or continuation
-6. Verify team-safety policy:
+6. Detect duplicate registration risk:
+   - extension-managed hook commands duplicated by manual/user hook config
+   - multiple AfterAgent registrations that would emit the same OmG signal twice
+7. Verify team-safety policy:
    - side-effect hooks disabled in worker/delegated sessions
    - high-risk hooks require explicit user confirmation context
-7. Report failures by severity (`critical`, `major`, `minor`).
-8. If filesystem tools are available, write/update `.omg/state/hooks-validation.md`.
+8. Report failures by severity (`critical`, `major`, `minor`).
+9. If filesystem tools are available, write/update `.omg/state/hooks-validation.md`.
 
 Output format:
 ## Validation Result

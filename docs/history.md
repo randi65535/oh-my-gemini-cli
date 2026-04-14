@@ -6,6 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.7.5` | 2026-04-14 | Hook stability and usage-state hygiene | Split usage monitor state by model/provider and added duplicate-hook registration diagnostics for repeated AfterAgent output |
 | `v0.7.4` | 2026-04-13 | Baseline-aware lane guardrails | Added baseline branch/HEAD anchors to workspace/taskboard/team flows so branch drift is caught before execution or review |
 | `v0.7.3` | 2026-04-08 | Stage-gate and runtime signal hardening | Added workspace-aware usage monitor cwd hints, stop/cancel skill-state cleanup signals, and stricter staged execution readiness checks |
 | `v0.7.2` | 2026-04-07 | Workflow/runtime hygiene | Added learn-signal cooldown control, release metadata sync utility, and stronger staged-workflow diagnostics |
@@ -35,6 +36,33 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.2` | 2026-02-22 | Model/branding consistency | `gemini-3.1-*` naming and OmG branding normalized |
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
+
+## v0.7.5 - Hook Stability and Usage-State Hygiene (2026-04-14)
+
+Focused on hook reliability for long-running OmG sessions, especially when model usage tracking or hook registration paths become noisy.
+
+### Changed
+
+- Split usage-monitor state into more stable buckets:
+  - `hooks/scripts/after-agent-usage.js`
+  - `.omg/state/quota-watch.json` can now persist session totals by model and provider in addition to the latest turn snapshot
+- Expanded hook diagnostics and validation coverage:
+  - `commands/omg/hooks.toml`
+  - `commands/omg/hooks-validate.toml`
+  - `commands/omg/doctor.toml`
+  - duplicate extension/manual hook registration risk is now called out explicitly when repeated AfterAgent output is suspected
+- Refreshed docs and release metadata for `v0.7.5`:
+  - `README.md`
+  - `docs/README_ko.md`
+  - `docs/index.html`
+  - `docs/history.md`
+  - `package.json`
+  - `gemini-extension.json`
+
+### Structural Fit Note
+
+- OmG remains extension-native.
+- Changes are limited to hook/runtime state handling, diagnostics guidance, and documentation.
 
 ## v0.7.4 - Baseline-Aware Lane Guardrails (2026-04-13)
 

@@ -40,8 +40,11 @@ Protocol:
    - every before/enter path must have exactly one terminal outcome (`completed`, `blocked`, or `stopped`)
    - blocked continuations must re-enter `P0-safety` once before `P1` or `P2`
    - terminal hooks must not double-fire after continuation or retry
-7. Enforce team-safety: side-effect hooks must be disabled in delegated sub-agent turns unless user explicitly allows them.
-8. If filesystem tools are available, write/update `.omg/state/hooks.json`.
+7. Detect duplicate delivery risk:
+   - if the same OmG hook appears to be registered through both extension-managed hooks and a manual/user-maintained hook file, call out the coexistence risk explicitly
+   - prefer one authoritative registration path per event to avoid duplicate AfterAgent output
+8. Enforce team-safety: side-effect hooks must be disabled in delegated sub-agent turns unless user explicitly allows them.
+9. If filesystem tools are available, write/update `.omg/state/hooks.json`.
 
 Suggested `hooks.json` shape:
 {

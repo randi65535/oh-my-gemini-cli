@@ -113,6 +113,26 @@ function formatCwdLabel(cwd, mode) {
   return leaf || normalizeDisplayPath(resolved);
 }
 
+function detectProvider(modelName) {
+  const normalized =
+    typeof modelName === "string" ? modelName.trim().toLowerCase() : "";
+  if (!normalized) {
+    return "unknown";
+  }
+  if (normalized.startsWith("gemini")) {
+    return "gemini";
+  }
+  const slashIndex = normalized.indexOf("/");
+  if (slashIndex > 0) {
+    return normalized.slice(0, slashIndex);
+  }
+  const dashIndex = normalized.indexOf("-");
+  if (dashIndex > 0) {
+    return normalized.slice(0, dashIndex);
+  }
+  return normalized;
+}
+
 function readState(statePath) {
   try {
     const raw = fs.readFileSync(statePath, "utf8");
@@ -157,6 +177,7 @@ function buildUsageFromTranscript(transcript) {
     total: 0,
   };
   const byModel = {};
+  const byProvider = {};
 
   for (const msg of geminiMessages) {
     const t = msg.tokens || {};
@@ -168,10 +189,15 @@ function buildUsageFromTranscript(transcript) {
     totals.total += asNumber(t.total);
 
     const model = typeof msg.model === "string" && msg.model ? msg.model : "unknown";
+    const provider = detectProvider(model);
     if (!byModel[model]) {
       byModel[model] = 0;
     }
     byModel[model] += asNumber(t.total);
+    if (!byProvider[provider]) {
+      byProvider[provider] = 0;
+    }
+    byProvider[provider] += asNumber(t.total);
   }
 
   const latestModel =
@@ -188,6 +214,7 @@ function buildUsageFromTranscript(transcript) {
     },
     session: totals,
     byModel,
+    byProvider,
   };
 }
 
@@ -270,8 +297,11 @@ async function main() {
         last_event_key: eventKey,
         last_transcript_hash: lastTranscriptHash,
         last_model: usage.latest.model,
+        last_provider: detectProvider(usage.latest.model),
         last_turn_total_tokens: usage.latest.total,
         last_session_total_tokens: usage.session.total,
+        session_totals_by_model: usage.byModel,
+        session_totals_by_provider: usage.byProvider,
         cwd_mode: cwdMode,
         last_cwd_label: cwdLabel,
         updated_at: new Date().toISOString(),
