@@ -10,25 +10,37 @@ OmG provides an extension-native hook layer for deterministic orchestration and 
 
 ## Native Events
 
-Hooks can be attached to these core events:
+Hooks can be attached to these core extension-level events:
 
-- `session-start`
-- `stage-transition`
-- `pre-verify`
-- `post-verify`
-- `checkpoint-save`
-- `blocker-raised`
-- `session-stop`
+- `SessionStart`: Session initialization.
+- `SessionEnd`: Session finalization.
+- `BeforeAgent`: Before an agent turn begins.
+- `AfterAgent`: After an agent turn completes (success, failure, or block).
+- `BeforeModel`: Before a model request is sent.
+- `AfterModel`: After a model response is received.
+- `BeforeToolSelection`: Before the model decides which tool to call.
+- `BeforeTool`: Before a specific tool is executed.
+- `AfterTool`: After a tool execution returns.
+- `PreCompress`: Before context window compaction/summarization.
+- `Notification`: When a system or agent notification is issued.
 
 ## Derived Signals
 
-Derived signals are optional and evaluated from runtime/session state:
+Derived signals are state-driven mappings that allow for higher-level orchestration:
 
-- `context-drift`
-- `risk-spike`
-- `loop-stall`
-- `token-burst`
-- `blocker-repeat`
+- `session-start`: Triggered by `SessionStart`.
+- `stage-transition`: Triggered by `AfterAgent` (e.g., plan -> exec).
+- `blocker-raised`: Triggered by `AfterAgent` when a new blocker is identified.
+- `agent-blocked`: Triggered by `AfterAgent` when execution is paused.
+- `agent-finished-early`: Triggered by `AfterAgent` when a goal is completed before all tasks are exhausted.
+- `pre-verify`: Triggered by `BeforeTool` for critical validation.
+- `post-verify`: Triggered by `AfterTool` to confirm outcome.
+- `checkpoint-save`: Triggered by `AfterTool` when state is persisted.
+- `blocker-repeat`: Triggered by `Notification` or `AfterAgent` when the same blocker persists.
+- `loop-stall`: Triggered by `Notification` or `AfterAgent` when a loop fails to progress.
+- `risk-spike`: Triggered by `Notification` or `AfterAgent` on high failure density.
+- `context-drift`: Triggered by `PreCompress` when summary entropy is high.
+- `token-burst`: Triggered by `AfterModel` when token usage exceeds thresholds.
 
 ## Deterministic Lanes
 
