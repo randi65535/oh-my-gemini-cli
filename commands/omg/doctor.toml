@@ -41,6 +41,7 @@ Diagnostic protocol:
    - hook safety policy gaps for autonomous loops
    - hook lifecycle asymmetry (start without terminal outcome, blocked continuation skipping safety re-entry)
    - duplicate OmG hook registration causing repeated AfterAgent output or mixed manual/extension hook paths
+   - runtime hook profile/disable env vars producing unexpected silence or reduced hook coverage
    - repeated learn nudges due missing cooldown policy in `.omg/rules/learn.json`
    - repeated denied tool calls without escalation path
 7. Produce concrete remediation actions in priority order.

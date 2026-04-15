@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>oh-my-gemini-cli | Extension-first workflow pack for Gemini CLI</title>
-  <meta name="description" content="oh-my-gemini-cli is an extension-first, context-engineering-powered multi-agent workflow pack for Gemini CLI with hook-stable usage tracking, baseline-aware taskboards, and cache-stable state anchors.">
+  <meta name="description" content="oh-my-gemini-cli is an extension-first, context-engineering-powered multi-agent workflow pack for Gemini CLI with env-driven hook controls, hook-stable usage tracking, and cache-stable state anchors.">
   <style>
     :root {
       --bg: #f4f8f6;
@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.7.5</span>
+        <span class="badge">Latest Update v0.7.6</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (Hook Stability + Usage-State Hygiene)</h2>
-      <p class="sub">OmG v0.7.5 strengthens AfterAgent reliability by splitting usage state more safely and making duplicate hook registration easier to diagnose.</p>
+      <h2>Latest Update (Hook Runtime Controls)</h2>
+      <p class="sub">OmG v0.7.6 adds environment-driven hook controls so operators can quiet or selectively disable shipped AfterAgent hooks without editing hook files.</p>
       <table>
         <thead>
           <tr>
@@ -550,20 +550,20 @@
         </thead>
         <tbody>
           <tr>
-            <td>Usage-state split</td>
-            <td><code>hooks/scripts/after-agent-usage.js</code> now persists usage state by model and provider so mixed-model sessions keep cleaner cumulative accounting.</td>
+            <td>Hook profile control</td>
+            <td><code>OMG_HOOK_PROFILE=minimal|balanced|strict</code> now lets operators reduce hook noise per session. <code>minimal</code> suppresses normal usage lines and learn nudges while preserving hook state.</td>
           </tr>
           <tr>
-            <td>Quota-watch state shape</td>
-            <td><code>.omg/state/quota-watch.json</code> can now retain per-model and per-provider session totals in addition to the latest turn snapshot and dedupe fingerprint.</td>
+            <td>Per-hook env disable</td>
+            <td><code>OMG_DISABLED_HOOKS=usage,learn</code> can disable one or both shipped AfterAgent hooks without editing hook manifests or deleting state files.</td>
           </tr>
           <tr>
-            <td>Duplicate-hook diagnostics</td>
-            <td><code>/omg:hooks</code>, <code>/omg:hooks-validate</code>, and <code>/omg:doctor</code> now call out extension/manual hook coexistence that can make AfterAgent signals appear twice.</td>
+            <td>Script coverage</td>
+            <td><code>hooks/scripts/after-agent-usage.js</code> and <code>hooks/scripts/learn.js</code> now both respect runtime hook controls, keeping behavior consistent across shipped AfterAgent surfaces.</td>
           </tr>
           <tr>
-            <td>Operator guidance</td>
-            <td>Repeated usage or learn-hook output should now point operators toward hook registration cleanup first, instead of blind state purges or repeated retries.</td>
+            <td>Validation coverage</td>
+            <td><code>/omg:hooks</code>, <code>/omg:hooks-validate</code>, and <code>/omg:doctor</code> now treat runtime env controls as first-class diagnostics alongside lifecycle and duplicate-registration checks.</td>
           </tr>
           <tr>
             <td>Scope boundary</td>
@@ -571,7 +571,7 @@
           </tr>
           <tr>
             <td>Release refresh</td>
-            <td>README, Korean README, landing page, changelog, package metadata, and extension metadata were updated together for <code>v0.7.5</code>.</td>
+            <td>README, Korean README, landing page, changelog, package metadata, and extension metadata were updated together for <code>v0.7.6</code>.</td>
           </tr>
         </tbody>
       </table>
@@ -1150,6 +1150,11 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
             <td>Run <code>/omg:hooks status</code> and <code>/omg:hooks-validate</code>, then keep one authoritative OmG hook registration path per event</td>
           </tr>
           <tr>
+            <td>Hook output suddenly becomes quiet</td>
+            <td>Runtime hook controls were set in the current shell or session</td>
+            <td>Check <code>OMG_HOOK_PROFILE</code> and <code>OMG_DISABLED_HOOKS</code> before editing hook files or deleting OmG state</td>
+          </tr>
+          <tr>
             <td>Output feels generic or repetitive</td>
             <td>Reasoning posture and quality gate too weak for target artifact</td>
             <td>Raise <code>/omg:reasoning</code> (optionally teammate overrides) and rerun <code>/omg:team-verify</code></td>
@@ -1203,7 +1208,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
         <a href="./guide/agent-team-assembly.md">Team Assembly Guide</a>
         <a href="./guide/hook-engineering.md">Hook Engineering Guide</a>
       </div>
-      <div>Built for official Gemini CLI Extensions workflow. Hook stability and usage-state hygiene refreshed through v0.7.5.</div>
+      <div>Built for official Gemini CLI Extensions workflow. Hook runtime controls refreshed through v0.7.6.</div>
     </div>
   </footer>
 

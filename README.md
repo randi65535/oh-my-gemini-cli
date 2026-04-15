@@ -56,16 +56,17 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.7.5
+## What's New in v0.7.6
 
-- Hardened AfterAgent usage-state stability for mixed-model sessions:
-  - `hooks/scripts/after-agent-usage.js` now persists usage state split by model and provider
-  - `.omg/state/quota-watch.json` can now retain `session_totals_by_model` and `session_totals_by_provider`
-  - reduces state thrash when long sessions switch between multiple model variants
-- Expanded hook diagnostics for duplicate registration risk:
-  - `commands/omg/hooks.toml`, `commands/omg/hooks-validate.toml`, and `commands/omg/doctor.toml` now call out duplicate OmG hook registration and mixed manual/extension hook paths
-  - helps explain repeated AfterAgent output before operators start deleting state blindly
-- Bumped extension/package version to `0.7.5` and refreshed README, Korean README, landing docs, and history.
+- Added hook runtime controls for quieter or more selective sessions without editing hook files:
+  - `OMG_HOOK_PROFILE=minimal|balanced|strict`
+  - `OMG_DISABLED_HOOKS=usage,learn`
+- Applied the runtime controls to shipped AfterAgent hooks:
+  - `hooks/scripts/after-agent-usage.js` respects profile/disable envs and keeps state snapshots even when `minimal` suppresses output
+  - `hooks/scripts/learn.js` suppresses learn nudges under `minimal` and can be disabled explicitly via env
+- Expanded hook management diagnostics:
+  - `commands/omg/hooks.toml`, `commands/omg/hooks-validate.toml`, and `commands/omg/doctor.toml` now document and validate runtime hook controls in addition to duplicate-registration risk
+- Bumped extension/package version to `0.7.6` and refreshed README, Korean README, landing docs, and history.
 
 ## At A Glance
 
@@ -258,6 +259,8 @@ OmG now ships an extension hook that prints a compact token-usage line after eac
 - Optional state root override: `OMG_STATE_ROOT=<dir>` (absolute path or path relative to session `cwd`)
 - Optional quiet hook output: `OMG_HOOKS_QUIET=1`
 - Optional cwd hint mode: `OMG_USAGE_CWD_MODE=off|leaf|parent-leaf|full` (default: `parent-leaf`)
+- Optional hook profile: `OMG_HOOK_PROFILE=minimal|balanced|strict` (`minimal` suppresses usage line output but keeps state snapshots)
+- Optional per-hook disable: `OMG_DISABLED_HOOKS=usage` to disable only the usage monitor by env
 
 What it shows automatically:
 
@@ -290,6 +293,12 @@ Example (show full cwd path in usage lines):
 export OMG_USAGE_CWD_MODE=full
 ```
 
+Example (keep state snapshots but suppress normal usage output):
+
+```bash
+export OMG_HOOK_PROFILE=minimal
+```
+
 Disable only this hook:
 
 ```json
@@ -311,6 +320,8 @@ OmG now also ships a safety-hardened learn-signal hook so `/omg:learn` nudges ap
 - Runtime controls:
   - `OMG_STATE_ROOT=<dir>` to move `learn-watch.json` beside other OmG state
   - `OMG_HOOKS_QUIET=1` to keep the hook silent while preserving state updates
+  - `OMG_HOOK_PROFILE=minimal|balanced|strict` (`minimal` suppresses learn nudges)
+  - `OMG_DISABLED_HOOKS=learn` to disable only the learn-signal hook by env
 
 Safety behavior:
 
@@ -327,6 +338,12 @@ Disable only this hook:
     "disabled": ["omg-learn-signal-after-agent"]
   }
 }
+```
+
+Example (disable one or both shipped AfterAgent hooks by env):
+
+```bash
+export OMG_DISABLED_HOOKS=usage,learn
 ```
 
 ## Gemini CLI Compatibility Notes (Reviewed: 2026-04-09)
@@ -477,6 +494,7 @@ oh-my-gemini-cli/
 | You cannot remember why a decision was made earlier | Prior rationale is buried in long session history | Run `/omg:recall "<keyword>" scope=state` first, then widen to `scope=recent` only if needed |
 | Hooks seem to miss terminal events or fire twice after continuation | Hook lifecycle symmetry is not explicit | Run `/omg:hooks-validate`, then fix lifecycle policy before re-enabling autonomous loops |
 | Usage hook or learn hook appears to fire twice | OmG hook registration may be duplicated across extension-managed and manual hook paths | Run `/omg:hooks status` and `/omg:hooks-validate`, then keep one authoritative OmG hook registration path per event |
+| Hook output suddenly becomes quiet or a learn nudge disappears | Runtime hook controls were set for the current shell/session | Check `OMG_HOOK_PROFILE` and `OMG_DISABLED_HOOKS` before changing hook files or deleting state |
 | Output is verbose, generic, or repetitive | Reasoning/gate posture too weak for the target artifact | Raise `/omg:reasoning` effort (optionally teammate overrides) and rerun `/omg:team-verify` |
 | Existing launch scripts use `--allowed-tools` | Flag deprecated in newer Gemini CLI | Replace with policy profiles via `--policy` and re-run |
 | Autonomous flow confirms too often (or too little) | Approval posture not aligned to task risk | Run `/omg:approval suggest|auto|full-auto` and recheck guardrails |
@@ -497,7 +515,6 @@ Extension behavior is manifest-driven through Gemini CLI extension primitives.
 - [Gemini CLI](https://github.com/google-gemini/gemini-cli) - Google's open-source AI terminal agent
 - [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode) - OpenCode agent harness
 - [Claude Code Prompt Caching](https://news.hada.io/topic?id=26835) - Context engineering principles
-- [everything-claude-code](https://github.com/affaan-m/everything-claude-code) - Claude Code CLI harness
 
 ## Docs
 

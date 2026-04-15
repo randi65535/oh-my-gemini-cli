@@ -36,6 +36,7 @@ Protocol:
    - debounce window for repeated triggers
    - timeout budget per lane
    - cooldown after repeated failures
+   - runtime profile overrides via environment when operators need fast/noisy-session adjustments without editing hook files
 6. Enforce lifecycle symmetry for agent-bound triggers:
    - every before/enter path must have exactly one terminal outcome (`completed`, `blocked`, or `stopped`)
    - blocked continuations must re-enter `P0-safety` once before `P1` or `P2`
@@ -69,6 +70,10 @@ Suggested `hooks.json` shape:
     "before_after_symmetry": true,
     "continuation_reenters_safety_lane": true,
     "terminal_states": ["completed", "blocked", "stopped"]
+  },
+  "runtime_controls": {
+    "hook_profile_env": "OMG_HOOK_PROFILE=minimal|balanced|strict",
+    "disabled_hooks_env": "OMG_DISABLED_HOOKS=usage,learn"
   },
   "team_safety": {
     "disable_side_effects_for_worker_sessions": true

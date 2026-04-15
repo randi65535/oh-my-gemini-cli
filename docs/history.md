@@ -6,6 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.7.6` | 2026-04-15 | Hook runtime controls | Added env-driven hook profile/disable controls so operators can quiet or selectively disable shipped AfterAgent hooks without editing hook files |
 | `v0.7.5` | 2026-04-14 | Hook stability and usage-state hygiene | Split usage monitor state by model/provider and added duplicate-hook registration diagnostics for repeated AfterAgent output |
 | `v0.7.4` | 2026-04-13 | Baseline-aware lane guardrails | Added baseline branch/HEAD anchors to workspace/taskboard/team flows so branch drift is caught before execution or review |
 | `v0.7.3` | 2026-04-08 | Stage-gate and runtime signal hardening | Added workspace-aware usage monitor cwd hints, stop/cancel skill-state cleanup signals, and stricter staged execution readiness checks |
@@ -36,6 +37,34 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.2` | 2026-02-22 | Model/branding consistency | `gemini-3.1-*` naming and OmG branding normalized |
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
+
+## v0.7.6 - Hook Runtime Controls (2026-04-15)
+
+Added environment-driven hook controls so OmG operators can reduce noise or selectively disable shipped AfterAgent hooks without editing hook files directly.
+
+### Changed
+
+- Added runtime hook controls to shipped hook scripts:
+  - `hooks/scripts/after-agent-usage.js`
+  - `hooks/scripts/learn.js`
+  - supports `OMG_HOOK_PROFILE=minimal|balanced|strict`
+  - supports `OMG_DISABLED_HOOKS=usage,learn`
+- Expanded hook-management guidance and validation:
+  - `commands/omg/hooks.toml`
+  - `commands/omg/hooks-validate.toml`
+  - `commands/omg/doctor.toml`
+- Refreshed docs and release metadata for `v0.7.6`:
+  - `README.md`
+  - `docs/README_ko.md`
+  - `docs/index.html`
+  - `docs/history.md`
+  - `package.json`
+  - `gemini-extension.json`
+
+### Structural Fit Note
+
+- OmG remains extension-native.
+- Changes are limited to shipped hook scripts, prompt-policy guidance, and documentation.
 
 ## v0.7.5 - Hook Stability and Usage-State Hygiene (2026-04-14)
 

@@ -18,6 +18,14 @@ const DEFAULT_STATE_RELATIVE_PATH = path.join(".omg", "state", "quota-watch.json
 const QUIET_HOOKS_ENV = "OMG_HOOKS_QUIET";
 const STATE_ROOT_ENV = "OMG_STATE_ROOT";
 const CWD_MODE_ENV = "OMG_USAGE_CWD_MODE";
+const HOOK_PROFILE_ENV = "OMG_HOOK_PROFILE";
+const DISABLED_HOOKS_ENV = "OMG_DISABLED_HOOKS";
+const USAGE_HOOK_KEYS = new Set([
+  "usage",
+  "quota",
+  "quota-watch",
+  "omg-quota-watch-after-agent",
+]);
 
 function readStdinText() {
   return new Promise((resolve) => {
@@ -49,6 +57,36 @@ function isTruthy(value) {
   }
   const normalized = value.trim().toLowerCase();
   return normalized === "1" || normalized === "true" || normalized === "yes" || normalized === "on";
+}
+
+function parseCsvEnv(value) {
+  if (typeof value !== "string") {
+    return [];
+  }
+  return value
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function resolveHookProfile() {
+  const raw =
+    typeof process.env[HOOK_PROFILE_ENV] === "string"
+      ? process.env[HOOK_PROFILE_ENV].trim().toLowerCase()
+      : "";
+  if (raw === "minimal" || raw === "balanced" || raw === "strict") {
+    return raw;
+  }
+  return "balanced";
+}
+
+function isHookDisabled(disabledHooks, candidates) {
+  for (const candidate of candidates) {
+    if (disabledHooks.includes(candidate)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function resolveStatePath(cwd) {
@@ -265,6 +303,9 @@ async function main() {
 
   const statePath = resolveStatePath(cwd);
   const quietHooks = isTruthy(process.env[QUIET_HOOKS_ENV]);
+  const hookProfile = resolveHookProfile();
+  const disabledHooks = parseCsvEnv(process.env[DISABLED_HOOKS_ENV]);
+  const usageHookDisabled = isHookDisabled(disabledHooks, [...USAGE_HOOK_KEYS]);
   const cwdMode = resolveCwdMode();
   const cwdLabel = formatCwdLabel(cwd, cwdMode);
   const prevState = readState(statePath);
@@ -337,7 +378,8 @@ async function main() {
     });
   }
 
-  emitHookOutput(quietHooks ? "" : line);
+  const suppressOutput = quietHooks || hookProfile === "minimal";
+  emitHookOutput(suppressOutput ? "" : line);
 }
 
 main().catch((error) => {
@@ -350,3 +392,7 @@ main().catch((error) => {
   };
   process.stdout.write(JSON.stringify(fallback));
 });
+  if (usageHookDisabled) {
+    emitHookOutput("");
+    return;
+  }

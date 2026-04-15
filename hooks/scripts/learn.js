@@ -16,6 +16,8 @@ import path from "node:path";
 
 const QUIET_HOOKS_ENV = "OMG_HOOKS_QUIET";
 const STATE_ROOT_ENV = "OMG_STATE_ROOT";
+const HOOK_PROFILE_ENV = "OMG_HOOK_PROFILE";
+const DISABLED_HOOKS_ENV = "OMG_DISABLED_HOOKS";
 const DEFAULT_STATE_RELATIVE_PATH = path.join(".omg", "state", "learn-watch.json");
 const DEFAULT_DEEP_INTERVIEW_STATE_RELATIVE_PATH = path.join(
   ".omg",
@@ -51,6 +53,12 @@ const INFORMATIONAL_PREFIXES = [
   "compare",
 ];
 
+const LEARN_HOOK_KEYS = new Set([
+  "learn",
+  "learn-signal",
+  "omg-learn-signal-after-agent",
+]);
+
 function readStdinText() {
   return new Promise((resolve) => {
     let data = "";
@@ -83,6 +91,36 @@ function isTruthy(value) {
   }
   const normalized = value.trim().toLowerCase();
   return normalized === "1" || normalized === "true" || normalized === "yes" || normalized === "on";
+}
+
+function parseCsvEnv(value) {
+  if (typeof value !== "string") {
+    return [];
+  }
+  return value
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function resolveHookProfile() {
+  const raw =
+    typeof process.env[HOOK_PROFILE_ENV] === "string"
+      ? process.env[HOOK_PROFILE_ENV].trim().toLowerCase()
+      : "";
+  if (raw === "minimal" || raw === "balanced" || raw === "strict") {
+    return raw;
+  }
+  return "balanced";
+}
+
+function isHookDisabled(disabledHooks, candidates) {
+  for (const candidate of candidates) {
+    if (disabledHooks.includes(candidate)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function resolveStatePath(cwd) {
@@ -385,6 +423,8 @@ async function main() {
       ? hookInput.transcript_path
       : "";
   const quietHooks = isTruthy(process.env[QUIET_HOOKS_ENV]);
+  const hookProfile = resolveHookProfile();
+  const disabledHooks = parseCsvEnv(process.env[DISABLED_HOOKS_ENV]);
   const statePath = resolveStatePath(cwd);
   const deepInterviewStatePath = resolveDeepInterviewStatePath(cwd);
   const prevState = readState(statePath);
@@ -393,6 +433,13 @@ async function main() {
   const deepInterviewLockActive = isDeepInterviewLockActive(deepInterviewState);
   const nowMs = Date.now();
   const nowIso = new Date(nowMs).toISOString();
+  const learnHookDisabled =
+    hookProfile === "minimal" || isHookDisabled(disabledHooks, [...LEARN_HOOK_KEYS]);
+
+  if (learnHookDisabled) {
+    emitHookOutput("");
+    return;
+  }
 
   if (!transcriptPath || !fs.existsSync(transcriptPath)) {
     const eventKey = buildEventKey(sessionId, transcriptPath, null);
