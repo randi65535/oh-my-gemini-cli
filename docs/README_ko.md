@@ -67,6 +67,10 @@ gemini extensions list
   - `hooks/scripts/learn.js`는 `minimal`에서 learn nudge를 억제하고, env로 개별 비활성화할 수 있습니다.
 - hook 관리 진단을 강화했습니다.
   - `commands/omg/hooks.toml`, `commands/omg/hooks-validate.toml`, `commands/omg/doctor.toml`이 runtime hook control과 중복 등록 위험을 함께 점검합니다.
+- 확장 유지보수를 위한 skill metadata 무결성 검사를 추가했습니다.
+  - 새 maintainer 체크: `npm run test:skills`
+  - `scripts/check-skill-metadata.js`가 `skills/*/SKILL.md` frontmatter, 중복 name, 폴더/name 불일치를 검증합니다.
+  - `commands/omg/doctor.toml`은 malformed/duplicate skill metadata를 준비도 이슈로 다룹니다.
 - 패키지/확장 버전을 `0.7.6`으로 올리고 README/한국어 README/랜딩/히스토리를 갱신했습니다.
 
 ## 한눈에 보기
@@ -459,6 +463,7 @@ oh-my-gemini-cli/
 | continuation 이후 훅이 두 번 실행되거나 종료 이벤트를 놓침 | hook lifecycle 대칭성이 불명확함 | `/omg:hooks-validate`를 실행해 lifecycle policy를 정리한 뒤 자율 루프를 다시 켬 |
 | usage hook이나 learn hook이 두 번씩 실행되는 것처럼 보임 | OmG hook 등록이 extension 관리 경로와 수동 hook 경로에 중복되어 있을 수 있음 | `/omg:hooks status`, `/omg:hooks-validate`를 실행하고, 이벤트별 OmG hook 등록 경로를 하나로 정리 |
 | hook 출력이 갑자기 조용해지거나 learn 안내가 사라짐 | 현재 셸/세션에 runtime hook control이 설정되어 있음 | hook 파일이나 상태를 지우기 전에 `OMG_HOOK_PROFILE`, `OMG_DISABLED_HOOKS`를 먼저 확인 |
+| 유지된 skill 하나가 갑자기 로드되지 않거나 이상하게 동작함 | `SKILL.md` frontmatter가 깨졌거나 name이 중복됨 | 배포 전에 `npm run test:skills`를 실행하고 malformed frontmatter, 중복 name, 폴더/name 불일치를 수정 |
 | 자율 실행에서 확인 요청이 너무 많거나 너무 적음 | 승인 포스처가 작업 위험도와 불일치 | `/omg:approval suggest|auto|full-auto`로 재설정 후 재확인 |
 | 장기 실행 전에 환경 정상 여부가 불확실함 | 상태/구성 드리프트 누적 | `/omg:doctor`(또는 `/omg:doctor team`) 실행 후 복구 항목 반영 |
 

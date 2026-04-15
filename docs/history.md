@@ -6,7 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
-| `v0.7.6` | 2026-04-15 | Hook runtime controls | Added env-driven hook profile/disable controls so operators can quiet or selectively disable shipped AfterAgent hooks without editing hook files |
+| `v0.7.6` | 2026-04-15 | Hook runtime controls and skill metadata guardrails | Added env-driven hook profile/disable controls and a retained-skill metadata integrity check for safer extension maintenance |
 | `v0.7.5` | 2026-04-14 | Hook stability and usage-state hygiene | Split usage monitor state by model/provider and added duplicate-hook registration diagnostics for repeated AfterAgent output |
 | `v0.7.4` | 2026-04-13 | Baseline-aware lane guardrails | Added baseline branch/HEAD anchors to workspace/taskboard/team flows so branch drift is caught before execution or review |
 | `v0.7.3` | 2026-04-08 | Stage-gate and runtime signal hardening | Added workspace-aware usage monitor cwd hints, stop/cancel skill-state cleanup signals, and stricter staged execution readiness checks |
@@ -38,9 +38,9 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
 
-## v0.7.6 - Hook Runtime Controls (2026-04-15)
+## v0.7.6 - Hook Runtime Controls and Skill Metadata Guardrails (2026-04-15)
 
-Added environment-driven hook controls so OmG operators can reduce noise or selectively disable shipped AfterAgent hooks without editing hook files directly.
+Added environment-driven hook controls so OmG operators can reduce noise or selectively disable shipped AfterAgent hooks without editing hook files directly, and added a maintainer-facing skill metadata integrity check.
 
 ### Changed
 
@@ -49,6 +49,10 @@ Added environment-driven hook controls so OmG operators can reduce noise or sele
   - `hooks/scripts/learn.js`
   - supports `OMG_HOOK_PROFILE=minimal|balanced|strict`
   - supports `OMG_DISABLED_HOOKS=usage,learn`
+- Added retained-skill metadata validation:
+  - `scripts/check-skill-metadata.js`
+  - `npm run test:skills`
+  - validates `skills/*/SKILL.md` frontmatter, duplicate skill names, and folder/name mismatches
 - Expanded hook-management guidance and validation:
   - `commands/omg/hooks.toml`
   - `commands/omg/hooks-validate.toml`

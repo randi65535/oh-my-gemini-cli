@@ -20,6 +20,7 @@
   "type": "module",
   "scripts": {
     "test:version": "node scripts/check-version.js",
+    "test:skills": "node scripts/check-skill-metadata.js",
     "sync:version": "node scripts/sync-version.js"
   },
   "files": [

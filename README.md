@@ -64,8 +64,10 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 - Applied the runtime controls to shipped AfterAgent hooks:
   - `hooks/scripts/after-agent-usage.js` respects profile/disable envs and keeps state snapshots even when `minimal` suppresses output
   - `hooks/scripts/learn.js` suppresses learn nudges under `minimal` and can be disabled explicitly via env
-- Expanded hook management diagnostics:
-  - `commands/omg/hooks.toml`, `commands/omg/hooks-validate.toml`, and `commands/omg/doctor.toml` now document and validate runtime hook controls in addition to duplicate-registration risk
+- Added skill metadata integrity checks for extension maintainability:
+  - new maintainer check: `npm run test:skills`
+  - `scripts/check-skill-metadata.js` validates `skills/*/SKILL.md` frontmatter, duplicate names, and folder/name mismatches
+  - `commands/omg/doctor.toml` now treats malformed or duplicate skill metadata as a first-class readiness issue
 - Bumped extension/package version to `0.7.6` and refreshed README, Korean README, landing docs, and history.
 
 ## At A Glance
@@ -495,6 +497,7 @@ oh-my-gemini-cli/
 | Hooks seem to miss terminal events or fire twice after continuation | Hook lifecycle symmetry is not explicit | Run `/omg:hooks-validate`, then fix lifecycle policy before re-enabling autonomous loops |
 | Usage hook or learn hook appears to fire twice | OmG hook registration may be duplicated across extension-managed and manual hook paths | Run `/omg:hooks status` and `/omg:hooks-validate`, then keep one authoritative OmG hook registration path per event |
 | Hook output suddenly becomes quiet or a learn nudge disappears | Runtime hook controls were set for the current shell/session | Check `OMG_HOOK_PROFILE` and `OMG_DISABLED_HOOKS` before changing hook files or deleting state |
+| A retained skill stops loading or behaves inconsistently after edits | `SKILL.md` frontmatter drifted or duplicated a name | Run `npm run test:skills` and fix malformed frontmatter, duplicate names, or folder/name mismatches before publishing |
 | Output is verbose, generic, or repetitive | Reasoning/gate posture too weak for the target artifact | Raise `/omg:reasoning` effort (optionally teammate overrides) and rerun `/omg:team-verify` |
 | Existing launch scripts use `--allowed-tools` | Flag deprecated in newer Gemini CLI | Replace with policy profiles via `--policy` and re-run |
 | Autonomous flow confirms too often (or too little) | Approval posture not aligned to task risk | Run `/omg:approval suggest|auto|full-auto` and recheck guardrails |

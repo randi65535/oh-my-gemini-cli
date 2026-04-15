@@ -17,13 +17,14 @@ Diagnostic protocol:
    - key directories (`agents`, `commands/omg`, `skills`, `context`)
    - key manifest/context files (`gemini-extension.json`, `GEMINI.md`, `context/omg-core.md`)
 3. Verify command readiness for core flows (`team`, `intent`, `workspace`, `taskboard`, `loop`, `rules`, `memory`, `hooks`, `notify`, `reasoning`, `approval`).
-4. Verify retained deep-work skills (`plan`, `omg-plan`, `execute`, `prd`, `ralplan`, `research`, `deep-dive`, `context-optimize`).
+4. Verify retained deep-work skills (`plan`, `omg-plan`, `execute`, `prd`, `ralplan`, `research`, `deep-dive`, `context-optimize`) and their metadata integrity.
 5. Check state artifacts and drift risks under `.omg/state/` when available, including lane health, trust notes, and hook lifecycle policy.
 6. Detect common failure patterns:
    - extension not loaded in current session
    - Gemini CLI runtime too old for current OmG assumptions (recommend `v0.37.0+`)
    - missing or stale root `GEMINI.md` import chain
    - command discovery mismatch
+   - malformed or duplicate skill metadata (`skills/*/SKILL.md` frontmatter)
    - stale/missing state files
    - taskboard entries with missing/null priority causing nondeterministic `next` selection
    - outdated depth flags (`--essential`, `--standard`, `--deep`) used instead of keywords (`low`, `medium`, `high`)
