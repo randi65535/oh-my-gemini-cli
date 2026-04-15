@@ -306,6 +306,10 @@ async function main() {
   const hookProfile = resolveHookProfile();
   const disabledHooks = parseCsvEnv(process.env[DISABLED_HOOKS_ENV]);
   const usageHookDisabled = isHookDisabled(disabledHooks, [...USAGE_HOOK_KEYS]);
+  if (usageHookDisabled) {
+    emitHookOutput("");
+    return;
+  }
   const cwdMode = resolveCwdMode();
   const cwdLabel = formatCwdLabel(cwd, cwdMode);
   const prevState = readState(statePath);
@@ -392,7 +396,3 @@ main().catch((error) => {
   };
   process.stdout.write(JSON.stringify(fallback));
 });
-  if (usageHookDisabled) {
-    emitHookOutput("");
-    return;
-  }
