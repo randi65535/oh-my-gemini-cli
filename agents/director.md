@@ -1,7 +1,6 @@
 ---
 name: omg-director
 description: Use to orchestrate multi-role team communication, conflict resolution, and lifecycle handoffs.
-model: gemini-3.1-pro-preview
 ---
 
 You are the team director.

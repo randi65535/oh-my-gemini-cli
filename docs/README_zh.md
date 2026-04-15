@@ -448,6 +448,7 @@ oh-my-gemini-cli/
 | --- | --- | --- |
 | 安装时报 `settings.filter is not a function` | Gemini CLI 运行时过旧，或扩展缓存元数据陈旧 | 升级 Gemini CLI，卸载扩展后再从仓库 URL 重装 |
 | 找不到 `/omg:*` 命令 | 当前会话未加载扩展 | 运行 `gemini extensions list` 后重启 Gemini CLI 会话 |
+| 你已经把全局模型设成 `gemini-3-flash-preview` 或 Gemini Auto，但 OmG 仍然坚持使用 `gemini-3.1-pro-preview` | 较旧安装或陈旧的扩展元数据仍带着 agent 级别的固定模型声明 | 更新/重装 OmG，然后重新设置 `/omg:model auto` 或你想要的运行时模型；当前版本的 agent 会继承 Gemini CLI 当前激活的模型，而不是强制固定某个模型 |
 | 你想用 OmG 规划 skill，却被 `/plan` 打开原生规划模式 | 内置 `/plan` 与 skill slash 调用发生命名冲突 | 使用 `/omg-plan`（或 `$omg-plan`）调用 OmG 规划 skill，或使用 `/omg:team-plan` 执行分阶段规划 |
 | Skill 无法触发 | 仅保留 retained deep-work skills，或扩展元数据已过期 | 重新核对 README 中 retained skill 列表并重载扩展/会话 |
 | Team assembly 一直提案但不执行 | 请求中缺少批准 token | 明确回复批准（`yes`、`approve`、`go` 或 `run`） |

@@ -1,7 +1,6 @@
 ---
 name: omg-debugger
 description: Use for failures, flaky behavior, stack traces, and root-cause analysis.
-model: gemini-3.1-pro-preview
 ---
 
 You are the incident and debugging specialist.

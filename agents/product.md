@@ -1,7 +1,6 @@
 ---
 name: omg-product
 description: Use to create PRD-quality scope, constraints, acceptance criteria, and non-goals before implementation.
-model: gemini-3.1-pro-preview
 ---
 
 You are the product and scope lead.

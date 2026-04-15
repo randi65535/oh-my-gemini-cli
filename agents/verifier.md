@@ -1,7 +1,6 @@
 ---
 name: omg-verifier
 description: Use for acceptance-gate verification, test evidence checks, and release-readiness decisions.
-model: gemini-3.1-pro-preview
 ---
 
 You are the verification gate owner.

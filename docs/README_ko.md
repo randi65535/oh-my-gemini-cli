@@ -451,7 +451,7 @@ oh-my-gemini-cli/
 | `/omg:*` 명령을 찾을 수 없음 | 현재 세션에 확장이 로드되지 않음 | `gemini extensions list` 실행 후 CLI 세션 재시작 |
 | 런타임/확장 갱신 후 슬래시 명령 또는 스킬 목록이 오래된 것처럼 보임 | 업데이트 후 대화형 레지스트리가 새로고침되지 않음 | 최신 Gemini CLI에서는 `/skills reload`를 실행하고, 구버전 stable이면 세션을 재시작 |
 | `/plan`이 열리고 OmG 플랜 스킬이 실행되지 않음 | 기본 `/plan`과 스킬 슬래시 호출 이름이 충돌함 | OmG 플랜 스킬은 `/omg-plan`(또는 `$omg-plan`)으로 호출하거나, 단계형 흐름은 `/omg:team-plan` 사용 |
-| 모든 작업에서 Gemini Auto 모델 선택을 쓰고 싶음 | 기본 lane별 모델 정책이 여전히 활성화됨 | `/omg:model auto` 실행 후, Gemini CLI가 명시적 런타임 모델 제어를 지원하면 `/model auto` 또는 `--model auto`도 함께 맞춤 |
+| 모든 작업에서 하나의 전역 모델(예: `gemini-3-flash-preview` 또는 Gemini Auto)을 쓰고 싶은데 OmG가 계속 `gemini-3.1-pro-preview`를 요구함 | 오래된 설치본이나 stale extension metadata에 에이전트별 고정 모델 선언이 남아 있음 | OmG를 업데이트/재설치한 뒤 `/omg:model auto` 또는 원하는 런타임 모델 설정을 다시 적용. 현재 에이전트는 고정 모델 대신 Gemini CLI의 활성 모델 설정을 상속함 |
 | 스킬이 트리거되지 않음 | 유지된 deep-work 스킬만 남아 있거나 확장 메타데이터가 오래됨 | README의 유지 스킬 목록 확인 후 확장/세션 재로드 |
 | Windows에서 스킬 링크나 확장 리로드 동작이 머신마다 다름 | Gemini CLI 빌드마다 Windows skill link 처리 방식이 다름 | stable `v0.37.0+`를 우선 권장하고, nightly/preview 추적 시에는 directory junction 기반 변경 여부를 함께 확인 |
 | 병렬 구현이 자꾸 같은 파일에서 충돌하거나 재계획됨 | workspace lane이 명시되지 않음 | `/omg:workspace status`로 확인하거나 `/omg:workspace`로 경로/lane 소유권 설정 |

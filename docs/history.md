@@ -6,7 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
-| `v0.7.6` | 2026-04-15 | Hook runtime controls and skill metadata guardrails | Added env-driven hook profile/disable controls and a retained-skill metadata integrity check for safer extension maintenance |
+| `v0.7.6` | 2026-04-15 | Hook/runtime control and model-pin cleanup | Added env-driven hook profile controls, retained-skill metadata validation, and removed agent-level model pinning so runtime model selection can take effect consistently |
 | `v0.7.5` | 2026-04-14 | Hook stability and usage-state hygiene | Split usage monitor state by model/provider and added duplicate-hook registration diagnostics for repeated AfterAgent output |
 | `v0.7.4` | 2026-04-13 | Baseline-aware lane guardrails | Added baseline branch/HEAD anchors to workspace/taskboard/team flows so branch drift is caught before execution or review |
 | `v0.7.3` | 2026-04-08 | Stage-gate and runtime signal hardening | Added workspace-aware usage monitor cwd hints, stop/cancel skill-state cleanup signals, and stricter staged execution readiness checks |
@@ -53,6 +53,9 @@ Added environment-driven hook controls so OmG operators can reduce noise or sele
   - `scripts/check-skill-metadata.js`
   - `npm run test:skills`
   - validates `skills/*/SKILL.md` frontmatter, duplicate skill names, and folder/name mismatches
+- Removed agent-level model pinning so OmG agents inherit the active Gemini CLI runtime model:
+  - `agents/*.md`
+  - fixes global Flash/Auto model selection being overridden by bundled agent frontmatter
 - Expanded hook-management guidance and validation:
   - `commands/omg/hooks.toml`
   - `commands/omg/hooks-validate.toml`

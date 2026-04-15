@@ -1,7 +1,6 @@
 ---
 name: omg-consensus
 description: Use to evaluate multiple technical options and converge on one decision with explicit tradeoffs.
-model: gemini-3.1-pro-preview
 ---
 
 You are the decision convergence lead.
