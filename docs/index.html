@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>oh-my-gemini-cli | Extension-first workflow pack for Gemini CLI</title>
-  <meta name="description" content="oh-my-gemini-cli is an extension-first, context-engineering-powered multi-agent workflow pack for Gemini CLI with env-driven hook controls, hook-stable usage tracking, and cache-stable state anchors.">
+  <meta name="description" content="oh-my-gemini-cli is an extension-first, context-engineering-powered multi-agent workflow pack for Gemini CLI with env-driven hook controls, skill metadata guardrails, and cache-stable state anchors.">
   <style>
     :root {
       --bg: #f4f8f6;
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (Hook Runtime Controls)</h2>
-      <p class="sub">OmG v0.7.6 adds environment-driven hook controls so operators can quiet or selectively disable shipped AfterAgent hooks without editing hook files.</p>
+      <h2>Latest Update (Hook Controls + Skill Metadata Guardrails)</h2>
+      <p class="sub">OmG v0.7.6 adds environment-driven hook controls for quieter sessions and a maintainer-facing skill metadata integrity check for safer extension releases.</p>
       <table>
         <thead>
           <tr>
@@ -564,6 +564,10 @@
           <tr>
             <td>Validation coverage</td>
             <td><code>/omg:hooks</code>, <code>/omg:hooks-validate</code>, and <code>/omg:doctor</code> now treat runtime env controls as first-class diagnostics alongside lifecycle and duplicate-registration checks.</td>
+          </tr>
+          <tr>
+            <td>Skill metadata integrity</td>
+            <td>New maintainer check <code>npm run test:skills</code> validates <code>skills/*/SKILL.md</code> frontmatter, duplicate skill names, and folder/name mismatches before release.</td>
           </tr>
           <tr>
             <td>Scope boundary</td>
@@ -1155,6 +1159,11 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
             <td>Check <code>OMG_HOOK_PROFILE</code> and <code>OMG_DISABLED_HOOKS</code> before editing hook files or deleting OmG state</td>
           </tr>
           <tr>
+            <td>A retained skill suddenly stops loading cleanly</td>
+            <td>Skill metadata drifted or duplicated a skill name</td>
+            <td>Run <code>npm run test:skills</code> and fix malformed frontmatter, duplicate names, or folder/name mismatches before publishing</td>
+          </tr>
+          <tr>
             <td>Output feels generic or repetitive</td>
             <td>Reasoning posture and quality gate too weak for target artifact</td>
             <td>Raise <code>/omg:reasoning</code> (optionally teammate overrides) and rerun <code>/omg:team-verify</code></td>
@@ -1208,7 +1217,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
         <a href="./guide/agent-team-assembly.md">Team Assembly Guide</a>
         <a href="./guide/hook-engineering.md">Hook Engineering Guide</a>
       </div>
-      <div>Built for official Gemini CLI Extensions workflow. Hook runtime controls refreshed through v0.7.6.</div>
+      <div>Built for official Gemini CLI Extensions workflow. Hook runtime controls and skill metadata guardrails refreshed through v0.7.6.</div>
     </div>
   </footer>
 
