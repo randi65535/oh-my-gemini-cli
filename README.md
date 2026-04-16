@@ -371,17 +371,25 @@ Example (disable one or both shipped AfterAgent hooks by env):
 export OMG_DISABLED_HOOKS=usage,learn
 ```
 
-## Gemini CLI Compatibility Notes (Reviewed: 2026-04-09)
+## Gemini CLI Compatibility Notes (Reviewed: 2026-04-16)
 
-- Recommended stable runtime: Gemini CLI `v0.37.0+`.
-  - This baseline includes stable dynamic Linux worktree sandbox support, Windows sandbox expansion improvements, plan-mode policy relaxations that reduce false blockers, and more reliable skill/subagent instruction propagation that OmG now benefits from.
+- Recommended minimum validated baseline: Gemini CLI `v0.37.0+`.
+  - This remains the minimum stable runtime OmG has explicitly aligned to for dynamic Linux worktree sandbox support, Windows sandbox expansion improvements, plan-mode policy relaxations, and stronger skill/subagent instruction propagation.
+- Official subagent status update:
+  - Google Developers Blog published `Subagents have arrived in Gemini CLI` on 2026-04-15.
+  - OmG now treats Gemini CLI subagents as a first-class supported capability rather than an experimental edge path.
+  - That review is directly reflected in OmG's current safety rules: delegated/worker/subagent turns are treated as read-mostly for shared workflow state, and shared project state now uses a single-writer session lock plus session-local draft fallback.
 - Recent stable updates with direct OmG impact:
   - `v0.36.0` (2026-04-01): multi-registry subagent architecture, native macOS Seatbelt + Windows sandboxing, Git worktree support, and stronger subagent context/rejection handling.
   - `v0.37.0` (2026-04-08): dynamic Linux sandbox expansion + worktree support, Windows sandbox dynamic expansion, plan-mode write-policy relaxations, skill-system instructions injected into subagent prompts, global env allowlist fixes, cross-platform terminal-bell notifications, and role-specific `/stats` metrics.
-- Preview channel note:
-  - `v0.38.0-preview.0` (2026-04-08) improves extension UX around `/skills reload` slash-command refresh, explicitly allows `web_fetch` in plan mode with ask-user policy, changes default loading phrases to `off`, and expands memory extraction flows. OmG does not require preview-only features, but these are useful for operators who rely on slash skills or plan-heavy sessions.
-- Nightly watchlist from the same review window:
-  - 2026-04-07 to 2026-04-08 nightlies add Windows skill-linking via directory junctions, `/memory inbox`, `Ctrl+G` replacing `Ctrl+X`, and a rollback of `terminalBuffer=true` after regressions. These are not OmG requirements, but Windows users and power users may notice the behavior changes first on nightly.
+- Current OmG review outcome for post-GA subagent use:
+  - cross-project hook state now avoids unsafe shared `process.cwd()` fallback
+  - delegated subagent hook turns are skipped by default unless explicitly allowed
+  - same-project shared workflow state now assumes one authoritative orchestration writer via `.omg/state/session-lock.json`
+  - non-owning parallel sessions should write drafts under `.omg/state/sessions/[session-slug]/` and hand them back for merge
+- Preview/nightly note:
+  - OmG does not require preview-only Gemini CLI features for subagent operation.
+  - If you track preview/nightly builds, continue to watch Windows skill-link behavior, slash-registry refresh behavior, and other UX-level changes separately from OmG's stable baseline.
 - UX compatibility retained from `v0.34.0-preview.0+`:
   - direct skill invocation via `/skill-name`
   - footer customization via `/footer` (backed by `ui.footer.items`, `ui.footer.showLabels`, `ui.footer.hideCWD`, `ui.footer.hideSandboxStatus`, `ui.footer.hideModelInfo`)
@@ -553,8 +561,11 @@ Extension behavior is manifest-driven through Gemini CLI extension primitives.
 ## Inspiration
 
 - [Gemini CLI](https://github.com/google-gemini/gemini-cli) - Google's open-source AI terminal agent
-- [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode) - OpenCode agent harness
+- [oh-my-codex](https://github.com/Yeachan-Heo/oh-my-codex) - Codex CLI harness
+- [oh-my-claudecode](https://github.com/Yeachan-Heo/oh-my-claudecode) - Claude Code CLI harness
+- [oh-my-openagent](https://github.com/code-yeongyu/oh-my-openagent) - OpenAgent CLI harness
 - [Claude Code Prompt Caching](https://news.hada.io/topic?id=26835) - Context engineering principles
+- [everything-claude-code](https://github.com/affaan-m/everything-claude-code) - Claude Code CLI harness
 
 ## Docs
 

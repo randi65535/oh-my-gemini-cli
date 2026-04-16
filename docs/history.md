@@ -90,6 +90,11 @@ Focused on reducing same-project parallel-session drift after Gemini CLI subagen
   - `docs/history.md`
   - `package.json`
   - `gemini-extension.json`
+- Refreshed Gemini CLI compatibility guidance after the official subagent launch review:
+  - compatibility notes re-reviewed on 2026-04-16
+  - now calls out the 2026-04-15 Google Developers Blog subagent launch explicitly
+  - explains why OmG now treats delegated/worker/subagent turns as read-mostly for shared workflow state
+  - links the compatibility review to OmG's new session-lock and session-local draft safety model
 
 ### Structural Fit Note
 

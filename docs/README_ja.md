@@ -477,7 +477,7 @@ extension の動作は Gemini CLI extension primitive による manifest 駆動�
 - [Gemini CLI](https://github.com/google-gemini/gemini-cli) - Google のオープンソース AI ターミナルエージェント
 - [oh-my-codex](https://github.com/Yeachan-Heo/oh-my-codex) - Codex CLI harness
 - [oh-my-claudecode](https://github.com/Yeachan-Heo/oh-my-claudecode) - Claude Code CLI harness
-- [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode) - OpenCode agent harness
+- [oh-my-openagent](https://github.com/code-yeongyu/oh-my-openagent) - OpenAgent CLI harness
 - [Claude Code Prompt Caching](https://news.hada.io/topic?id=26835) - コンテキストエンジニアリングの原則
 - [everything-claude-code](https://github.com/affaan-m/everything-claude-code) - Claude Code CLI harness
 

@@ -476,7 +476,7 @@ Le comportement de l'extension est piloté par manifest via les primitives d'ext
 - [Gemini CLI](https://github.com/google-gemini/gemini-cli) - Agent terminal IA open-source de Google
 - [oh-my-codex](https://github.com/Yeachan-Heo/oh-my-codex) - Harness Codex CLI
 - [oh-my-claudecode](https://github.com/Yeachan-Heo/oh-my-claudecode) - Harness Claude Code CLI
-- [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode) - Harness agent OpenCode
+- [oh-my-openagent](https://github.com/code-yeongyu/oh-my-openagent) - Harness OpenAgent CLI
 - [Claude Code Prompt Caching](https://news.hada.io/topic?id=26835) - Principes d'ingénierie de contexte
 - [everything-claude-code](https://github.com/affaan-m/everything-claude-code) - Harness Claude Code CLI
 
