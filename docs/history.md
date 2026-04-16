@@ -6,6 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.7.7` | 2026-04-16 | Extension-boundary checks and audit-first launch safety | Tightened stale/mixed extension-root diagnostics, discouraged manual hook-shadow fixes ahead of extension-managed recovery, and promoted workspace audit to the default preflight before non-trivial execution |
 | `v0.7.6` | 2026-04-15 | Hook/runtime control and model-pin cleanup | Added env-driven hook profile controls, retained-skill metadata validation, and removed agent-level model pinning so runtime model selection can take effect consistently |
 | `v0.7.5` | 2026-04-14 | Hook stability and usage-state hygiene | Split usage monitor state by model/provider and added duplicate-hook registration diagnostics for repeated AfterAgent output |
 | `v0.7.4` | 2026-04-13 | Baseline-aware lane guardrails | Added baseline branch/HEAD anchors to workspace/taskboard/team flows so branch drift is caught before execution or review |
@@ -37,6 +38,37 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.2` | 2026-02-22 | Model/branding consistency | `gemini-3.1-*` naming and OmG branding normalized |
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
+
+## v0.7.7 - Extension-Boundary Checks and Audit-First Launch Safety (2026-04-16)
+
+Focused on low-risk improvements that fit OmG's extension-native structure: safer recovery guidance when installs or hook paths drift, and clearer preflight gating before multi-lane execution starts.
+
+### Changed
+
+- Tightened extension-boundary diagnostics:
+  - `commands/omg/doctor.toml`
+  - treats stale or mixed extension roots, copied asset drift, and manual hook/skill shadowing as first-class readiness risks
+- Hardened hook recovery guidance:
+  - `commands/omg/hooks.toml`
+  - prefers env/runtime controls plus extension-managed recovery paths before recommending direct edits to shipped hook files
+- Promoted audit-first launch behavior:
+  - `commands/omg/launch.toml`
+  - non-trivial launches now treat `/omg:workspace audit` as the default preflight before `team-exec`
+- Made workspace audit verdicts more actionable:
+  - `commands/omg/workspace.toml`
+  - dirty, untrusted, missing-baseline, or baseline-drifted active lanes are now explicit blockers until reconciled
+- Refreshed docs and release metadata for `v0.7.7`:
+  - `README.md`
+  - `docs/README_ko.md`
+  - `docs/index.html`
+  - `docs/history.md`
+  - `package.json`
+  - `gemini-extension.json`
+
+### Structural Fit Note
+
+- OmG remains extension-native.
+- Changes stay within command guidance, safety policy, and documentation; no runtime daemon, binary helper, or override-heavy setup flow was introduced.
 
 ## v0.7.6 - Hook Runtime Controls and Skill Metadata Guardrails (2026-04-15)
 

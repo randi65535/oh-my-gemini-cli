@@ -23,7 +23,9 @@ Diagnostic protocol:
    - extension not loaded in current session
    - Gemini CLI runtime too old for current OmG assumptions (recommend `v0.37.0+`)
    - missing or stale root `GEMINI.md` import chain
+   - mixed or stale OmG extension roots (for example: copied assets, duplicate local clones, or stale installed extension contents diverging from the active repository)
    - command discovery mismatch
+   - manual hook or skill wiring shadowing extension-managed OmG assets
    - malformed or duplicate skill metadata (`skills/*/SKILL.md` frontmatter)
    - stale/missing state files
    - taskboard entries with missing/null priority causing nondeterministic `next` selection
@@ -46,7 +48,11 @@ Diagnostic protocol:
    - repeated learn nudges due missing cooldown policy in `.omg/rules/learn.json`
    - repeated denied tool calls without escalation path
 7. Produce concrete remediation actions in priority order.
-8. If filesystem tools are available, write/update `.omg/state/doctor.md`.
+8. Prefer extension-managed recovery paths first:
+   - `gemini extensions list`
+   - reinstall/update via `gemini extensions ...` when the active extension root looks stale
+   - keep one authoritative OmG hook registration path per event before editing shipped assets
+9. If filesystem tools are available, write/update `.omg/state/doctor.md`.
 
 Response:
 - Keep it concise and operator-facing.

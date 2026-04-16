@@ -56,19 +56,22 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.7.6
+## What's New in v0.7.7
 
-- Added hook runtime controls for quieter or more selective sessions without editing hook files:
-  - `OMG_HOOK_PROFILE=minimal|balanced|strict`
-  - `OMG_DISABLED_HOOKS=usage,learn`
-- Applied the runtime controls to shipped AfterAgent hooks:
-  - `hooks/scripts/after-agent-usage.js` respects profile/disable envs and keeps state snapshots even when `minimal` suppresses output
-  - `hooks/scripts/learn.js` suppresses learn nudges under `minimal` and can be disabled explicitly via env
-- Added skill metadata integrity checks for extension maintainability:
-  - new maintainer check: `npm run test:skills`
-  - `scripts/check-skill-metadata.js` validates `skills/*/SKILL.md` frontmatter, duplicate names, and folder/name mismatches
-  - `commands/omg/doctor.toml` now treats malformed or duplicate skill metadata as a first-class readiness issue
-- Bumped extension/package version to `0.7.6` and refreshed README, Korean README, landing docs, and history.
+- Tightened extension-boundary diagnostics so OmG prefers extension-managed recovery paths before users start editing shipped assets by hand:
+  - `commands/omg/doctor.toml` now treats stale/mixed extension roots and manual hook-or-skill shadowing as readiness risks
+  - `commands/omg/hooks.toml` now prefers env/runtime controls before recommending direct edits to shipped hook files
+- Made workspace audit the default safety gate for non-trivial launches:
+  - `commands/omg/launch.toml` now treats `/omg:workspace audit` as the standard preflight before `team-exec`
+  - `commands/omg/workspace.toml` now marks dirty, untrusted, or baseline-drifted active lanes as explicit execution blockers
+- Bumped extension/package version to `0.7.7` and refreshed README, Korean README, landing docs, and history.
+
+## Extension Boundary and Upgrade Safety
+
+- Install and update OmG through `gemini extensions ...`; do not rely on copied command/skill folders as the primary runtime path.
+- Keep one authoritative OmG hook registration path per event. Mixing extension-managed hooks with manual duplicates is the fastest way to get repeated AfterAgent output or stale behavior.
+- When OmG feels stale after an update, check `gemini extensions list` first, then refresh or reinstall the extension before editing shipped files.
+- For long or multi-lane work, treat `/omg:workspace audit` as the default preflight before review, automation, or `team-exec`.
 
 ## At A Glance
 

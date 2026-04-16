@@ -57,21 +57,22 @@ gemini extensions list
 
 참고: 설치/업데이트 명령은 대화형 슬래시 명령 모드가 아니라 터미널 모드(`gemini extensions ...`)에서 실행합니다.
 
-## v0.7.6의 새로운 내용
+## v0.7.7의 새로운 내용
 
-- hook 파일을 직접 수정하지 않고도 세션 단위로 훅 동작을 조절할 수 있는 runtime control을 추가했습니다.
-  - `OMG_HOOK_PROFILE=minimal|balanced|strict`
-  - `OMG_DISABLED_HOOKS=usage,learn`
-- 기본 제공 AfterAgent 훅이 runtime control을 따르도록 만들었습니다.
-  - `hooks/scripts/after-agent-usage.js`는 `minimal`에서 출력은 숨기되 상태 스냅샷은 유지합니다.
-  - `hooks/scripts/learn.js`는 `minimal`에서 learn nudge를 억제하고, env로 개별 비활성화할 수 있습니다.
-- hook 관리 진단을 강화했습니다.
-  - `commands/omg/hooks.toml`, `commands/omg/hooks-validate.toml`, `commands/omg/doctor.toml`이 runtime hook control과 중복 등록 위험을 함께 점검합니다.
-- 확장 유지보수를 위한 skill metadata 무결성 검사를 추가했습니다.
-  - 새 maintainer 체크: `npm run test:skills`
-  - `scripts/check-skill-metadata.js`가 `skills/*/SKILL.md` frontmatter, 중복 name, 폴더/name 불일치를 검증합니다.
-  - `commands/omg/doctor.toml`은 malformed/duplicate skill metadata를 준비도 이슈로 다룹니다.
-- 패키지/확장 버전을 `0.7.6`으로 올리고 README/한국어 README/랜딩/히스토리를 갱신했습니다.
+- OmG가 extension-managed 경계를 더 엄격하게 진단하도록 조정했습니다.
+  - `commands/omg/doctor.toml`은 stale/mixed extension root, 수동 hook/skill shadowing을 readiness risk로 다룹니다.
+  - `commands/omg/hooks.toml`은 기본 제공 hook 파일을 직접 수정하기 전에 env/runtime control과 extension-managed 경로를 먼저 확인하도록 안내합니다.
+- non-trivial launch에서 `workspace audit`를 기본 안전 게이트로 끌어올렸습니다.
+  - `commands/omg/launch.toml`은 `team-exec` 전에 `/omg:workspace audit`를 기본 preflight로 취급합니다.
+  - `commands/omg/workspace.toml`은 dirty, untrusted, baseline-drift lane을 명시적 execution blocker로 표시합니다.
+- 패키지/확장 버전을 `0.7.7`으로 올리고 README/한국어 README/랜딩/히스토리를 갱신했습니다.
+
+## Extension Boundary와 Update Safety
+
+- OmG 설치/업데이트는 `gemini extensions ...` 경로를 기준으로 유지하고, 복사해 둔 command/skill 폴더를 주 실행 경로로 삼지 않는 편이 안전합니다.
+- 같은 이벤트에 대해 OmG hook 등록 경로는 하나만 authoritative 하게 유지하세요. extension-managed hook과 수동 hook를 섞으면 AfterAgent 출력 중복이나 stale 동작이 가장 쉽게 발생합니다.
+- 업데이트 후 동작이 이상하면 shipped 파일을 바로 고치기 전에 `gemini extensions list`로 활성 확장을 먼저 확인하고, 필요 시 refresh/reinstall을 우선하세요.
+- long-run, review, automation, `team-exec` 전에는 `/omg:workspace audit`를 기본 preflight로 두는 편이 안전합니다.
 
 ## 한눈에 보기
 

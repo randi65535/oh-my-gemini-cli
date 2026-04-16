@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>oh-my-gemini-cli | Extension-first workflow pack for Gemini CLI</title>
-  <meta name="description" content="oh-my-gemini-cli is an extension-first, context-engineering-powered multi-agent workflow pack for Gemini CLI with env-driven hook controls, skill metadata guardrails, and cache-stable state anchors.">
+  <meta name="description" content="oh-my-gemini-cli is an extension-first, context-engineering-powered multi-agent workflow pack for Gemini CLI with audit-first launch safety, extension-boundary diagnostics, and cache-stable state anchors.">
   <style>
     :root {
       --bg: #f4f8f6;
@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.7.6</span>
+        <span class="badge">Latest Update v0.7.7</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (Hook Controls + Skill Metadata Guardrails)</h2>
-      <p class="sub">OmG v0.7.6 adds environment-driven hook controls for quieter sessions and a maintainer-facing skill metadata integrity check for safer extension releases.</p>
+      <h2>Latest Update (Audit-First Launch + Extension Boundary Safety)</h2>
+      <p class="sub">OmG v0.7.7 tightens extension-root diagnostics, prefers extension-managed recovery over manual asset edits, and promotes workspace audit to the default preflight before non-trivial execution.</p>
       <table>
         <thead>
           <tr>
@@ -550,32 +550,32 @@
         </thead>
         <tbody>
           <tr>
-            <td>Hook profile control</td>
-            <td><code>OMG_HOOK_PROFILE=minimal|balanced|strict</code> now lets operators reduce hook noise per session. <code>minimal</code> suppresses normal usage lines and learn nudges while preserving hook state.</td>
+            <td>Extension-root diagnostics</td>
+            <td><code>/omg:doctor</code> now treats stale or mixed extension roots, copied asset drift, and manual hook-or-skill shadowing as first-class readiness risks before deeper troubleshooting begins.</td>
           </tr>
           <tr>
-            <td>Per-hook env disable</td>
-            <td><code>OMG_DISABLED_HOOKS=usage,learn</code> can disable one or both shipped AfterAgent hooks without editing hook manifests or deleting state files.</td>
+            <td>Safer hook recovery</td>
+            <td><code>/omg:hooks</code> now prefers env/runtime controls and extension-managed recovery paths before recommending direct edits to shipped hook files.</td>
           </tr>
           <tr>
-            <td>Script coverage</td>
-            <td><code>hooks/scripts/after-agent-usage.js</code> and <code>hooks/scripts/learn.js</code> now both respect runtime hook controls, keeping behavior consistent across shipped AfterAgent surfaces.</td>
+            <td>Audit-first launch</td>
+            <td><code>/omg:launch</code> now treats <code>/omg:workspace audit</code> as the default preflight before <code>team-exec</code> for non-trivial implementation work.</td>
           </tr>
           <tr>
-            <td>Validation coverage</td>
-            <td><code>/omg:hooks</code>, <code>/omg:hooks-validate</code>, and <code>/omg:doctor</code> now treat runtime env controls as first-class diagnostics alongside lifecycle and duplicate-registration checks.</td>
+            <td>Lane blocker verdicts</td>
+            <td><code>/omg:workspace audit</code> now treats dirty, untrusted, missing-baseline, or baseline-drifted active lanes as explicit blockers until reconciled.</td>
           </tr>
           <tr>
-            <td>Skill metadata integrity</td>
-            <td>New maintainer check <code>npm run test:skills</code> validates <code>skills/*/SKILL.md</code> frontmatter, duplicate skill names, and folder/name mismatches before release.</td>
+            <td>Upgrade safety</td>
+            <td>Docs now emphasize checking <code>gemini extensions list</code> and refreshing the installed extension before editing shipped OmG assets by hand.</td>
           </tr>
           <tr>
             <td>Scope boundary</td>
-            <td>Changes stay extension-native: hook script behavior, diagnostics prompts, state guidance, and docs only.</td>
+            <td>Changes stay extension-native: command guidance, safety policy, and docs only.</td>
           </tr>
           <tr>
             <td>Release refresh</td>
-            <td>README, Korean README, landing page, changelog, package metadata, and extension metadata were updated together for <code>v0.7.6</code>.</td>
+            <td>README, Korean README, landing page, changelog, package metadata, and extension metadata were updated together for <code>v0.7.7</code>.</td>
           </tr>
         </tbody>
       </table>
@@ -1217,7 +1217,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
         <a href="./guide/agent-team-assembly.md">Team Assembly Guide</a>
         <a href="./guide/hook-engineering.md">Hook Engineering Guide</a>
       </div>
-      <div>Built for official Gemini CLI Extensions workflow. Hook runtime controls and skill metadata guardrails refreshed through v0.7.6.</div>
+      <div>Built for official Gemini CLI Extensions workflow. Audit-first launch safety and extension-boundary diagnostics refreshed through v0.7.7.</div>
     </div>
   </footer>
 

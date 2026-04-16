@@ -28,7 +28,12 @@ Protocol:
 4. Recommend separate worktrees only when parallel implementation would otherwise conflict, or when dirty/untrusted lanes need isolation before review or automation.
 5. When runtime behavior indicates Gemini CLI `v0.36.0+` capabilities, prefer native Git worktree lanes for parallel execution; otherwise keep explicit path-lane ownership with stricter collision notes.
 6. When a lane maps to a branch/worktree, record the expected baseline branch and a compact baseline commit/HEAD hint when available.
-7. If filesystem tools are available, write/update `.omg/state/workspace.json`.
+7. During `audit`, treat these as execution blockers until reconciled:
+   - dirty or untrusted lanes selected for review, verification, or autonomous execution
+   - missing baseline anchor on an active parallel lane
+   - baseline branch/HEAD mismatch between the recorded lane anchor and the current lane state
+8. Prefer one concise safety verdict per lane (`ready`, `needs-review`, `blocked`) so follow-up commands can reuse the result without reinterpreting prose.
+9. If filesystem tools are available, write/update `.omg/state/workspace.json`.
 
 Suggested `workspace.json` shape:
 {
@@ -57,4 +62,5 @@ Suggested `workspace.json` shape:
 Response:
 - Keep it concise and operator-facing.
 - Include `Workspace Status`, `Lane Map`, `Lane Health`, `Baseline Anchors`, `Collision Risks`, and `Next Command`.
+- When `audit` finds blockers, make the blocker lane and the unblock action explicit.
 """
