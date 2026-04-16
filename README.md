@@ -56,17 +56,15 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.7.8
+## What's New in v0.7.9
 
-- Split interview session state by requirement thread instead of keeping one shared interview state file:
-  - `/omg:intent` and `/omg:interview` now target `.omg/state/interviews/[slug]/context.json`
-  - `.omg/state/interviews/active.json` now acts as the deterministic pointer for resume/status flows
-- Aligned the command contract, agent contract, and core workflow context around the new interview session layout:
-  - `commands/omg/intent.toml`
-  - `commands/omg/interview.toml`
-  - `agents/interview.md`
-  - `context/omg-core.md`
-- Bumped extension/package version to `0.7.8` and refreshed README, Korean README, Chinese README, landing docs, and history.
+- Hardened hook state persistence so quota-watch and learn-state writes no longer fall back to one shared `process.cwd()` location across unrelated projects:
+  - `hooks/scripts/after-agent-usage.js` now writes state only when the hook receives a reliable session `cwd`
+  - `hooks/scripts/learn.js` now skips persistence when session-local state paths cannot be resolved safely
+- Reduced cross-process state corruption risk during concurrent hook writes:
+  - usage and learn state now write through a temp file plus atomic rename
+  - usage output still works without persistence when state writes are intentionally skipped
+- Bumped extension/package version to `0.7.9` and refreshed README, Korean README, landing docs, and history.
 
 ## Extension Boundary and Upgrade Safety
 
@@ -274,6 +272,7 @@ OmG now ships an extension hook that prints a compact token-usage line after eac
 - Optional cwd hint mode: `OMG_USAGE_CWD_MODE=off|leaf|parent-leaf|full` (default: `parent-leaf`)
 - Optional hook profile: `OMG_HOOK_PROFILE=minimal|balanced|strict` (`minimal` suppresses usage line output but keeps state snapshots)
 - Optional per-hook disable: `OMG_DISABLED_HOOKS=usage` to disable only the usage monitor by env
+- State writes are skipped when the hook does not receive a reliable session `cwd`, so different projects do not fall back to one shared `process.cwd()` state file.
 
 What it shows automatically:
 
@@ -287,6 +286,7 @@ Boundary:
 - This hook cannot read authoritative remaining account quota by itself.
 - For true remaining quota/limits, run `/stats model(~0.37.2) or /model(^0.38.0)`.
 - If Gemini retries the same transcript snapshot, the hook treats it as already delivered and suppresses duplicate output.
+- State snapshots are written via an atomic temp-file rename to reduce cross-process corruption risk.
 
 Example (silence hook output but keep state snapshots):
 
@@ -335,6 +335,7 @@ OmG now also ships a safety-hardened learn-signal hook so `/omg:learn` nudges ap
   - `OMG_HOOKS_QUIET=1` to keep the hook silent while preserving state updates
   - `OMG_HOOK_PROFILE=minimal|balanced|strict` (`minimal` suppresses learn nudges)
   - `OMG_DISABLED_HOOKS=learn` to disable only the learn-signal hook by env
+  - when no reliable session `cwd` is available, learn-state persistence is skipped to avoid cross-project collisions
 
 Safety behavior:
 

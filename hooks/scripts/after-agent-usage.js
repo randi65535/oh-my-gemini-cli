@@ -69,6 +69,27 @@ function parseCsvEnv(value) {
     .filter(Boolean);
 }
 
+function resolveSessionCwd(hookInput) {
+  const rawCwd =
+    typeof hookInput?.cwd === "string" && hookInput.cwd.trim()
+      ? hookInput.cwd.trim()
+      : "";
+  if (!rawCwd) {
+    return null;
+  }
+
+  const resolved = path.resolve(rawCwd);
+  try {
+    if (fs.existsSync(resolved) && fs.statSync(resolved).isDirectory()) {
+      return resolved;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
 function resolveHookProfile() {
   const raw =
     typeof process.env[HOOK_PROFILE_ENV] === "string"
@@ -94,8 +115,16 @@ function resolveStatePath(cwd) {
   if (typeof customStateRoot === "string" && customStateRoot.trim()) {
     const stateRoot = path.isAbsolute(customStateRoot)
       ? customStateRoot.trim()
-      : path.join(cwd, customStateRoot.trim());
+      : cwd
+        ? path.join(cwd, customStateRoot.trim())
+        : "";
+    if (!stateRoot) {
+      return null;
+    }
     return path.join(stateRoot, "quota-watch.json");
+  }
+  if (!cwd) {
+    return null;
   }
   return path.join(cwd, DEFAULT_STATE_RELATIVE_PATH);
 }
@@ -172,6 +201,9 @@ function detectProvider(modelName) {
 }
 
 function readState(statePath) {
+  if (!statePath) {
+    return {};
+  }
   try {
     const raw = fs.readFileSync(statePath, "utf8");
     const parsed = safeJsonParse(raw, {});
@@ -182,10 +214,18 @@ function readState(statePath) {
 }
 
 function writeState(statePath, state) {
+  if (!statePath) {
+    return;
+  }
   try {
     const dir = path.dirname(statePath);
     fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(statePath, `${JSON.stringify(state, null, 2)}\n`, "utf8");
+    const tempPath = path.join(
+      dir,
+      `${path.basename(statePath)}.${process.pid}.${Date.now()}.tmp`,
+    );
+    fs.writeFileSync(tempPath, `${JSON.stringify(state, null, 2)}\n`, "utf8");
+    fs.renameSync(tempPath, statePath);
   } catch {
     // Fail-open: usage monitor should never block the parent workflow.
   }
@@ -243,6 +283,7 @@ function buildUsageFromTranscript(transcript) {
   const latestTokens = latest.tokens || {};
 
   return {
+    turnCount: geminiMessages.length,
     latest: {
       model: latestModel,
       input: asNumber(latestTokens.input),
@@ -291,7 +332,7 @@ async function main() {
   const rawInput = await readStdinText();
   const hookInput = safeJsonParse(rawInput, {});
 
-  const cwd = typeof hookInput?.cwd === "string" && hookInput.cwd ? hookInput.cwd : process.cwd();
+  const sessionCwd = resolveSessionCwd(hookInput);
   const sessionId =
     typeof hookInput?.session_id === "string" && hookInput.session_id
       ? hookInput.session_id
@@ -301,7 +342,7 @@ async function main() {
       ? hookInput.transcript_path
       : "";
 
-  const statePath = resolveStatePath(cwd);
+  const statePath = resolveStatePath(sessionCwd);
   const quietHooks = isTruthy(process.env[QUIET_HOOKS_ENV]);
   const hookProfile = resolveHookProfile();
   const disabledHooks = parseCsvEnv(process.env[DISABLED_HOOKS_ENV]);
@@ -311,7 +352,7 @@ async function main() {
     return;
   }
   const cwdMode = resolveCwdMode();
-  const cwdLabel = formatCwdLabel(cwd, cwdMode);
+  const cwdLabel = sessionCwd ? formatCwdLabel(sessionCwd, cwdMode) : "";
   const prevState = readState(statePath);
   let line;
   let nextTurnCount = prevState.last_session_id === sessionId ? asNumber(prevState.turn_count) : 0;
@@ -324,17 +365,20 @@ async function main() {
     eventKey = buildEventKey(sessionId, transcriptPath, transcriptRaw);
 
     const duplicateEvent =
-      prevState.last_session_id === sessionId && prevState.last_event_key === eventKey;
+      statePath &&
+      prevState.last_session_id === sessionId &&
+      prevState.last_event_key === eventKey;
     if (duplicateEvent) {
       emitHookOutput("");
       return;
     }
 
-    nextTurnCount += 1;
-
     const transcript = safeJsonParse(transcriptRaw, null);
     const usage = buildUsageFromTranscript(transcript);
     if (usage) {
+      nextTurnCount = statePath
+        ? nextTurnCount + 1
+        : Math.max(asNumber(usage.turnCount), 1);
       line = buildMonitorLine(usage, nextTurnCount, cwdLabel);
       writeState(statePath, {
         turn_count: nextTurnCount,
@@ -355,13 +399,15 @@ async function main() {
   } else {
     eventKey = buildEventKey(sessionId, transcriptPath, null);
     const duplicateEvent =
-      prevState.last_session_id === sessionId && prevState.last_event_key === eventKey;
+      statePath &&
+      prevState.last_session_id === sessionId &&
+      prevState.last_event_key === eventKey;
     if (duplicateEvent) {
       emitHookOutput("");
       return;
     }
 
-    nextTurnCount += 1;
+    nextTurnCount = statePath ? nextTurnCount + 1 : 1;
   }
 
   if (!line) {

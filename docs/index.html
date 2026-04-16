@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.7.8</span>
+        <span class="badge">Latest Update v0.7.9</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (Interview Session Partitioning)</h2>
-      <p class="sub">OmG v0.7.8 splits interview state by requirement thread, adds an active-session pointer for deterministic resume flows, and aligns the command, agent, and documentation contracts around the new layout.</p>
+      <h2>Latest Update (Hook State Collision Hardening)</h2>
+      <p class="sub">OmG v0.7.9 hardens quota-watch and learn-state persistence by requiring a reliable session cwd, avoiding unsafe process-wide fallback paths, and writing state snapshots atomically.</p>
       <table>
         <thead>
           <tr>
@@ -550,32 +550,32 @@
         </thead>
         <tbody>
           <tr>
-            <td>Session-scoped interview state</td>
-            <td><code>/omg:interview</code> state is now documented under <code>.omg/state/interviews/[slug]/context.json</code> instead of one shared interview file.</td>
+            <td>Safe session cwd requirement</td>
+            <td><code>quota-watch</code> and <code>learn-state</code> persistence now require a reliable hook-provided session <code>cwd</code> before writing any OmG state file.</td>
           </tr>
           <tr>
-            <td>Deterministic active pointer</td>
-            <td><code>.omg/state/interviews/active.json</code> now anchors resume and status flows to one active interview without mixing separate requirement threads.</td>
+            <td>No shared process cwd fallback</td>
+            <td>The hooks no longer fall back to one shared <code>process.cwd()</code> path when the incoming session path is missing or invalid.</td>
           </tr>
           <tr>
-            <td>Command contract alignment</td>
-            <td><code>/omg:intent</code> and <code>/omg:interview</code> now describe session-folder initialization, resume, restart, and finalization against the same state layout.</td>
+            <td>Atomic state writes</td>
+            <td><code>quota-watch.json</code> and <code>learn-watch.json</code> now write through temp files plus atomic rename to reduce concurrent write corruption risk.</td>
           </tr>
           <tr>
-            <td>Agent and core context alignment</td>
-            <td>The interview agent contract and core workflow context now use the active-session pointer plus session-local context file as the source of truth.</td>
+            <td>Graceful persistence skip</td>
+            <td>When a safe state path cannot be resolved, the hooks now fail open without persisting ambiguous cross-project state.</td>
           </tr>
           <tr>
-            <td>Archive-friendly output</td>
-            <td>Finalized interview artifacts are now documented under <code>.omg/state/interviews/[slug]/prd.md</code>, making parallel requirement threads easier to preserve.</td>
+            <td>Usage output preserved</td>
+            <td>The usage hook still emits monitor output from transcript data even when state persistence is intentionally skipped.</td>
           </tr>
           <tr>
             <td>Doc structure refresh</td>
-            <td>README, Korean README, Chinese README, landing page, changelog, package metadata, and extension metadata were updated together for <code>v0.7.8</code>.</td>
+            <td>README, Korean README, landing page, changelog, package metadata, and extension metadata were updated together for <code>v0.7.9</code>.</td>
           </tr>
           <tr>
             <td>Scope boundary</td>
-            <td>Changes stay extension-native: command guidance, agent instructions, workflow context, and docs only.</td>
+            <td>Changes stay extension-native: shipped hook scripts, documentation, and release metadata only.</td>
           </tr>
         </tbody>
       </table>
@@ -1217,7 +1217,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
         <a href="./guide/agent-team-assembly.md">Team Assembly Guide</a>
         <a href="./guide/hook-engineering.md">Hook Engineering Guide</a>
       </div>
-      <div>Built for official Gemini CLI Extensions workflow. Interview session partitioning and state-contract alignment refreshed through v0.7.8.</div>
+      <div>Built for official Gemini CLI Extensions workflow. Hook state collision hardening refreshed through v0.7.9.</div>
     </div>
   </footer>
 

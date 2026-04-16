@@ -6,6 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.7.9` | 2026-04-16 | Hook state collision hardening | Stopped quota-watch and learn-state hooks from falling back to shared `process.cwd()` state paths, added atomic state writes, and documented the safer cross-project behavior |
 | `v0.7.8` | 2026-04-16 | Interview session partitioning and docs alignment | Replaced the single shared interview state contract with session-scoped interview folders, added an active-session pointer, and aligned versioned docs plus release metadata around the new structure |
 | `v0.7.7` | 2026-04-16 | Extension-boundary checks and audit-first launch safety | Tightened stale/mixed extension-root diagnostics, discouraged manual hook-shadow fixes ahead of extension-managed recovery, and promoted workspace audit to the default preflight before non-trivial execution |
 | `v0.7.6` | 2026-04-15 | Hook/runtime control and model-pin cleanup | Added env-driven hook profile controls, retained-skill metadata validation, and removed agent-level model pinning so runtime model selection can take effect consistently |
@@ -39,6 +40,38 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.2` | 2026-02-22 | Model/branding consistency | `gemini-3.1-*` naming and OmG branding normalized |
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
+
+## v0.7.9 - Hook State Collision Hardening (2026-04-16)
+
+Focused on reducing cross-project hook-state collisions during concurrent local work by requiring a reliable session `cwd` before persisting OmG hook state and by making state writes atomic.
+
+### Changed
+
+- Hardened usage-monitor state persistence:
+  - `hooks/scripts/after-agent-usage.js`
+  - no longer falls back to shared `process.cwd()` state paths when hook-level `cwd` is missing or invalid
+  - skips quota-watch persistence when a safe session-local state path cannot be resolved
+  - still emits usage output using transcript-derived turn counts when persistence is skipped
+- Hardened learn-signal state persistence:
+  - `hooks/scripts/learn.js`
+  - no longer falls back to shared `process.cwd()` state paths when hook-level `cwd` is missing or invalid
+  - skips learn-state persistence rather than writing into an ambiguous cross-project location
+- Reduced concurrent write corruption risk:
+  - `hooks/scripts/after-agent-usage.js`
+  - `hooks/scripts/learn.js`
+  - state snapshots now write through temp files plus atomic rename
+- Refreshed documentation and release metadata for `v0.7.9`:
+  - `README.md`
+  - `docs/README_ko.md`
+  - `docs/index.html`
+  - `docs/history.md`
+  - `package.json`
+  - `gemini-extension.json`
+
+### Structural Fit Note
+
+- OmG remains extension-native.
+- Changes are limited to shipped hook scripts, documentation, and release metadata.
 
 ## v0.7.8 - Interview Session Partitioning and Docs Alignment (2026-04-16)
 

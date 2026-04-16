@@ -57,17 +57,15 @@ gemini extensions list
 
 참고: 설치/업데이트 명령은 대화형 슬래시 명령 모드가 아니라 터미널 모드(`gemini extensions ...`)에서 실행합니다.
 
-## v0.7.8의 새로운 내용
+## v0.7.9의 새로운 내용
 
-- 인터뷰 상태를 단일 공유 파일 대신 요구사항 스레드별 세션 폴더로 분리했습니다.
-  - `/omg:intent`, `/omg:interview`는 이제 `.omg/state/interviews/[slug]/context.json`을 기준으로 동작합니다.
-  - `.omg/state/interviews/active.json`은 현재 활성 인터뷰를 가리키는 결정적 포인터 역할을 합니다.
-- 새 인터뷰 세션 레이아웃에 맞춰 명령 계약, 에이전트 계약, 코어 워크플로우 컨텍스트를 정렬했습니다.
-  - `commands/omg/intent.toml`
-  - `commands/omg/interview.toml`
-  - `agents/interview.md`
-  - `context/omg-core.md`
-- 패키지/확장 버전을 `0.7.8`으로 올리고 README/한국어 README/중국어 README/랜딩/히스토리를 갱신했습니다.
+- quota-watch와 learn-state 저장이 서로 다른 프로젝트 사이에서 같은 `process.cwd()` 경로로 떨어지지 않도록 훅 상태 저장을 강화했습니다.
+  - `hooks/scripts/after-agent-usage.js`는 신뢰 가능한 세션 `cwd`가 있을 때만 상태를 기록합니다.
+  - `hooks/scripts/learn.js`는 안전한 세션 로컬 상태 경로를 만들 수 없으면 상태 저장을 건너뜁니다.
+- 동시 실행 중 상태 파일 손상 가능성을 줄였습니다.
+  - `quota-watch.json`, `learn-watch.json`은 이제 임시 파일에 쓴 뒤 원자적으로 교체합니다.
+  - usage 출력은 상태 저장을 건너뛰는 경우에도 transcript 기준으로 계속 표시됩니다.
+- 패키지/확장 버전을 `0.7.9`로 올리고 README/한국어 README/랜딩/히스토리를 갱신했습니다.
 
 ## Extension Boundary와 Update Safety
 - OmG 설치/업데이트는 `gemini extensions ...` 경로를 기준으로 유지하고, 복사해 둔 command/skill 폴더를 주 실행 경로로 삼지 않는 편이 안전합니다.

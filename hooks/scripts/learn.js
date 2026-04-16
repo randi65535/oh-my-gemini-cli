@@ -103,6 +103,27 @@ function parseCsvEnv(value) {
     .filter(Boolean);
 }
 
+function resolveSessionCwd(hookInput) {
+  const rawCwd =
+    typeof hookInput?.cwd === "string" && hookInput.cwd.trim()
+      ? hookInput.cwd.trim()
+      : "";
+  if (!rawCwd) {
+    return null;
+  }
+
+  const resolved = path.resolve(rawCwd);
+  try {
+    if (fs.existsSync(resolved) && fs.statSync(resolved).isDirectory()) {
+      return resolved;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
 function resolveHookProfile() {
   const raw =
     typeof process.env[HOOK_PROFILE_ENV] === "string"
@@ -128,8 +149,16 @@ function resolveStatePath(cwd) {
   if (typeof customStateRoot === "string" && customStateRoot.trim()) {
     const stateRoot = path.isAbsolute(customStateRoot)
       ? customStateRoot.trim()
-      : path.join(cwd, customStateRoot.trim());
+      : cwd
+        ? path.join(cwd, customStateRoot.trim())
+        : "";
+    if (!stateRoot) {
+      return null;
+    }
     return path.join(stateRoot, "learn-watch.json");
+  }
+  if (!cwd) {
+    return null;
   }
   return path.join(cwd, DEFAULT_STATE_RELATIVE_PATH);
 }
@@ -139,8 +168,16 @@ function resolveDeepInterviewStatePath(cwd) {
   if (typeof customStateRoot === "string" && customStateRoot.trim()) {
     const stateRoot = path.isAbsolute(customStateRoot)
       ? customStateRoot.trim()
-      : path.join(cwd, customStateRoot.trim());
+      : cwd
+        ? path.join(cwd, customStateRoot.trim())
+        : "";
+    if (!stateRoot) {
+      return null;
+    }
     return path.join(stateRoot, "deep-interview.json");
+  }
+  if (!cwd) {
+    return null;
   }
   return path.join(cwd, DEFAULT_DEEP_INTERVIEW_STATE_RELATIVE_PATH);
 }
@@ -180,6 +217,9 @@ function normalizeState(state) {
 }
 
 function readState(statePath) {
+  if (!statePath) {
+    return {};
+  }
   try {
     const raw = fs.readFileSync(statePath, "utf8");
     return normalizeState(safeJsonParse(raw, {}));
@@ -189,6 +229,9 @@ function readState(statePath) {
 }
 
 function readDeepInterviewState(statePath) {
+  if (!statePath) {
+    return null;
+  }
   try {
     const raw = fs.readFileSync(statePath, "utf8");
     const parsed = safeJsonParse(raw, null);
@@ -260,9 +303,18 @@ function isDeepInterviewLockActive(state, nowMs = Date.now()) {
 }
 
 function writeState(statePath, state) {
+  if (!statePath) {
+    return;
+  }
   try {
-    fs.mkdirSync(path.dirname(statePath), { recursive: true });
-    fs.writeFileSync(statePath, `${JSON.stringify(state, null, 2)}\n`, "utf8");
+    const dir = path.dirname(statePath);
+    fs.mkdirSync(dir, { recursive: true });
+    const tempPath = path.join(
+      dir,
+      `${path.basename(statePath)}.${process.pid}.${Date.now()}.tmp`,
+    );
+    fs.writeFileSync(tempPath, `${JSON.stringify(state, null, 2)}\n`, "utf8");
+    fs.renameSync(tempPath, statePath);
   } catch {
     // Fail-open: learn hook must never block the parent workflow.
   }
@@ -360,6 +412,9 @@ function loadLearnConfig(cwd) {
     promptOncePerSession: true,
     promptCooldownMinutes: 45,
   };
+  if (!cwd) {
+    return defaults;
+  }
   const configPath = path.join(cwd, ".omg", "rules", "learn.json");
   if (!fs.existsSync(configPath)) {
     return defaults;
@@ -413,7 +468,7 @@ async function main() {
   const rawInput = await readStdinText();
   const hookInput = safeJsonParse(rawInput, {});
 
-  const cwd = typeof hookInput?.cwd === "string" && hookInput.cwd ? hookInput.cwd : process.cwd();
+  const sessionCwd = resolveSessionCwd(hookInput);
   const sessionId =
     typeof hookInput?.session_id === "string" && hookInput.session_id
       ? hookInput.session_id
@@ -425,10 +480,10 @@ async function main() {
   const quietHooks = isTruthy(process.env[QUIET_HOOKS_ENV]);
   const hookProfile = resolveHookProfile();
   const disabledHooks = parseCsvEnv(process.env[DISABLED_HOOKS_ENV]);
-  const statePath = resolveStatePath(cwd);
-  const deepInterviewStatePath = resolveDeepInterviewStatePath(cwd);
+  const statePath = resolveStatePath(sessionCwd);
+  const deepInterviewStatePath = resolveDeepInterviewStatePath(sessionCwd);
   const prevState = readState(statePath);
-  const config = loadLearnConfig(cwd);
+  const config = loadLearnConfig(sessionCwd);
   const deepInterviewState = readDeepInterviewState(deepInterviewStatePath);
   const deepInterviewLockActive = isDeepInterviewLockActive(deepInterviewState);
   const nowMs = Date.now();
@@ -437,6 +492,11 @@ async function main() {
     hookProfile === "minimal" || isHookDisabled(disabledHooks, [...LEARN_HOOK_KEYS]);
 
   if (learnHookDisabled) {
+    emitHookOutput("");
+    return;
+  }
+
+  if (!statePath) {
     emitHookOutput("");
     return;
   }
