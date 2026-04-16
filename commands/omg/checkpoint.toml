@@ -11,7 +11,9 @@ Protocol:
 3. Capture key decisions and open risks.
 4. Reference `.omg/state/taskboard.md` and `.omg/state/workspace.json` when available instead of replaying long raw history.
 5. Provide a one-command resume hint.
-6. If filesystem tools are available, write/update `.omg/state/checkpoint.md`.
+6. Read `.omg/state/session-lock.json` before persisting.
+   - if the current orchestration session owns the lock, write/update `.omg/state/checkpoint.md`
+   - if another session owns the lock, write `.omg/state/sessions/[session-slug]/checkpoint.md` instead and flag the pending merge
 
 Output format:
 ## Checkpoint

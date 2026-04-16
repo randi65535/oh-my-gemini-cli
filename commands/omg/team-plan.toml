@@ -18,7 +18,10 @@ Protocol:
 8. Mark tasks as critical-path, sequential, or sidecar parallelizable, and note when isolated worktrees or explicit handoffs are required.
 9. Define verification checkpoints per phase.
 10. List 3-5 critical files most relevant for implementation.
-11. If filesystem tools are available, seed/update `.omg/state/taskboard.md`.
+11. Read `.omg/state/session-lock.json` before mutating the shared board.
+12. If filesystem tools are available:
+   - if the current orchestration session owns the lock, seed/update `.omg/state/taskboard.md`
+   - otherwise write `.omg/state/sessions/[session-slug]/taskboard.md` and flag the pending merge instead of overwriting the shared board
 
 Output format:
 ## Stage

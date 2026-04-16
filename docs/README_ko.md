@@ -57,15 +57,26 @@ gemini extensions list
 
 참고: 설치/업데이트 명령은 대화형 슬래시 명령 모드가 아니라 터미널 모드(`gemini extensions ...`)에서 실행합니다.
 
-## v0.7.9의 새로운 내용
+## v0.8.0의 새로운 내용
 
-- quota-watch와 learn-state 저장이 서로 다른 프로젝트 사이에서 같은 `process.cwd()` 경로로 떨어지지 않도록 훅 상태 저장을 강화했습니다.
-  - `hooks/scripts/after-agent-usage.js`는 신뢰 가능한 세션 `cwd`가 있을 때만 상태를 기록합니다.
-  - `hooks/scripts/learn.js`는 안전한 세션 로컬 상태 경로를 만들 수 없으면 상태 저장을 건너뜁니다.
-- 동시 실행 중 상태 파일 손상 가능성을 줄였습니다.
-  - `quota-watch.json`, `learn-watch.json`은 이제 임시 파일에 쓴 뒤 원자적으로 교체합니다.
-  - usage 출력은 상태 저장을 건너뛰는 경우에도 transcript 기준으로 계속 표시됩니다.
-- 패키지/확장 버전을 `0.7.9`로 올리고 README/한국어 README/랜딩/히스토리를 갱신했습니다.
+- 같은 프로젝트 안에서 병렬 세션이 shared workflow state를 덮어쓰지 않도록 single-writer 규칙을 강화했습니다.
+  - `.omg/state/session-lock.json`을 shared state의 authoritative writer 잠금으로 사용합니다.
+  - lock을 가진 orchestration 세션만 `workspace.json`, `taskboard.md`, `workflow.md`, `checkpoint.md` 같은 공유 파일을 갱신합니다.
+  - lock이 없는 병렬 세션은 `.omg/state/sessions/[session-slug]/...` 아래에 session-local draft를 쓰고 merge 필요를 보고합니다.
+- 운영 설정 파일도 같은 잠금 규칙을 따르도록 확장했습니다.
+  - `mode`, `hud`, `approval`, `reasoning`, `hooks`, `notify` 명령도 lock-aware persistence로 정리했습니다.
+  - delegated/worker/sub-agent turn은 shared workflow state를 직접 쓰지 않도록 명시했습니다.
+- 기존 훅 충돌 완화도 그대로 유지합니다.
+  - usage/learn hook은 unsafe `process.cwd()` fallback을 쓰지 않습니다.
+  - hook 상태 파일은 temp file + atomic rename으로 기록합니다.
+- 패키지/확장 버전을 `0.8.0`으로 올리고 README/한국어 README/랜딩/히스토리를 갱신했습니다.
+
+## 공유 워크플로우 상태
+
+- `.omg/state/session-lock.json`은 하나의 프로젝트 안에서 shared workflow/operating-profile state를 쓰는 authoritative writer 잠금입니다.
+- lock을 가진 orchestration 세션만 `workspace.json`, `taskboard.md`, `workflow.md`, `checkpoint.md`, `mode.json`, `hud.json`, `approval.json`, `reasoning.json`, `hooks.json`, `notify.json` 같은 공유 파일을 갱신해야 합니다.
+- 병렬 top-level 세션은 shared state를 덮어쓰지 말고 `.omg/state/sessions/[session-slug]/` 아래의 session-local draft를 만들고 orchestrator에게 merge하도록 넘겨야 합니다.
+- delegated worker/sub-agent turn은 shared workflow state를 직접 수정하지 않아야 합니다.
 
 ## Extension Boundary와 Update Safety
 - OmG 설치/업데이트는 `gemini extensions ...` 경로를 기준으로 유지하고, 복사해 둔 command/skill 폴더를 주 실행 경로로 삼지 않는 편이 안전합니다.

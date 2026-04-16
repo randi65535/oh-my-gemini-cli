@@ -44,6 +44,11 @@ OmG adds a role-driven workflow layer to Gemini CLI.
   - **Smart Synchronization**: Agents `read_file` the active pointer first, then the session state ONLY at entry points to ensure alignment.
   - **Implicit Adoption**: On read, the file content overrides any stale internal context immediately.
   - **Update Policy**: Update the active session file (`write_file`) only when tangible changes (facts, score, prompt) occur.
+- **Shared Workflow State**: Treat `.omg/state/workspace.json`, `.omg/state/taskboard.md`, `.omg/state/workflow.md`, and `.omg/state/checkpoint.md` as single-writer artifacts per project.
+  - **Lock File**: Read `.omg/state/session-lock.json` before mutating any shared workflow artifact.
+  - **Authoritative Writer**: Only the main/orchestration session whose lock matches may update shared workflow artifacts.
+  - **Conflict Rule**: If another live session owns the lock, do not overwrite shared workflow artifacts; write session-local drafts under `.omg/state/sessions/[session-slug]/` and surface the ownership conflict explicitly.
+  - **Delegated Turns**: Delegated/worker/subagent turns must not write shared workflow artifacts directly; they return handoff summaries or session-local notes for the orchestrator to merge.
 - **Summarization**: Read only files needed for the current step and summarize before handoff.
 - **Persistence**: Use `.omg/state/*`, `MEMORY.md`, `.omg/memory/*`, `.omg/rules/*`, `.omg/hooks/*`, or `.omg/notify/*`.
 
@@ -57,6 +62,7 @@ OmG adds a role-driven workflow layer to Gemini CLI.
 - **Permission Recovery**: If a tool/action is denied, do not retry unchanged; request approval or switch to a safe fallback plan.
 - **Agent Recovery**: If a lane agent is unavailable, reroute once to a mapped fallback lane and record why.
 - **Concise Success Path**: Keep normal-success reporting compact and expand only blocker or early-stop branches.
+- **Session Ownership**: When multiple top-level sessions touch the same project, keep one authoritative orchestration session per shared workflow state and push all parallel session notes into lane/session-local drafts until merged.
 
 ## Command Response Contract
 

@@ -56,15 +56,19 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.7.9
+## What's New in v0.8.0
 
-- Hardened hook state persistence so quota-watch and learn-state writes no longer fall back to one shared `process.cwd()` location across unrelated projects:
-  - `hooks/scripts/after-agent-usage.js` now writes state only when the hook receives a reliable session `cwd`
-  - `hooks/scripts/learn.js` now skips persistence when session-local state paths cannot be resolved safely
-- Reduced cross-process state corruption risk during concurrent hook writes:
-  - usage and learn state now write through a temp file plus atomic rename
-  - usage output still works without persistence when state writes are intentionally skipped
-- Bumped extension/package version to `0.7.9` and refreshed README, Korean README, landing docs, and history.
+- Hardened same-project parallel session safety across OmG shared workflow state:
+  - shared workflow artifacts now treat `.omg/state/session-lock.json` as the authoritative writer lock
+  - only the lock-owning orchestration session may mutate shared workflow files such as `workspace.json`, `taskboard.md`, `workflow.md`, and `checkpoint.md`
+  - non-owning sessions now route writes into `.omg/state/sessions/[session-slug]/...` session-local drafts instead of overwriting shared state
+- Extended the single-writer rule beyond workflow files into shared operating profiles:
+  - `mode`, `hud`, `approval`, `reasoning`, `hooks`, and `notify` commands now follow the same lock-aware persistence policy
+  - delegated/worker/subagent turns are explicitly instructed not to write shared workflow state directly
+- Kept earlier hook hardening in place for cross-project safety:
+  - usage/learn hooks still avoid unsafe `process.cwd()` fallback paths
+  - hook state writes still use temp file plus atomic rename
+- Bumped extension/package version to `0.8.0` and refreshed README, Korean README, landing docs, and history.
 
 ## Extension Boundary and Upgrade Safety
 
@@ -78,6 +82,13 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 - `/omg:interview` session state is now intended to live under `.omg/state/interviews/[slug]/` instead of one shared interview file.
 - `.omg/state/interviews/active.json` tracks the current interview so resume/status commands stay deterministic without mixing separate requirement threads.
 - This keeps multiple requirement-discovery passes in the same project distinguishable and archive-friendly.
+
+## Shared Workflow State
+
+- `.omg/state/session-lock.json` is now the single-writer lock for shared workflow and operating-profile state inside one project.
+- Only the lock-owning orchestration session should write shared files like `workspace.json`, `taskboard.md`, `workflow.md`, `checkpoint.md`, `mode.json`, `hud.json`, `approval.json`, `reasoning.json`, `hooks.json`, and `notify.json`.
+- Parallel top-level sessions that do not own the lock should write session-local drafts under `.omg/state/sessions/[session-slug]/` and hand those notes back to the orchestrator for merge.
+- Delegated worker/sub-agent turns should stay read-mostly and must not mutate shared workflow state directly.
 
 ## At A Glance
 
@@ -481,11 +492,18 @@ oh-my-gemini-cli/
 |- gemini-extension.json
 |- .omg/
 |  `- state/
+|     |- session-lock.json
 |     `- interviews/
-|        |- active.json
-|        `- [slug]/
-|           |- context.json
-|           `- prd.md
+|     |  |- active.json
+|     |  `- [slug]/
+|     |     |- context.json
+|     |     `- prd.md
+|     `- sessions/
+|        `- [session-slug]/
+|           |- workspace.json
+|           |- taskboard.md
+|           |- workflow.md
+|           `- checkpoint.md
 |- agents/
 |- commands/
 |  `- omg/

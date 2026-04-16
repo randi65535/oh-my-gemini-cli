@@ -37,8 +37,11 @@ Protocol:
 6. Keep ordering stable and write only high-signal notes; avoid volatile chatter or duplicated diffs.
 7. If `team-plan` or `team-prd` output exists, align the board to those artifacts.
 8. Never mark a task `verified` without evidence from `team-verify`; if lane scope, trust status, or evidence is unclear, keep the task `blocked` or call out the ambiguity explicitly.
-9. If filesystem tools are available, write/update `.omg/state/taskboard.md`.
-10. If scope or evidence is unclear, call it out instead of fabricating a board.
+9. Before mutating the shared board, read `.omg/state/session-lock.json`.
+   - if the current orchestration session owns the lock, write/update `.omg/state/taskboard.md`
+   - if another session owns the lock, do not overwrite the shared board; write `.omg/state/sessions/[session-slug]/taskboard.md` instead and flag the merge requirement
+10. Delegated/worker/subagent turns must not write the shared board directly.
+11. If scope or evidence is unclear, call it out instead of fabricating a board.
 
 Suggested `taskboard.md` shape:
 # Taskboard

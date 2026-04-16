@@ -7,7 +7,7 @@ $ARGUMENTS
 
 Execution protocol (staged):
 1. If team composition is unclear or task is non-standard, run `team-assemble` first.
-2. Load `.omg/state/workspace.json` and `.omg/state/reasoning.json` when available.
+2. Read `.omg/state/session-lock.json`, then load `.omg/state/workspace.json` and `.omg/state/reasoning.json` when available.
 3. Identify the immediate blocking objective and keep it on the active critical lane.
 4. `team-plan`: Delegate decomposition to `omg-planner` and architecture checks to `omg-architect`, including lane-health and isolation risks.
 5. `team-prd`: Delegate scope lock and acceptance criteria to `omg-product`.
@@ -22,10 +22,12 @@ Execution protocol (staged):
 14. Return one merged lifecycle report.
 
 State handling:
-- If filesystem tools are available, update `.omg/state/workflow.md` with stage status and open blockers.
-- Keep `.omg/state/taskboard.md` as the compact source of truth for ready, blocked, done, and verified tasks.
+- Only the orchestration session that owns `.omg/state/session-lock.json` may update shared workflow artifacts.
+- If another session owns the lock, do not overwrite `.omg/state/workflow.md`, `.omg/state/taskboard.md`, or `.omg/state/workspace.json`; write session-local drafts under `.omg/state/sessions/[session-slug]/` and report merge needs.
+- If filesystem tools are available and the current session owns the lock, update `.omg/state/workflow.md` with stage status and open blockers.
+- Keep `.omg/state/taskboard.md` as the compact source of truth for ready, blocked, done, and verified tasks only for the lock-owning orchestration session.
 - Keep task ordering deterministic via dependency-ready + lane-safe + priority (`p0` -> `p3`) + task-id tie-breaker.
-- Keep `.omg/state/workspace.json` as the compact source of truth for lane ownership, cleanliness, trust, and handoff readiness.
+- Keep `.omg/state/workspace.json` as the compact source of truth for lane ownership, cleanliness, trust, and handoff readiness only for the lock-owning orchestration session.
 - Preserve lane baseline anchors in both workspace/taskboard state when known so resume and review can detect branch drift.
 - If dynamic assembly was used, also persist `.omg/state/team-assembly.md`.
 - Keep verification evidence concise (tests, checks, reasoning) and avoid repeating full success traces when nothing unusual happened.

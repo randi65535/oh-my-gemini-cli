@@ -6,6 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.8.0` | 2026-04-16 | Shared workflow single-writer safety | Added session-lock based ownership for shared workflow and operating-profile state, routed non-owning sessions into session-local drafts, and documented the safer same-project parallel-session model |
 | `v0.7.9` | 2026-04-16 | Hook state collision hardening | Stopped quota-watch and learn-state hooks from falling back to shared `process.cwd()` state paths, added atomic state writes, and documented the safer cross-project behavior |
 | `v0.7.8` | 2026-04-16 | Interview session partitioning and docs alignment | Replaced the single shared interview state contract with session-scoped interview folders, added an active-session pointer, and aligned versioned docs plus release metadata around the new structure |
 | `v0.7.7` | 2026-04-16 | Extension-boundary checks and audit-first launch safety | Tightened stale/mixed extension-root diagnostics, discouraged manual hook-shadow fixes ahead of extension-managed recovery, and promoted workspace audit to the default preflight before non-trivial execution |
@@ -40,6 +41,60 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.2` | 2026-02-22 | Model/branding consistency | `gemini-3.1-*` naming and OmG branding normalized |
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
+
+## v0.8.0 - Shared Workflow Single-Writer Safety (2026-04-16)
+
+Focused on reducing same-project parallel-session drift after Gemini CLI subagent GA by formalizing one authoritative writer for shared OmG state and routing non-owning sessions into session-local drafts.
+
+### Changed
+
+- Added shared workflow single-writer policy:
+  - `context/omg-core.md`
+  - shared workflow artifacts now treat `.omg/state/session-lock.json` as the authoritative writer lock
+  - only the lock-owning orchestration session should mutate shared workflow artifacts
+  - delegated/worker/subagent turns are explicitly read-mostly for shared workflow state
+- Hardened shared workflow state writers:
+  - `commands/omg/launch.toml`
+  - `commands/omg/team.toml`
+  - `commands/omg/team-assemble.toml`
+  - `commands/omg/taskboard.toml`
+  - `commands/omg/workspace.toml`
+  - `commands/omg/checkpoint.toml`
+  - `commands/omg/stop.toml`
+  - `commands/omg/cancel.toml`
+  - `commands/omg/loop.toml`
+  - `commands/omg/autopilot.toml`
+  - `commands/omg/team-plan.toml`
+  - `commands/omg/team-exec.toml`
+  - `commands/omg/team-verify.toml`
+  - non-owning sessions now write session-local drafts under `.omg/state/sessions/[session-slug]/...` instead of overwriting shared workflow state
+- Extended the lock-aware persistence model to operating-profile state:
+  - `commands/omg/mode.toml`
+  - `commands/omg/hud.toml`
+  - `commands/omg/hud-on.toml`
+  - `commands/omg/hud-off.toml`
+  - `commands/omg/hud-compact.toml`
+  - `commands/omg/approval.toml`
+  - `commands/omg/reasoning.toml`
+  - `commands/omg/hooks.toml`
+  - `commands/omg/hooks-init.toml`
+  - `commands/omg/notify.toml`
+- Preserved prior hook collision safeguards:
+  - `hooks/scripts/after-agent-usage.js`
+  - `hooks/scripts/learn.js`
+  - hook state still avoids unsafe `process.cwd()` fallback and still writes via temp file plus atomic rename
+- Refreshed documentation and release metadata for `v0.8.0`:
+  - `README.md`
+  - `docs/README_ko.md`
+  - `docs/index.html`
+  - `docs/history.md`
+  - `package.json`
+  - `gemini-extension.json`
+
+### Structural Fit Note
+
+- OmG remains extension-native.
+- Changes are limited to prompt-policy contracts, shipped hook scripts, documentation, and release metadata.
 
 ## v0.7.9 - Hook State Collision Hardening (2026-04-16)
 

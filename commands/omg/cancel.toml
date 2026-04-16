@@ -13,9 +13,10 @@ Protocol:
    - emit/update a compact cancel signal artifact for deterministic resume behavior
 4. Summarize completed work, in-flight work, blockers, taskboard status, current lane/subagent handoff, and remaining TODOs.
 5. Provide a minimal resume plan with one recommended next command.
-6. If filesystem tools are available, write/update:
-   - `.omg/state/checkpoint.md`
-   - `.omg/state/cancel-signal.json`
+6. Read `.omg/state/session-lock.json` before persisting shared cancel artifacts.
+7. If filesystem tools are available:
+   - if the current orchestration session owns the lock, write/update `.omg/state/checkpoint.md` and `.omg/state/cancel-signal.json`
+   - otherwise write `.omg/state/sessions/[session-slug]/checkpoint.md` and `.omg/state/sessions/[session-slug]/cancel-signal.json` instead of overwriting shared state
 
 Output format:
 ## Lifecycle

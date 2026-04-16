@@ -19,8 +19,11 @@ Protocol:
    - verification strictness
    - expected latency/token cost
 5. If teammate overrides are provided, apply them only to listed roles and keep the global default for others.
-6. If filesystem tools are available, write/update `.omg/state/reasoning.json`.
-7. Clarify boundary: this profile controls OmG orchestration behavior and recommendations, not Gemini runtime flags directly.
+6. Read `.omg/state/session-lock.json` before mutating shared reasoning state.
+7. If filesystem tools are available:
+   - if the current orchestration session owns the lock, write/update `.omg/state/reasoning.json`
+   - otherwise write `.omg/state/sessions/[session-slug]/reasoning.json` instead and report the ownership conflict
+8. Clarify boundary: this profile controls OmG orchestration behavior and recommendations, not Gemini runtime flags directly.
 
 Suggested `reasoning.json` shape:
 {

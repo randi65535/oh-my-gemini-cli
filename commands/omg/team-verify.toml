@@ -19,7 +19,10 @@ Protocol:
 9. Classify issues as blocker, major, or minor.
 10. Produce targeted fix list for `team-fix`, anchored to task IDs and termination reasons when applicable.
 11. Order the fix backlog by priority first (`p0` -> `p3`), then severity.
-12. If filesystem tools are available, update `.omg/state/taskboard.md`.
+12. Read `.omg/state/session-lock.json` before mutating the shared board.
+13. If filesystem tools are available:
+   - if the current orchestration session owns the lock, update `.omg/state/taskboard.md`
+   - otherwise write `.omg/state/sessions/[session-slug]/taskboard.md` and verifier notes instead of overwriting the shared board
 
 Output format:
 ## Stage

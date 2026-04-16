@@ -47,9 +47,11 @@ Protocol:
 8. Approved execution path:
    - Run `team-plan -> team-prd -> taskboard -> team-exec -> team-verify -> team-fix`.
    - Repeat `team-exec -> team-verify -> team-fix` until criteria pass, tracked tasks are verified, or blockers are explicit.
-9. If filesystem tools are available, write/update:
-   - `.omg/state/team-assembly.md`
-   - `.omg/state/workflow.md`
+9. Read `.omg/state/session-lock.json` before mutating shared workflow state.
+10. If filesystem tools are available:
+   - write/update `.omg/state/team-assembly.md`
+   - if the current orchestration session owns the lock, write/update `.omg/state/workflow.md`
+   - otherwise write `.omg/state/sessions/[session-slug]/workflow.md` instead of overwriting shared workflow state
 
 Response:
 - Keep it concise and operator-facing.

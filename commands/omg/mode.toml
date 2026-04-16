@@ -15,7 +15,10 @@ Mode behavior:
    - `ralph`
    - `ultrawork`
 3. Produce profile settings for planning depth, execution pace, quick-fix lane, and verification strictness.
-4. If filesystem tools are available, write/update `.omg/state/mode.json`.
+4. Read `.omg/state/session-lock.json` before mutating shared operating-profile state.
+5. If filesystem tools are available:
+   - if the current orchestration session owns the lock, write/update `.omg/state/mode.json`
+   - otherwise write `.omg/state/sessions/[session-slug]/mode.json` instead and report the ownership conflict
 
 Suggested `mode.json` shape:
 {

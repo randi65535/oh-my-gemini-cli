@@ -18,6 +18,7 @@ const QUIET_HOOKS_ENV = "OMG_HOOKS_QUIET";
 const STATE_ROOT_ENV = "OMG_STATE_ROOT";
 const HOOK_PROFILE_ENV = "OMG_HOOK_PROFILE";
 const DISABLED_HOOKS_ENV = "OMG_DISABLED_HOOKS";
+const ALLOW_DELEGATED_HOOKS_ENV = "OMG_ALLOW_DELEGATED_HOOKS";
 const DEFAULT_STATE_RELATIVE_PATH = path.join(".omg", "state", "learn-watch.json");
 const DEFAULT_DEEP_INTERVIEW_STATE_RELATIVE_PATH = path.join(
   ".omg",
@@ -93,6 +94,10 @@ function isTruthy(value) {
   return normalized === "1" || normalized === "true" || normalized === "yes" || normalized === "on";
 }
 
+function isObject(value) {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
 function parseCsvEnv(value) {
   if (typeof value !== "string") {
     return [];
@@ -101,6 +106,36 @@ function parseCsvEnv(value) {
     .split(",")
     .map((item) => item.trim().toLowerCase())
     .filter(Boolean);
+}
+
+function isDelegatedSubagentTurn(hookInput) {
+  const metadata = isObject(hookInput?.metadata) ? hookInput.metadata : {};
+  const lane = typeof hookInput?.lane === "string" ? hookInput.lane.trim().toLowerCase() : "";
+  const subagent =
+    typeof hookInput?.subagent === "string"
+      ? hookInput.subagent.trim().toLowerCase()
+      : typeof metadata?.subagent === "string"
+        ? metadata.subagent.trim().toLowerCase()
+        : "";
+
+  if (subagent && !["main", "primary", "root", "orchestrator", "director"].includes(subagent)) {
+    return true;
+  }
+
+  if (lane && !["main", "primary", "root", "orchestration"].includes(lane)) {
+    return true;
+  }
+
+  return [
+    hookInput?.delegated,
+    hookInput?.is_delegated,
+    hookInput?.worker,
+    hookInput?.is_worker,
+    metadata?.delegated,
+    metadata?.is_delegated,
+    metadata?.worker,
+    metadata?.is_worker,
+  ].some((value) => value === true);
 }
 
 function resolveSessionCwd(hookInput) {
@@ -492,6 +527,11 @@ async function main() {
     hookProfile === "minimal" || isHookDisabled(disabledHooks, [...LEARN_HOOK_KEYS]);
 
   if (learnHookDisabled) {
+    emitHookOutput("");
+    return;
+  }
+  const allowDelegatedHooks = isTruthy(process.env[ALLOW_DELEGATED_HOOKS_ENV]);
+  if (!allowDelegatedHooks && isDelegatedSubagentTurn(hookInput)) {
     emitHookOutput("");
     return;
   }

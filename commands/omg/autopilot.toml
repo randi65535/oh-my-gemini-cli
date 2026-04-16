@@ -13,7 +13,10 @@ Autopilot protocol:
 5. Default max cycles: 5 (override only if user explicitly requests).
 
 State handling:
-- If filesystem tools are available, update `.omg/state/workflow.md`, `.omg/state/taskboard.md`, and `.omg/state/checkpoint.md`.
+- Read `.omg/state/session-lock.json` before mutating shared workflow state.
+- If filesystem tools are available:
+  - if the current orchestration session owns the lock, update `.omg/state/workflow.md`, `.omg/state/taskboard.md`, and `.omg/state/checkpoint.md`
+  - otherwise write session-local drafts under `.omg/state/sessions/[session-slug]/` and report the ownership conflict instead of overwriting shared state
 - Include mode and cycle count in the state summary.
 
 Output format:

@@ -16,8 +16,11 @@ Protocol:
    - destructive operation checks
    - secret/credential handling checks
    - production-impact confirmation checks
-5. If filesystem tools are available, write/update `.omg/state/approval.json`.
-6. Clarify boundary: this sets OmG policy posture and does not directly reconfigure Gemini CLI runtime approval flags.
+5. Read `.omg/state/session-lock.json` before mutating shared approval state.
+6. If filesystem tools are available:
+   - if the current orchestration session owns the lock, write/update `.omg/state/approval.json`
+   - otherwise write `.omg/state/sessions/[session-slug]/approval.json` instead and report the ownership conflict
+7. Clarify boundary: this sets OmG policy posture and does not directly reconfigure Gemini CLI runtime approval flags.
 
 Suggested `approval.json` shape:
 {

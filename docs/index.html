@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.7.9</span>
+        <span class="badge">Latest Update v0.8.0</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (Hook State Collision Hardening)</h2>
-      <p class="sub">OmG v0.7.9 hardens quota-watch and learn-state persistence by requiring a reliable session cwd, avoiding unsafe process-wide fallback paths, and writing state snapshots atomically.</p>
+      <h2>Latest Update (Shared Workflow Single-Writer Safety)</h2>
+      <p class="sub">OmG v0.8.0 adds a session-lock based authoritative writer model for shared workflow and operating-profile state, routes non-owning sessions into session-local drafts, and keeps prior hook collision hardening in place.</p>
       <table>
         <thead>
           <tr>
@@ -550,32 +550,32 @@
         </thead>
         <tbody>
           <tr>
-            <td>Safe session cwd requirement</td>
-            <td><code>quota-watch</code> and <code>learn-state</code> persistence now require a reliable hook-provided session <code>cwd</code> before writing any OmG state file.</td>
+            <td>Authoritative session lock</td>
+            <td><code>.omg/state/session-lock.json</code> now defines which orchestration session may mutate shared workflow and operating-profile state inside one project.</td>
           </tr>
           <tr>
-            <td>No shared process cwd fallback</td>
-            <td>The hooks no longer fall back to one shared <code>process.cwd()</code> path when the incoming session path is missing or invalid.</td>
+            <td>Session-local draft fallback</td>
+            <td>Parallel sessions that do not own the lock now write drafts under <code>.omg/state/sessions/[session-slug]/...</code> instead of overwriting shared state.</td>
           </tr>
           <tr>
-            <td>Atomic state writes</td>
-            <td><code>quota-watch.json</code> and <code>learn-watch.json</code> now write through temp files plus atomic rename to reduce concurrent write corruption risk.</td>
+            <td>Shared workflow protection</td>
+            <td><code>workspace</code>, <code>taskboard</code>, <code>workflow</code>, and <code>checkpoint</code> state now follow a single-writer contract across top-level sessions.</td>
           </tr>
           <tr>
-            <td>Graceful persistence skip</td>
-            <td>When a safe state path cannot be resolved, the hooks now fail open without persisting ambiguous cross-project state.</td>
+            <td>Operating-profile protection</td>
+            <td><code>mode</code>, <code>hud</code>, <code>approval</code>, <code>reasoning</code>, <code>hooks</code>, and <code>notify</code> persistence now use the same lock-aware policy.</td>
           </tr>
           <tr>
-            <td>Usage output preserved</td>
-            <td>The usage hook still emits monitor output from transcript data even when state persistence is intentionally skipped.</td>
+            <td>Delegated turn safety</td>
+            <td>Delegated worker/subagent turns are now explicitly treated as read-mostly for shared workflow state and should hand results back to the orchestrator for merge.</td>
           </tr>
           <tr>
             <td>Doc structure refresh</td>
-            <td>README, Korean README, landing page, changelog, package metadata, and extension metadata were updated together for <code>v0.7.9</code>.</td>
+            <td>README, Korean README, landing page, changelog, package metadata, and extension metadata were updated together for <code>v0.8.0</code>.</td>
           </tr>
           <tr>
             <td>Scope boundary</td>
-            <td>Changes stay extension-native: shipped hook scripts, documentation, and release metadata only.</td>
+            <td>Changes stay extension-native: prompt-policy contracts, shipped hook scripts, documentation, and release metadata only.</td>
           </tr>
         </tbody>
       </table>
@@ -1217,7 +1217,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
         <a href="./guide/agent-team-assembly.md">Team Assembly Guide</a>
         <a href="./guide/hook-engineering.md">Hook Engineering Guide</a>
       </div>
-      <div>Built for official Gemini CLI Extensions workflow. Hook state collision hardening refreshed through v0.7.9.</div>
+      <div>Built for official Gemini CLI Extensions workflow. Shared workflow single-writer safety refreshed through v0.8.0.</div>
     </div>
   </footer>
 

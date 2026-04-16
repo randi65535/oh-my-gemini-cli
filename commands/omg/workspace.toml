@@ -33,7 +33,10 @@ Protocol:
    - missing baseline anchor on an active parallel lane
    - baseline branch/HEAD mismatch between the recorded lane anchor and the current lane state
 8. Prefer one concise safety verdict per lane (`ready`, `needs-review`, `blocked`) so follow-up commands can reuse the result without reinterpreting prose.
-9. If filesystem tools are available, write/update `.omg/state/workspace.json`.
+9. Before mutating shared lane state, read `.omg/state/session-lock.json`.
+   - only the lock-owning orchestration session may write/update `.omg/state/workspace.json`
+   - if another session owns the lock, write `.omg/state/sessions/[session-slug]/workspace.json` instead and report the ownership conflict
+10. Delegated/worker/subagent turns must not write shared workspace state directly.
 
 Suggested `workspace.json` shape:
 {

@@ -55,7 +55,10 @@ Protocol:
    - prefer one authoritative registration path per event to avoid duplicate AfterAgent output
    - do not recommend editing shipped hook files first when env/runtime controls or extension-managed settings can solve the issue safely
 8. Enforce team-safety: side-effect hooks must be disabled in delegated sub-agent turns unless user explicitly allows them.
-9. If filesystem tools are available, write/update `.omg/state/hooks.json`.
+9. Read `.omg/state/session-lock.json` before mutating shared hook-policy state.
+10. If filesystem tools are available:
+   - if the current orchestration session owns the lock, write/update `.omg/state/hooks.json`
+   - otherwise write `.omg/state/sessions/[session-slug]/hooks.json` instead and report the ownership conflict
 
 Suggested `hooks.json` shape:
 {

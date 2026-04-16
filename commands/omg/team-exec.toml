@@ -31,7 +31,11 @@ Protocol:
 12. Include checks/tests performed for this slice.
 13. If lane health is unsafe for review or automation, call it out and recommend `/omg:workspace audit` or isolated worktree use.
 14. If permissions/tools are denied, stop this slice as blocked and emit explicit approval/fallback needs.
-15. If filesystem tools are available, update `.omg/state/taskboard.md`.
+15. Delegated/worker/subagent turns must not write shared workflow state directly.
+16. Read `.omg/state/session-lock.json` before mutating the shared board.
+17. If filesystem tools are available:
+   - if the current orchestration session owns the lock, update `.omg/state/taskboard.md`
+   - otherwise write `.omg/state/sessions/[session-slug]/taskboard.md` and explicit handoff notes instead of overwriting the shared board
 
 Output format:
 ## Stage

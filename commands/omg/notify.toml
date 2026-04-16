@@ -41,12 +41,10 @@ Protocol:
    - external side-effect channels (`desktop`, `webhook`) require explicit opt-in
    - `webhook` stays disabled if the bridge URL/secret is missing
    - if approval posture is `suggest`, recommend explicit confirmation before enabling external channels
-7. If filesystem tools are available, write/update:
-   - `.omg/state/notify.json`
-   - `.omg/notify/README.md`
-   - `.omg/notify/templates/compact.md`
-   - `.omg/notify/templates/detailed.md`
-   - `.omg/notify/templates/incident.md`
+7. Read `.omg/state/session-lock.json` before mutating shared notification state.
+8. If filesystem tools are available:
+   - if the current orchestration session owns the lock, write/update `.omg/state/notify.json`, `.omg/notify/README.md`, and `.omg/notify/templates/*`
+   - otherwise write `.omg/state/sessions/[session-slug]/notify.json` plus session-local notify notes under `.omg/state/sessions/[session-slug]/notify/` and report the ownership conflict
 
 Suggested `notify.json` shape:
 {
