@@ -7,27 +7,27 @@ $ARGUMENTS
 
 Protocol:
 1. Initialize or Resume:
-   - **Check First**: Use `read_file` to verify the existence of `.omg/state/interview-context.json`.
+   - **Check First**: Use `read_file` to verify the existence of `.omg/state/interviews/active.json`.
    - **If the file is missing**: **Request the user to start** an active interview via `/omg:intent [depth]`.
-   - **If resuming**: Surface the `ready_to_run_prompt` from the file.
+   - **If resuming**: Resolve the active session folder from `.omg/state/interviews/active.json`, then surface the `ready_to_run_prompt` from `.omg/state/interviews/[slug]/context.json`.
 2. Socratic Dialogue:
    - Invoke the `interview` agent.
-   - **State Enforcement**: The agent MUST use the contents of `interview-context.json` as the exclusive source of truth.
+   - **State Enforcement**: The agent MUST use the active session context file as the exclusive source of truth.
    - Identify the highest-risk ambiguity or technical gap.
    - Ask ONE targeted Socratic question.
 3. Convergence & Scoring:
-   - Update `clarity_score`, `facts`, and `questions_asked` in the state file.
+   - Update `clarity_score`, `facts`, and `questions_asked` in `.omg/state/interviews/[slug]/context.json`.
    - Thresholds:
      - `low`: Score > 65
      - `medium`: Score > 80
      - `high`: Score > 95
 4. Meta-command Logic:
-   - **$intent-status**: Read the JSON and display its exact contents.
-   - **$intent-restart**: Delete the JSON file to start fresh.
-   - **$intent-done**: Use the JSON facts to generate the PRD.
+   - **$intent-status**: Read `.omg/state/interviews/active.json`, then display the exact contents of the active session context JSON.
+   - **$intent-restart**: Clear `.omg/state/interviews/active.json` and start a new session folder.
+   - **$intent-done**: Use the active session facts to generate the PRD.
 5. Finalization:
    - When the threshold is met or `$intent-done` is triggered:
-     - Generate `.omg/state/prd-[slug].md` based on `.omg/templates/prd-template.md`.
+     - Generate `.omg/state/interviews/[slug]/prd.md` based on `.omg/templates/prd-template.md`.
      - Transition the workflow to `ready_to_execute`.
      - Instruct the user to run `/omg:team-plan --intent="[Confirmed Objective]"` or `/omg:team-exec --intent="[Confirmed Objective]"`.
 

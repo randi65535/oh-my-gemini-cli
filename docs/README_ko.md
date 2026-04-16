@@ -57,25 +57,31 @@ gemini extensions list
 
 참고: 설치/업데이트 명령은 대화형 슬래시 명령 모드가 아니라 터미널 모드(`gemini extensions ...`)에서 실행합니다.
 
-## v0.7.7의 새로운 내용
+## v0.7.8의 새로운 내용
 
-- OmG가 extension-managed 경계를 더 엄격하게 진단하도록 조정했습니다.
-  - `commands/omg/doctor.toml`은 stale/mixed extension root, 수동 hook/skill shadowing을 readiness risk로 다룹니다.
-  - `commands/omg/hooks.toml`은 기본 제공 hook 파일을 직접 수정하기 전에 env/runtime control과 extension-managed 경로를 먼저 확인하도록 안내합니다.
-- non-trivial launch에서 `workspace audit`를 기본 안전 게이트로 끌어올렸습니다.
-  - `commands/omg/launch.toml`은 `team-exec` 전에 `/omg:workspace audit`를 기본 preflight로 취급합니다.
-  - `commands/omg/workspace.toml`은 dirty, untrusted, baseline-drift lane을 명시적 execution blocker로 표시합니다.
-- 패키지/확장 버전을 `0.7.7`으로 올리고 README/한국어 README/랜딩/히스토리를 갱신했습니다.
+- 인터뷰 상태를 단일 공유 파일 대신 요구사항 스레드별 세션 폴더로 분리했습니다.
+  - `/omg:intent`, `/omg:interview`는 이제 `.omg/state/interviews/[slug]/context.json`을 기준으로 동작합니다.
+  - `.omg/state/interviews/active.json`은 현재 활성 인터뷰를 가리키는 결정적 포인터 역할을 합니다.
+- 새 인터뷰 세션 레이아웃에 맞춰 명령 계약, 에이전트 계약, 코어 워크플로우 컨텍스트를 정렬했습니다.
+  - `commands/omg/intent.toml`
+  - `commands/omg/interview.toml`
+  - `agents/interview.md`
+  - `context/omg-core.md`
+- 패키지/확장 버전을 `0.7.8`으로 올리고 README/한국어 README/중국어 README/랜딩/히스토리를 갱신했습니다.
 
 ## Extension Boundary와 Update Safety
-
 - OmG 설치/업데이트는 `gemini extensions ...` 경로를 기준으로 유지하고, 복사해 둔 command/skill 폴더를 주 실행 경로로 삼지 않는 편이 안전합니다.
 - 같은 이벤트에 대해 OmG hook 등록 경로는 하나만 authoritative 하게 유지하세요. extension-managed hook과 수동 hook를 섞으면 AfterAgent 출력 중복이나 stale 동작이 가장 쉽게 발생합니다.
 - 업데이트 후 동작이 이상하면 shipped 파일을 바로 고치기 전에 `gemini extensions list`로 활성 확장을 먼저 확인하고, 필요 시 refresh/reinstall을 우선하세요.
 - long-run, review, automation, `team-exec` 전에는 `/omg:workspace audit`를 기본 preflight로 두는 편이 안전합니다.
 
-## 한눈에 보기
+## 인터뷰 세션 저장 구조
 
+- `/omg:interview` 세션 상태는 이제 하나의 공유 인터뷰 파일이 아니라 `.omg/state/interviews/[slug]/` 아래에 저장하는 구조를 기준으로 합니다.
+- `.omg/state/interviews/active.json`이 현재 인터뷰를 추적하므로 resume/status 흐름이 서로 다른 요구사항 스레드를 섞지 않습니다.
+- 같은 프로젝트 안에서 여러 요구사항 정리 세션을 구분하고 보관하기 쉬워집니다.
+
+## 한눈에 보기
 | 항목 | 요약 |
 | --- | --- |
 | 제공 방식 | 공식 Gemini CLI 확장 (`gemini-extension.json`) |
@@ -431,21 +437,27 @@ export OMG_DISABLED_HOOKS=usage,learn
 
 ## 프로젝트 구조
 
-```text
+`	ext
 oh-my-gemini-cli/
 |- GEMINI.md
 |- gemini-extension.json
+|- .omg/
+|  - state/
+|     - interviews/
+|        |- active.json
+|        - [slug]/
+|           |- context.json
+|           - prd.md
 |- agents/
 |- commands/
-|  `- omg/
+|  - omg/
 |- skills/
 |- context/
 |- docs/
-`- LICENSE
-```
+- LICENSE
+`
 
 ## 문제 해결
-
 | 증상 | 가능 원인 | 조치 |
 | --- | --- | --- |
 | 설치 중 `settings.filter is not a function` | Gemini CLI 런타임 또는 확장 메타데이터 캐시가 오래됨 | Gemini CLI 업데이트 후 확장 제거/재설치 |

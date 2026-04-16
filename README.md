@@ -56,15 +56,17 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.7.7
+## What's New in v0.7.8
 
-- Tightened extension-boundary diagnostics so OmG prefers extension-managed recovery paths before users start editing shipped assets by hand:
-  - `commands/omg/doctor.toml` now treats stale/mixed extension roots and manual hook-or-skill shadowing as readiness risks
-  - `commands/omg/hooks.toml` now prefers env/runtime controls before recommending direct edits to shipped hook files
-- Made workspace audit the default safety gate for non-trivial launches:
-  - `commands/omg/launch.toml` now treats `/omg:workspace audit` as the standard preflight before `team-exec`
-  - `commands/omg/workspace.toml` now marks dirty, untrusted, or baseline-drifted active lanes as explicit execution blockers
-- Bumped extension/package version to `0.7.7` and refreshed README, Korean README, landing docs, and history.
+- Split interview session state by requirement thread instead of keeping one shared interview state file:
+  - `/omg:intent` and `/omg:interview` now target `.omg/state/interviews/[slug]/context.json`
+  - `.omg/state/interviews/active.json` now acts as the deterministic pointer for resume/status flows
+- Aligned the command contract, agent contract, and core workflow context around the new interview session layout:
+  - `commands/omg/intent.toml`
+  - `commands/omg/interview.toml`
+  - `agents/interview.md`
+  - `context/omg-core.md`
+- Bumped extension/package version to `0.7.8` and refreshed README, Korean README, Chinese README, landing docs, and history.
 
 ## Extension Boundary and Upgrade Safety
 
@@ -72,6 +74,12 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 - Keep one authoritative OmG hook registration path per event. Mixing extension-managed hooks with manual duplicates is the fastest way to get repeated AfterAgent output or stale behavior.
 - When OmG feels stale after an update, check `gemini extensions list` first, then refresh or reinstall the extension before editing shipped files.
 - For long or multi-lane work, treat `/omg:workspace audit` as the default preflight before review, automation, or `team-exec`.
+
+## Interview Session Storage
+
+- `/omg:interview` session state is now intended to live under `.omg/state/interviews/[slug]/` instead of one shared interview file.
+- `.omg/state/interviews/active.json` tracks the current interview so resume/status commands stay deterministic without mixing separate requirement threads.
+- This keeps multiple requirement-discovery passes in the same project distinguishable and archive-friendly.
 
 ## At A Glance
 
@@ -470,6 +478,13 @@ Retained skills are intentionally limited to a compact deep-work set so the exte
 oh-my-gemini-cli/
 |- GEMINI.md
 |- gemini-extension.json
+|- .omg/
+|  `- state/
+|     `- interviews/
+|        |- active.json
+|        `- [slug]/
+|           |- context.json
+|           `- prd.md
 |- agents/
 |- commands/
 |  `- omg/

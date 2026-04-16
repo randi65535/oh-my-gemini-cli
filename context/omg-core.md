@@ -30,7 +30,7 @@ OmG adds a role-driven workflow layer to Gemini CLI.
 - **Entry**: Triggered via depth keywords (`low|medium|high`) on `/omg:intent`.
 - **Hold**: All automated implementation pipelines are blocked while in this state.
 - **Agent**: `interview` is the exclusive agent active during this state.
-- **Persistence**: Dialogue state, confirmed facts, and `ready_to_run_prompt` must be saved to `.omg/state/interview-context.json`.
+- **Persistence**: Dialogue state, confirmed facts, and `ready_to_run_prompt` must be saved to `.omg/state/interviews/[slug]/context.json`, with `.omg/state/interviews/active.json` pointing at the current session.
 - **Meta-commands**: Support `$intent-status`, `$intent-restart`, `$intent-help`, `$intent-resume`, and `$intent-done`.
 
 ## Intent Pinning Pattern
@@ -40,10 +40,10 @@ OmG adds a role-driven workflow layer to Gemini CLI.
 
 ## Context and State Management
 
-- **Single Source of Truth (SSoT)**: `.omg/state/interview-context.json` is the **exclusive** reference for the Socratic gateway.
-  - **Smart Synchronization**: Agents `read_file` the state ONLY at entry points to ensure alignment.
+- **Single Source of Truth (SSoT)**: The active interview session referenced by `.omg/state/interviews/active.json` is the **exclusive** reference for the Socratic gateway.
+  - **Smart Synchronization**: Agents `read_file` the active pointer first, then the session state ONLY at entry points to ensure alignment.
   - **Implicit Adoption**: On read, the file content overrides any stale internal context immediately.
-  - **Update Policy**: Update the file (`write_file`) only when tangible changes (facts, score, prompt) occur.
+  - **Update Policy**: Update the active session file (`write_file`) only when tangible changes (facts, score, prompt) occur.
 - **Summarization**: Read only files needed for the current step and summarize before handoff.
 - **Persistence**: Use `.omg/state/*`, `MEMORY.md`, `.omg/memory/*`, `.omg/rules/*`, `.omg/hooks/*`, or `.omg/notify/*`.
 

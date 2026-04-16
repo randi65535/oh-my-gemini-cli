@@ -6,6 +6,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.7.8` | 2026-04-16 | Interview session partitioning and docs alignment | Replaced the single shared interview state contract with session-scoped interview folders, added an active-session pointer, and aligned versioned docs plus release metadata around the new structure |
 | `v0.7.7` | 2026-04-16 | Extension-boundary checks and audit-first launch safety | Tightened stale/mixed extension-root diagnostics, discouraged manual hook-shadow fixes ahead of extension-managed recovery, and promoted workspace audit to the default preflight before non-trivial execution |
 | `v0.7.6` | 2026-04-15 | Hook/runtime control and model-pin cleanup | Added env-driven hook profile controls, retained-skill metadata validation, and removed agent-level model pinning so runtime model selection can take effect consistently |
 | `v0.7.5` | 2026-04-14 | Hook stability and usage-state hygiene | Split usage monitor state by model/provider and added duplicate-hook registration diagnostics for repeated AfterAgent output |
@@ -38,6 +39,34 @@ All notable changes to oh-my-gemini-cli are documented here.
 | `v0.1.2` | 2026-02-22 | Model/branding consistency | `gemini-3.1-*` naming and OmG branding normalized |
 | `v0.1.1` | 2026-02-22 | Dashboard redesign | Retro game-style TUI and richer telemetry presentation |
 | `v0.1.0` | 2026-02-22 | Initial release | Multi-agent orchestration foundation shipped |
+
+## v0.7.8 - Interview Session Partitioning and Docs Alignment (2026-04-16)
+
+Focused on making requirement-discovery sessions easier to separate within the same project by replacing the single shared interview-state contract with a session-scoped folder layout and an explicit active-session pointer.
+
+### Changed
+
+- Reworked interview state contract:
+  - `commands/omg/intent.toml`
+  - `commands/omg/interview.toml`
+  - `agents/interview.md`
+  - `context/omg-core.md`
+  - interview state now lives at `.omg/state/interviews/[slug]/context.json`
+  - the current session is tracked via `.omg/state/interviews/active.json`
+  - finalized interview PRDs now land in `.omg/state/interviews/[slug]/prd.md`
+- Refreshed documentation and release metadata for `v0.7.8`:
+  - `README.md`
+  - `docs/README_ko.md`
+  - `docs/README_zh.md`
+  - `docs/index.html`
+  - `docs/history.md`
+  - `package.json`
+  - `gemini-extension.json`
+
+### Structural Fit Note
+
+- OmG remains extension-native.
+- Changes are limited to command/agent contracts, workflow context, documentation, and release metadata.
 
 ## v0.7.7 - Extension-Boundary Checks and Audit-First Launch Safety (2026-04-16)
 

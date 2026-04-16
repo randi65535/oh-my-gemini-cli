@@ -9,7 +9,7 @@ Protocol:
 1. [Pre-check] Detect depth keywords:
    - `low`, `medium`, `high`: High-fidelity mode.
    - `skip`: Explicitly skip interview.
-2. [State Guard] If an unfinished interview is detected in `.omg/state/interview-context.json`, prompt the user to `$intent-resume` or `$intent-restart`.
+2. [State Guard] If an unfinished interview is detected via `.omg/state/interviews/active.json`, prompt the user to `$intent-resume` or `$intent-restart`.
 3. [Classification] Classify the primary intent into one:
    - `team-assemble`: Dynamic multi-role team setup.
    - `plan`: Planning ambiguity or roadmap needs.
@@ -24,7 +24,7 @@ Protocol:
 6. [Routing Decision]:
    - **If interview keywords are present**: Transition to `workflow_state: interviewing`, invoke `interview` agent, and provide the **First Socratic Question**.
    - **Otherwise**: Detect command-intent mismatch and recommend the standard next OmG command.
-7. [Persistence] If filesystem tools are available, write/update `.omg/state/intent.md`.
+7. [Persistence] If filesystem tools are available, write/update `.omg/state/intent.md`. When interview mode starts, initialize `.omg/state/interviews/[slug]/context.json` and point `.omg/state/interviews/active.json` at that session.
 
 Routing hints:
 - depth keywords (`low`, `medium`, `high`) detected -> `/omg:interview` (via `interview`) [Note: Flags like `--deep` are deprecated and replaced by keywords]

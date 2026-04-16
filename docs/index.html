@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.7.7</span>
+        <span class="badge">Latest Update v0.7.8</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (Audit-First Launch + Extension Boundary Safety)</h2>
-      <p class="sub">OmG v0.7.7 tightens extension-root diagnostics, prefers extension-managed recovery over manual asset edits, and promotes workspace audit to the default preflight before non-trivial execution.</p>
+      <h2>Latest Update (Interview Session Partitioning)</h2>
+      <p class="sub">OmG v0.7.8 splits interview state by requirement thread, adds an active-session pointer for deterministic resume flows, and aligns the command, agent, and documentation contracts around the new layout.</p>
       <table>
         <thead>
           <tr>
@@ -550,32 +550,32 @@
         </thead>
         <tbody>
           <tr>
-            <td>Extension-root diagnostics</td>
-            <td><code>/omg:doctor</code> now treats stale or mixed extension roots, copied asset drift, and manual hook-or-skill shadowing as first-class readiness risks before deeper troubleshooting begins.</td>
+            <td>Session-scoped interview state</td>
+            <td><code>/omg:interview</code> state is now documented under <code>.omg/state/interviews/[slug]/context.json</code> instead of one shared interview file.</td>
           </tr>
           <tr>
-            <td>Safer hook recovery</td>
-            <td><code>/omg:hooks</code> now prefers env/runtime controls and extension-managed recovery paths before recommending direct edits to shipped hook files.</td>
+            <td>Deterministic active pointer</td>
+            <td><code>.omg/state/interviews/active.json</code> now anchors resume and status flows to one active interview without mixing separate requirement threads.</td>
           </tr>
           <tr>
-            <td>Audit-first launch</td>
-            <td><code>/omg:launch</code> now treats <code>/omg:workspace audit</code> as the default preflight before <code>team-exec</code> for non-trivial implementation work.</td>
+            <td>Command contract alignment</td>
+            <td><code>/omg:intent</code> and <code>/omg:interview</code> now describe session-folder initialization, resume, restart, and finalization against the same state layout.</td>
           </tr>
           <tr>
-            <td>Lane blocker verdicts</td>
-            <td><code>/omg:workspace audit</code> now treats dirty, untrusted, missing-baseline, or baseline-drifted active lanes as explicit blockers until reconciled.</td>
+            <td>Agent and core context alignment</td>
+            <td>The interview agent contract and core workflow context now use the active-session pointer plus session-local context file as the source of truth.</td>
           </tr>
           <tr>
-            <td>Upgrade safety</td>
-            <td>Docs now emphasize checking <code>gemini extensions list</code> and refreshing the installed extension before editing shipped OmG assets by hand.</td>
+            <td>Archive-friendly output</td>
+            <td>Finalized interview artifacts are now documented under <code>.omg/state/interviews/[slug]/prd.md</code>, making parallel requirement threads easier to preserve.</td>
+          </tr>
+          <tr>
+            <td>Doc structure refresh</td>
+            <td>README, Korean README, Chinese README, landing page, changelog, package metadata, and extension metadata were updated together for <code>v0.7.8</code>.</td>
           </tr>
           <tr>
             <td>Scope boundary</td>
-            <td>Changes stay extension-native: command guidance, safety policy, and docs only.</td>
-          </tr>
-          <tr>
-            <td>Release refresh</td>
-            <td>README, Korean README, landing page, changelog, package metadata, and extension metadata were updated together for <code>v0.7.7</code>.</td>
+            <td>Changes stay extension-native: command guidance, agent instructions, workflow context, and docs only.</td>
           </tr>
         </tbody>
       </table>
@@ -1217,7 +1217,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
         <a href="./guide/agent-team-assembly.md">Team Assembly Guide</a>
         <a href="./guide/hook-engineering.md">Hook Engineering Guide</a>
       </div>
-      <div>Built for official Gemini CLI Extensions workflow. Audit-first launch safety and extension-boundary diagnostics refreshed through v0.7.7.</div>
+      <div>Built for official Gemini CLI Extensions workflow. Interview session partitioning and state-contract alignment refreshed through v0.7.8.</div>
     </div>
   </footer>
 
