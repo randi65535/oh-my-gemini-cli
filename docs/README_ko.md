@@ -59,16 +59,15 @@ gemini extensions list
 
 ## v0.8.1의 새로운 내용
 
-- 같은 프로젝트 안에서 병렬 세션이 shared workflow state를 덮어쓰지 않도록 single-writer 규칙을 강화했습니다.
-  - `.omg/state/session-lock.json`을 shared state의 authoritative writer 잠금으로 사용합니다.
-  - lock을 가진 orchestration 세션만 `workspace.json`, `taskboard.md`, `workflow.md`, `checkpoint.md` 같은 공유 파일을 갱신합니다.
-  - lock이 없는 병렬 세션은 `.omg/state/sessions/[session-slug]/...` 아래에 session-local draft를 쓰고 merge 필요를 보고합니다.
-- 운영 설정 파일도 같은 잠금 규칙을 따르도록 확장했습니다.
-  - `mode`, `hud`, `approval`, `reasoning`, `hooks`, `notify` 명령도 lock-aware persistence로 정리했습니다.
-  - delegated/worker/sub-agent turn은 shared workflow state를 직접 쓰지 않도록 명시했습니다.
-- 기존 훅 충돌 완화도 그대로 유지합니다.
-  - usage/learn hook은 unsafe `process.cwd()` fallback을 쓰지 않습니다.
-  - hook 상태 파일은 temp file + atomic rename으로 기록합니다.
+- 기본 OmG 모델 가이드를 하드코딩된 `gemini-3.x` preview 이름에서 Gemini CLI alias 기준으로 전환했습니다.
+  - `balanced` 기본 분배는 이제 `pro`, `flash`, `flash-lite`를 사용합니다.
+  - `/omg:model`, `/omg:mode`, team-assembly 가이드도 concrete 모델명 대신 alias 기반 설명으로 맞췄습니다.
+- 이 워크스페이스에서 preview 기반 alias 라우팅을 기본 활성화했습니다.
+  - `.gemini/settings.json`에 `general.previewFeatures=true`를 추가했습니다.
+  - 지원되는 Gemini CLI에서는 `pro`와 `auto`가 더 최신 preview-backed 라우팅을 따라갈 수 있습니다.
+- 실행 전에 모델이 잘 보이도록 가시성도 강화했습니다.
+  - 새 `BeforeModel` 훅 배너가 요청 직전에 예상 모델 정책을 출력합니다.
+  - `/omg:status`와 HUD 미리보기에서 모델 전략, lane alias, preview 상태를 더 앞쪽에 강조합니다.
 - 패키지/확장 버전을 `0.8.1`로 올리고 README/한국어 README/랜딩/히스토리를 갱신했습니다.
 
 ## 공유 워크플로우 상태

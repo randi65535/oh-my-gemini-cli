@@ -539,7 +539,7 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (Shared Workflow Single-Writer Safety)</h2>
+      <h2>Latest Update (Model Alias Routing and Visibility)</h2>
       <p class="sub">OmG v0.8.1 switches default model guidance to Gemini CLI aliases, enables preview-backed alias routing in the workspace by default, and adds a visible BeforeModel banner plus stronger HUD model visibility.</p>
       <table>
         <thead>
@@ -550,31 +550,27 @@
         </thead>
         <tbody>
           <tr>
-            <td>Authoritative session lock</td>
-            <td><code>.omg/state/session-lock.json</code> now defines which orchestration session may mutate shared workflow and operating-profile state inside one project.</td>
+            <td>Alias-based lane routing</td>
+            <td>Balanced model policy now uses Gemini CLI aliases <code>pro</code>, <code>flash</code>, and <code>flash-lite</code> instead of hard-pinned preview model names.</td>
           </tr>
           <tr>
-            <td>Session-local draft fallback</td>
-            <td>Parallel sessions that do not own the lock now write drafts under <code>.omg/state/sessions/[session-slug]/...</code> instead of overwriting shared state.</td>
+            <td>Preview features default</td>
+            <td>Workspace <code>.gemini/settings.json</code> now enables <code>general.previewFeatures=true</code> so preview-backed alias routing is available by default in this repository.</td>
           </tr>
           <tr>
-            <td>Shared workflow protection</td>
-            <td><code>workspace</code>, <code>taskboard</code>, <code>workflow</code>, and <code>checkpoint</code> state now follow a single-writer contract across top-level sessions.</td>
+            <td>BeforeModel visibility</td>
+            <td>A new <code>BeforeModel</code> hook prints a prominent model banner before Gemini CLI sends a request, making the expected runtime route visible up front.</td>
           </tr>
           <tr>
-            <td>Operating-profile protection</td>
-            <td><code>mode</code>, <code>hud</code>, <code>approval</code>, <code>reasoning</code>, <code>hooks</code>, and <code>notify</code> persistence now use the same lock-aware policy.</td>
+            <td>HUD/status visibility</td>
+            <td><code>/omg:status</code> and HUD previews now place model strategy, lane aliases, and preview status near the front so operators can see model routing at a glance.</td>
           </tr>
           <tr>
-            <td>Delegated turn safety</td>
-            <td>Delegated worker/subagent turns are now explicitly treated as read-mostly for shared workflow state and should hand results back to the orchestrator for merge.</td>
+            <td>Command guidance refresh</td>
+            <td><code>/omg:model</code>, <code>/omg:mode</code>, team-assembly guidance, and related docs now align with the current Gemini CLI model alias reference.</td>
           </tr>
           <tr>
-            <td>Compatibility review refresh</td>
-            <td>OmG's Gemini CLI compatibility guidance was re-reviewed on 2026-04-16 after the official 2026-04-15 subagent launch and now treats subagents as a first-class supported capability.</td>
-          </tr>
-          <tr>
-            <td>Doc structure refresh</td>
+            <td>Release metadata refresh</td>
             <td>README, Korean README, landing page, changelog, package metadata, and extension metadata were updated together for <code>v0.8.1</code>.</td>
           </tr>
           <tr>

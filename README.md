@@ -58,16 +58,15 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 
 ## What's New in v0.8.1
 
-- Hardened same-project parallel session safety across OmG shared workflow state:
-  - shared workflow artifacts now treat `.omg/state/session-lock.json` as the authoritative writer lock
-  - only the lock-owning orchestration session may mutate shared workflow files such as `workspace.json`, `taskboard.md`, `workflow.md`, and `checkpoint.md`
-  - non-owning sessions now route writes into `.omg/state/sessions/[session-slug]/...` session-local drafts instead of overwriting shared state
-- Extended the single-writer rule beyond workflow files into shared operating profiles:
-  - `mode`, `hud`, `approval`, `reasoning`, `hooks`, and `notify` commands now follow the same lock-aware persistence policy
-  - delegated/worker/subagent turns are explicitly instructed not to write shared workflow state directly
-- Kept earlier hook hardening in place for cross-project safety:
-  - usage/learn hooks still avoid unsafe `process.cwd()` fallback paths
-  - hook state writes still use temp file plus atomic rename
+- Switched default OmG model guidance from hard-pinned `gemini-3.x` preview names to Gemini CLI aliases:
+  - `balanced` lane defaults now use `pro`, `flash`, and `flash-lite`
+  - `/omg:model`, `/omg:mode`, and team-assembly guidance now describe alias-based routing instead of aging concrete model names
+- Enabled preview-backed alias routing by default for this workspace:
+  - added `.gemini/settings.json` with `general.previewFeatures=true`
+  - `pro` and `auto` can now follow Gemini CLI's newer preview-backed routing when supported
+- Added model visibility before execution:
+  - new `BeforeModel` hook banner prints the expected model strategy before Gemini CLI sends a request
+  - `/omg:status` and HUD previews now surface model strategy, lane aliases, and preview status more prominently
 - Bumped extension/package version to `0.8.1` and refreshed README, Korean README, landing docs, and history.
 
 ## Extension Boundary and Upgrade Safety
