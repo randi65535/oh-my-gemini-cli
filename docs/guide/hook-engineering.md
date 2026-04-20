@@ -67,6 +67,7 @@ Recommended behavior:
 
 - `OMG_HOOKS_QUIET=1`: suppresses non-essential hook status lines while keeping fail-open behavior.
 - `OMG_STATE_ROOT=<dir>`: overrides the default `.omg/state` location for `quota-watch.json`.
+- `OMG_DISABLED_HOOKS=model-preview`: disables only the `BeforeModel` model-visibility banner.
 
 ## Team Safety Policy
 

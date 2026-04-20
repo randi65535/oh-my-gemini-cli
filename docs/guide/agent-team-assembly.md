@@ -22,7 +22,7 @@ These entry points create a team charter with role lanes, model profile, and han
 
 ## Activation
 
-No separate research-preview toggle is required in OmG.
+OmG assumes Gemini CLI preview features are enabled so preview-backed aliases can resolve to the newest available preview model when Gemini CLI supports it.
 If the extension is loaded, `team-assemble` is available through:
 
 - `/omg:team-assemble`
@@ -64,11 +64,11 @@ Orchestration lane:
 
 Default role-to-model policy:
 
-- judgment and acceptance gates: `gemini-3.1-pro-preview`
-- implementation-heavy execution: `gemini-3-flash-preview`
-- broad low-risk exploration: `gemini-3.1-flash-lite-preview`
+- judgment and acceptance gates: `pro`
+- implementation-heavy execution: `flash`
+- broad low-risk exploration: `flash-lite`
 
-This keeps budget predictable while preserving quality at key decision points.
+With Gemini CLI preview features enabled, `pro` can resolve to the latest preview-capable Pro route without OmG hard-pinning an aging concrete model name.
 
 ## Approval Gate
 

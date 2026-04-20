@@ -2,10 +2,21 @@
 
 All notable changes to oh-my-gemini-cli are documented here.
 
+## v0.8.1 - Model Alias Routing and Visibility (2026-04-20)
+
+### Changed
+
+- Switched OmG model guidance from hard-pinned Gemini 3 preview model names to Gemini CLI aliases: `auto`, `pro`, `flash`, and `flash-lite`.
+- Updated balanced lane guidance across command/docs surfaces to use alias-based routing (`pro` for planning/review, `flash` for execution, `flash-lite` for quick edits).
+- Added workspace `.gemini/settings.json` with `general.previewFeatures=true` so this repository defaults to preview-backed alias routing where Gemini CLI supports it.
+- Refreshed `README.md`, `docs/README_ko.md`, `docs/index.html`, and command guidance to match the current Gemini CLI model alias reference.
+- Added a `BeforeModel` visibility banner hook and made `/omg:status` HUD guidance surface model strategy and preview status more prominently.
+
 ## Release Timeline
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.8.1` | 2026-04-20 | Model alias routing and visibility | Switched OmG guidance to Gemini CLI model aliases, enabled workspace preview features by default, and added a BeforeModel visibility banner plus stronger HUD model visibility |
 | `v0.8.0` | 2026-04-16 | Shared workflow single-writer safety | Added session-lock based ownership for shared workflow and operating-profile state, routed non-owning sessions into session-local drafts, and documented the safer same-project parallel-session model |
 | `v0.7.9` | 2026-04-16 | Hook state collision hardening | Stopped quota-watch and learn-state hooks from falling back to shared `process.cwd()` state paths, added atomic state writes, and documented the safer cross-project behavior |
 | `v0.7.8` | 2026-04-16 | Interview session partitioning and docs alignment | Replaced the single shared interview state contract with session-scoped interview folders, added an active-session pointer, and aligned versioned docs plus release metadata around the new structure |
@@ -1033,7 +1044,7 @@ Reimplemented OmG around Gemini CLI's official Extensions model.
 
 ### Changed
 
-- Model references standardized to `gemini-3.1-pro-preview` and `gemini-3-flash-preview`
+- Model references standardized to explicit Gemini preview model names used at the time (`gemini-3.1-pro-preview` and `gemini-3-flash-preview`)
 - Agent label output updated to display full model names
 - Project brand text normalized from `OMG` to `OmG`
 - Tagline changed to: `Gemini thinks. OmG orchestrates.`

@@ -17,7 +17,7 @@ Output format:
 
 ## Preview
 ```text
-[OMG][MODE balanced][STAGE team-exec][TASKS 3/8][NEXT /omg:team-verify]
+[OMG][MODEL pro/flash/flash-lite preview:on][STAGE team-exec][TASKS 3/8][NEXT /omg:team-verify]
 ```
 
 ## Next Command

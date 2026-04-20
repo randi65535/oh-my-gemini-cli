@@ -18,6 +18,7 @@ Compatibility note:
 
 - If your existing scripts still use `--allowed-tools`, migrate to `--policy` profiles.
 - OmG does not require preview-channel-only manifest features to run.
+- OmG now assumes `general.previewFeatures=true` so Gemini CLI model aliases like `pro` can resolve to preview-backed models when available.
 
 ## Step 1: Clone Repository
 
@@ -49,6 +50,20 @@ gemini extensions list
 ```
 
 You should see `oh-my-gemini-cli` in the extension list.
+
+## Step 3.5: Enable Preview Features
+
+OmG now defaults to alias-based model routing and expects Gemini CLI preview features to be enabled:
+
+```json
+{
+  "general": {
+    "previewFeatures": true
+  }
+}
+```
+
+Set this in `~/.gemini/settings.json` or your workspace `.gemini/settings.json`. This repository now ships the workspace setting enabled by default.
 
 ## Step 4: Verify Core Features
 

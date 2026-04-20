@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.8.0</span>
+        <span class="badge">Latest Update v0.8.1</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -540,7 +540,7 @@
   <section>
     <div class="wrap">
       <h2>Latest Update (Shared Workflow Single-Writer Safety)</h2>
-      <p class="sub">OmG v0.8.0 adds a session-lock based authoritative writer model for shared workflow and operating-profile state, routes non-owning sessions into session-local drafts, and keeps prior hook collision hardening in place.</p>
+      <p class="sub">OmG v0.8.1 switches default model guidance to Gemini CLI aliases, enables preview-backed alias routing in the workspace by default, and adds a visible BeforeModel banner plus stronger HUD model visibility.</p>
       <table>
         <thead>
           <tr>
@@ -575,7 +575,7 @@
           </tr>
           <tr>
             <td>Doc structure refresh</td>
-            <td>README, Korean README, landing page, changelog, package metadata, and extension metadata were updated together for <code>v0.8.0</code>.</td>
+            <td>README, Korean README, landing page, changelog, package metadata, and extension metadata were updated together for <code>v0.8.1</code>.</td>
           </tr>
           <tr>
             <td>Scope boundary</td>
@@ -607,22 +607,22 @@ Structured Result
 
       <div>
         <h2>Model Allocation</h2>
-        <p class="sub">Default balanced split across <code>gemini-3.1-pro-preview</code>, <code>gemini-3-flash-preview</code>, and <code>gemini-3.1-flash-lite-preview</code> lanes, with <code>/omg:model</code> overrides available.</p>
+        <p class="sub">Default balanced split uses Gemini CLI aliases <code>pro</code>, <code>flash</code>, and <code>flash-lite</code>, with workspace preview features enabled so <code>pro</code> can follow newer preview-backed routing when Gemini CLI updates its alias targets.</p>
         <div class="chart">
           <div class="bar">
-            <div class="bar-label"><span>Judgment &amp; Acceptance Gates (<code>gemini-3.1-pro-preview</code>)</span><span>60%</span></div>
+            <div class="bar-label"><span>Judgment &amp; Acceptance Gates (<code>pro</code>)</span><span>60%</span></div>
             <div class="bar-track"><div class="bar-fill" style="width:60%"></div></div>
           </div>
           <div class="bar">
-            <div class="bar-label"><span>Implementation &amp; Delivery (<code>gemini-3-flash-preview</code>)</span><span>25%</span></div>
+            <div class="bar-label"><span>Implementation &amp; Delivery (<code>flash</code>)</span><span>25%</span></div>
             <div class="bar-track"><div class="bar-fill flash" style="width:25%"></div></div>
           </div>
           <div class="bar">
-            <div class="bar-label"><span>Exploration &amp; Quick Low-Risk Work (<code>gemini-3.1-flash-lite-preview</code>)</span><span>15%</span></div>
+            <div class="bar-label"><span>Exploration &amp; Quick Low-Risk Work (<code>flash-lite</code>)</span><span>15%</span></div>
             <div class="bar-track"><div class="bar-fill lite" style="width:15%"></div></div>
           </div>
         </div>
-        <p class="sub" style="margin-top:10px;">Need one policy for every task? Run <code>/omg:model auto</code> to hand lane model selection to Gemini runtime auto behavior.</p>
+        <p class="sub" style="margin-top:10px;">Need one policy for every task? Run <code>/omg:model auto</code>. Want preview-backed alias routing? Keep <code>general.previewFeatures=true</code>.</p>
       </div>
     </div>
   </section>
@@ -865,13 +865,14 @@ Structured Result
       </div>
       <div>
         <h2>Sample Output</h2>
-        <p class="sub">Printed automatically after each completed agent turn.</p>
-        <pre class="diagram">[OMG][USAGE][TURN 12] turn=9,703 tok (in 9,487 / out 48 / cache 3,195)
-session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats model(~0.37.2) or /model(^0.38.0)
+        <p class="sub">Printed before model calls and after each completed agent turn.</p>
+        <pre class="diagram">[OMG][MODEL][NEXT] preview=on strategy=balanced requested=pro plan=pro exec=flash quick=flash-lite review=pro
+[OMG][USAGE][TURN 12] turn=9,703 tok (in 9,487 / out 48 / cache 3,195)
+session=18,859 tok model=flash 18,859 tok remaining=/stats model(~0.37.2) or /model(^0.38.0)
 (actionable session only) [OMG][Learn] Actionable session signals detected (4/11). Run '/omg:learn'
 (deep-interview lock active) learn nudge suppressed
 (duplicate retries against the same transcript snapshot are suppressed)</pre>
-        <p class="sub" style="margin-top:10px;">Disable per hook with <code>hooksConfig.disabled = ["omg-quota-watch-after-agent"]</code> or <code>["omg-learn-signal-after-agent"]</code>.</p>
+        <p class="sub" style="margin-top:10px;">Disable per hook with <code>hooksConfig.disabled = ["omg-before-model-banner"]</code>, <code>["omg-quota-watch-after-agent"]</code>, or <code>["omg-learn-signal-after-agent"]</code>.</p>
       </div>
     </div>
   </section>
@@ -948,19 +949,19 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
           </tr>
         </thead>
         <tbody>
-          <tr><td><code>omg-architect</code></td><td>System boundaries and long-term design quality</td><td><code>gemini-3.1-pro-preview</code></td></tr>
-          <tr><td><code>omg-planner</code></td><td>Task slicing, dependencies, execution order</td><td><code>gemini-3.1-pro-preview</code></td></tr>
-          <tr><td><code>omg-product</code></td><td>Scope lock and measurable acceptance criteria</td><td><code>gemini-3.1-pro-preview</code></td></tr>
-          <tr><td><code>omg-executor</code></td><td>Code-level implementation and incremental delivery</td><td><code>gemini-3-flash-preview</code></td></tr>
-          <tr><td><code>omg-reviewer</code></td><td>Regression checks and correctness review</td><td><code>gemini-3.1-pro-preview</code></td></tr>
-          <tr><td><code>omg-verifier</code></td><td>Acceptance-gate evidence checks and release readiness</td><td><code>gemini-3.1-pro-preview</code></td></tr>
-          <tr><td><code>omg-debugger</code></td><td>Root cause analysis and fix strategy</td><td><code>gemini-3.1-pro-preview</code></td></tr>
-          <tr><td><code>omg-consensus</code></td><td>Option convergence and decision scoring</td><td><code>gemini-3.1-pro-preview</code></td></tr>
-          <tr><td><code>omg-researcher</code></td><td>Evidence gathering and decision support</td><td><code>gemini-3.1-pro-preview</code></td></tr>
-          <tr><td><code>omg-director</code></td><td>Lane orchestration, conflict resolution, and handoff control</td><td><code>gemini-3.1-pro-preview</code></td></tr>
-          <tr><td><code>omg-consultant</code></td><td>Decision criteria, strategic analysis, and recommendation framing</td><td><code>gemini-3.1-pro-preview</code></td></tr>
-          <tr><td><code>omg-editor</code></td><td>Final deliverable structure and consistency packaging</td><td><code>gemini-3-flash-preview</code></td></tr>
-          <tr><td><code>omg-quick</code></td><td>Small tactical edits</td><td><code>gemini-3.1-flash-lite-preview</code></td></tr>
+          <tr><td><code>omg-architect</code></td><td>System boundaries and long-term design quality</td><td><code>pro</code></td></tr>
+          <tr><td><code>omg-planner</code></td><td>Task slicing, dependencies, execution order</td><td><code>pro</code></td></tr>
+          <tr><td><code>omg-product</code></td><td>Scope lock and measurable acceptance criteria</td><td><code>pro</code></td></tr>
+          <tr><td><code>omg-executor</code></td><td>Code-level implementation and incremental delivery</td><td><code>flash</code></td></tr>
+          <tr><td><code>omg-reviewer</code></td><td>Regression checks and correctness review</td><td><code>pro</code></td></tr>
+          <tr><td><code>omg-verifier</code></td><td>Acceptance-gate evidence checks and release readiness</td><td><code>pro</code></td></tr>
+          <tr><td><code>omg-debugger</code></td><td>Root cause analysis and fix strategy</td><td><code>pro</code></td></tr>
+          <tr><td><code>omg-consensus</code></td><td>Option convergence and decision scoring</td><td><code>pro</code></td></tr>
+          <tr><td><code>omg-researcher</code></td><td>Evidence gathering and decision support</td><td><code>pro</code></td></tr>
+          <tr><td><code>omg-director</code></td><td>Lane orchestration, conflict resolution, and handoff control</td><td><code>pro</code></td></tr>
+          <tr><td><code>omg-consultant</code></td><td>Decision criteria, strategic analysis, and recommendation framing</td><td><code>pro</code></td></tr>
+          <tr><td><code>omg-editor</code></td><td>Final deliverable structure and consistency packaging</td><td><code>flash</code></td></tr>
+          <tr><td><code>omg-quick</code></td><td>Small tactical edits</td><td><code>flash-lite</code></td></tr>
         </tbody>
       </table>
     </div>
@@ -1006,7 +1007,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
           <tr>
             <td>Set model policy</td>
             <td><code>/omg:model auto</code> (or <code>/omg:model balanced|custom ...</code>)</td>
-            <td>Default lane model strategy pinned for the session/project, including optional runtime auto-model alignment</td>
+            <td>Default lane model strategy pinned for the session/project, with alias-based routing that can follow newer Gemini CLI model targets over time</td>
           </tr>
           <tr>
             <td>Set alert posture</td>
@@ -1136,6 +1137,11 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
             <td>Run <code>/omg:model auto</code>; if supported in your Gemini CLI build, also set runtime model mode (<code>/model auto</code> or <code>--model auto</code>).</td>
           </tr>
           <tr>
+            <td>You expected preview-backed Pro routing but keep getting the non-preview alias target</td>
+            <td>Gemini CLI preview features are disabled, so <code>pro</code> and <code>auto</code> cannot resolve to preview-backed models</td>
+            <td>Enable <code>general.previewFeatures=true</code> in <code>~/.gemini/settings.json</code> or workspace <code>.gemini/settings.json</code>, then restart Gemini CLI</td>
+          </tr>
+          <tr>
             <td>Autonomous flow confirms too often or too little</td>
             <td>Approval posture not aligned with risk profile</td>
             <td>Run <code>/omg:approval suggest|auto|full-auto</code> and re-check policy</td>
@@ -1221,7 +1227,7 @@ session=18,859 tok model=gemini-3-flash-preview 18,859 tok remaining=/stats mode
         <a href="./guide/agent-team-assembly.md">Team Assembly Guide</a>
         <a href="./guide/hook-engineering.md">Hook Engineering Guide</a>
       </div>
-      <div>Built for official Gemini CLI Extensions workflow. Shared workflow single-writer safety refreshed through v0.8.0.</div>
+      <div>Built for official Gemini CLI Extensions workflow. Model alias routing and visibility refreshed through v0.8.1.</div>
     </div>
   </footer>
 

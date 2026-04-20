@@ -10,11 +10,11 @@ Protocol:
    - examples:
      - `auto`
      - `balanced`
-     - `custom planning=gemini-3.1-pro-preview execution=gemini-3-flash-preview quick=gemini-3.1-flash-lite-preview`
+     - `custom planning=pro execution=flash quick=flash-lite review_verify=pro`
 2. Supported strategies:
    - `balanced` (default): role-aware lane split (`pro` for planning/review, `flash` for execution, `flash-lite` for quick low-risk edits)
    - `auto`: defer lane model selection to Gemini runtime auto-model policy across all lanes
-   - `custom`: operator-provided lane map with explicit model names
+   - `custom`: operator-provided lane map with Gemini CLI aliases or concrete model names
 3. If no strategy is provided, show current policy from `.omg/state/model.json` when available.
 4. Produce an effective lane map for:
    - planning
@@ -30,10 +30,10 @@ Suggested `model.json` shape:
 {
   "strategy": "balanced|auto|custom",
   "lane_models": {
-    "planning": "gemini-3.1-pro-preview|auto|<custom>",
-    "execution": "gemini-3-flash-preview|auto|<custom>",
-    "quick_edit": "gemini-3.1-flash-lite-preview|auto|<custom>",
-    "review_verify": "gemini-3.1-pro-preview|auto|<custom>"
+    "planning": "pro|auto|<custom>",
+    "execution": "flash|auto|<custom>",
+    "quick_edit": "flash-lite|auto|<custom>",
+    "review_verify": "pro|auto|<custom>"
   },
   "updated_at": "<ISO-8601>",
   "source": "omg:model"
