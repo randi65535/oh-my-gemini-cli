@@ -61,6 +61,7 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 - Removed the noisy `BeforeModel` model-routing banner from the default hook registration:
   - Gemini CLI no longer prints repeated `[OMG][MODEL][NEXT] ...` lines before model calls
   - the hook now silently routes outgoing model requests with `hookSpecificOutput.llm_request.model`
+  - balanced routing now uses explicit preview model IDs instead of Gemini CLI aliases
   - model strategy visibility remains available through `/omg:status`, HUD previews, and `/omg:model`
 - Kept the quieter `AfterAgent` usage and learn-signal hooks unchanged.
 - Bumped extension/package version to `0.8.2` and refreshed README, Korean README, landing docs, and history.
@@ -93,7 +94,7 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 | Core building blocks | `GEMINI.md`, `agents/`, `commands/`, `skills/`, `context/` |
 | Main use case | Complex implementation tasks that need plan -> execute -> review loops |
 | Control surface | Slash-command-first `/omg:*` control plane + 8 deep-work `$skills` (including `omg-plan` alias) + sub-agent delegation |
-| Default model strategy | Configurable via `/omg:model` (`balanced` lane split uses `pro` / `flash` / `flash-lite` aliases by default, with optional `auto` or `custom` overrides) |
+| Default model strategy | Configurable via `/omg:model` (`balanced` lane split uses `gemini-3.1-pro-preview` / `gemini-3-flash-preview` / `gemini-3.1-flash-lite-preview` by default, with optional `auto` or `custom` overrides) |
 
 ## Why OmG
 
@@ -273,7 +274,7 @@ OmG now ships an extension hook that prints a compact token-usage line after eac
 - Hook entrypoint: `hooks/hooks.json` (`BeforeModel` -> `omg-model-router`)
 - Script: `hooks/scripts/before-model-banner.js`
 - Behavior: silently maps outgoing model requests to the active OmG strategy (`balanced`, `auto`, or `custom`) without printing a model banner
-- Default balanced routing: planning/review -> `pro`, execution -> `flash`, quick edits -> `flash-lite`
+- Default balanced routing: planning/review -> `gemini-3.1-pro-preview`, execution -> `gemini-3-flash-preview`, quick edits -> `gemini-3.1-flash-lite-preview`
 - Optional disable: `OMG_DISABLED_HOOKS=model-routing` or `OMG_MODEL_ROUTING=off`
 
 - Hook entrypoint: `hooks/hooks.json` (`AfterAgent` -> `omg-quota-watch-after-agent`)
@@ -374,13 +375,13 @@ export OMG_DISABLED_HOOKS=usage,learn
 
 ## Gemini CLI Compatibility Notes (Reviewed: 2026-04-16)
 
-- Model alias policy reviewed against Gemini CLI docs on 2026-04-20:
-  - current Gemini CLI aliases are `auto`, `pro`, `flash`, and `flash-lite`
-  - `auto` and `pro` resolve to preview-backed Gemini 3 Pro when preview features are enabled, otherwise fall back to stable Gemini 2.5 Pro
-  - OmG now recommends aliases instead of hard-pinning concrete preview model names so future Gemini CLI alias routing can pick up newer models without an OmG release
+- Model routing policy updated on 2026-04-22:
+  - OmG balanced routing now sends explicit preview model IDs instead of relying on Gemini CLI aliases.
+  - planning/review routes use `gemini-3.1-pro-preview`, execution uses `gemini-3-flash-preview`, and quick edits use `gemini-3.1-flash-lite-preview`.
+  - `/omg:model auto` still defers to Gemini runtime auto-model policy when the operator explicitly selects it.
 - Preview features default for this workspace:
   - this repository now ships `.gemini/settings.json` with `general.previewFeatures=true`
-  - for extension installs outside this repository, set the same flag in `~/.gemini/settings.json` or the target workspace if you want `auto`/`pro` to prefer preview-backed models
+  - explicit preview model IDs are used for balanced routing; keep the flag enabled for runtime features that still depend on Gemini CLI preview mode
 - Recommended minimum validated baseline: Gemini CLI `v0.37.0+`.
   - This remains the minimum stable runtime OmG has explicitly aligned to for dynamic Linux worktree sandbox support, Windows sandbox expansion improvements, plan-mode policy relaxations, and stronger skill/subagent instruction propagation.
 - Official subagent status update:
@@ -476,19 +477,19 @@ Retained skills are intentionally limited to a compact deep-work set so the exte
 
 | Agent | Primary responsibility | Preferred model profile |
 | --- | --- | --- |
-| `omg-architect` | System boundaries, interfaces, long-term maintainability | `pro` |
-| `omg-planner` | Task decomposition and sequencing | `pro` |
-| `omg-product` | Scope lock, non-goals, and measurable acceptance criteria | `pro` |
-| `omg-executor` | Fast implementation cycles | `flash` |
-| `omg-reviewer` | Correctness and regression risk checks | `pro` |
-| `omg-verifier` | Acceptance-gate evidence and release-readiness checks | `pro` |
-| `omg-debugger` | Root-cause analysis and patch strategy | `pro` |
-| `omg-consensus` | Option scoring and decision convergence | `pro` |
-| `omg-researcher` | External option analysis and synthesis | `pro` |
-| `omg-director` | Team message routing, conflict resolution, and lifecycle orchestration | `pro` |
-| `omg-consultant` | Strategic analysis criteria and recommendation framing | `pro` |
-| `omg-editor` | Final deliverable structure, consistency, and audience fit | `flash` |
-| `omg-quick` | Small, tactical fixes | `flash-lite` |
+| `omg-architect` | System boundaries, interfaces, long-term maintainability | `gemini-3.1-pro-preview` |
+| `omg-planner` | Task decomposition and sequencing | `gemini-3.1-pro-preview` |
+| `omg-product` | Scope lock, non-goals, and measurable acceptance criteria | `gemini-3.1-pro-preview` |
+| `omg-executor` | Fast implementation cycles | `gemini-3-flash-preview` |
+| `omg-reviewer` | Correctness and regression risk checks | `gemini-3.1-pro-preview` |
+| `omg-verifier` | Acceptance-gate evidence and release-readiness checks | `gemini-3.1-pro-preview` |
+| `omg-debugger` | Root-cause analysis and patch strategy | `gemini-3.1-pro-preview` |
+| `omg-consensus` | Option scoring and decision convergence | `gemini-3.1-pro-preview` |
+| `omg-researcher` | External option analysis and synthesis | `gemini-3.1-pro-preview` |
+| `omg-director` | Team message routing, conflict resolution, and lifecycle orchestration | `gemini-3.1-pro-preview` |
+| `omg-consultant` | Strategic analysis criteria and recommendation framing | `gemini-3.1-pro-preview` |
+| `omg-editor` | Final deliverable structure, consistency, and audience fit | `gemini-3-flash-preview` |
+| `omg-quick` | Small, tactical fixes | `gemini-3.1-flash-lite-preview` |
 
 ## Context Layer Model
 
@@ -537,7 +538,7 @@ oh-my-gemini-cli/
 | `/omg:*` command not found | Extension not loaded in current session | Run `gemini extensions list`, then restart Gemini CLI session |
 | Slash command or skill list looks stale after runtime/extension refresh | Interactive registry was not refreshed after update | Run `/skills reload` on newer Gemini CLI builds, or restart the session if the runtime is still on older stable |
 | `/plan` opens native plan mode when you wanted OmG planning skill | Name collision between built-in `/plan` and skill-slash invocation | Use `/omg-plan` (or `$omg-plan`) for the OmG planning skill, or use `/omg:team-plan` for staged workflow planning |
-| You want one global model (for example `flash`, `pro`, or Gemini Auto) but OmG still behaves like an older pinned model policy | Older installs or stale extension metadata may still carry older model guidance or cached command metadata | Update/reinstall OmG, enable `general.previewFeatures=true` if you want preview-backed alias routing, then set `/omg:model auto` or your runtime model; current agents inherit the active Gemini CLI model instead of hard-pinning one |
+| You want one global model or Gemini Auto but OmG still behaves like an older pinned model policy | Older installs or stale extension metadata may still carry older model guidance or cached command metadata | Update/reinstall OmG, then set `/omg:model balanced` for explicit preview routing or `/omg:model auto` for runtime auto selection |
 | Skill does not trigger | Only the retained deep-work skills are still shipped, or extension metadata is stale | Recheck the retained skill list in the README and reload the extension/session |
 | Windows skill linking or extension reload behaves differently across machines | Different Gemini CLI builds handle skill links differently | Prefer stable `v0.37.0+`; if you track nightly/preview, note that newer builds moved Windows skill linking toward directory junctions |
 | Team assembly keeps proposing but does not execute | Approval token missing in request | Reply with explicit approval (`yes`, `approve`, `go`, or `run`) |

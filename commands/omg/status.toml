@@ -19,7 +19,7 @@ HUD policy:
 - `normal`: include a full HUD line plus full snapshot/risk/action sections.
 - `compact`: include one-line HUD plus concise bullets.
 - `hidden`: skip the visual HUD code block and provide plain sections only.
-- In visible HUD modes, make the active model strategy visually prominent by showing strategy, lane aliases, and preview-features status near the front of the HUD line.
+- In visible HUD modes, make the active model strategy visually prominent by showing strategy, lane model IDs, and preview-features status near the front of the HUD line.
 
 If no HUD profile is found, default to `normal`.
 

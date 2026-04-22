@@ -7,7 +7,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 ### Changed
 
 - Replaced the noisy `BeforeModel` model-routing banner with a silent router that updates `hookSpecificOutput.llm_request.model`.
-- Kept balanced lane routing functional: planning/review routes to `pro`, execution to `flash`, and quick edits to `flash-lite`.
+- Switched balanced lane routing back to explicit preview model IDs: planning/review uses `gemini-3.1-pro-preview`, execution uses `gemini-3-flash-preview`, and quick edits use `gemini-3.1-flash-lite-preview`.
 - Kept model strategy visibility in `/omg:status`, HUD previews, and `/omg:model` instead of emitting a per-request banner.
 - Refreshed `README.md`, `docs/README_ko.md`, `docs/index.html`, package metadata, and extension metadata for `v0.8.2`.
 

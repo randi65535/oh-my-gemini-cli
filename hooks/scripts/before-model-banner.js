@@ -23,10 +23,10 @@ const MODEL_HOOK_KEYS = new Set([
 ]);
 
 const DEFAULT_LANE_MODELS = {
-  planning: "pro",
-  execution: "flash",
-  quick_edit: "flash-lite",
-  review_verify: "pro",
+  planning: "gemini-3.1-pro-preview",
+  execution: "gemini-3-flash-preview",
+  quick_edit: "gemini-3.1-flash-lite-preview",
+  review_verify: "gemini-3.1-pro-preview",
 };
 
 const LANE_PATTERNS = [

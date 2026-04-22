@@ -17,7 +17,7 @@ Output format:
 
 ## Preview
 ```text
-[OMG][MODEL pro/flash/flash-lite preview:on][STAGE team-exec][TASKS 3/8][NEXT /omg:team-verify]
+[OMG][MODEL gemini-3.1-pro-preview/gemini-3-flash-preview/gemini-3.1-flash-lite-preview preview:on][STAGE team-exec][TASKS 3/8][NEXT /omg:team-verify]
 ```
 
 ## Next Command

@@ -62,6 +62,7 @@ gemini extensions list
 - 기본 훅 등록에서 시끄러운 `BeforeModel` 모델 라우팅 배너를 제거했습니다.
   - Gemini CLI가 모델 요청을 보내기 전에 반복적으로 `[OMG][MODEL][NEXT] ...` 라인을 출력하지 않습니다.
   - 훅은 이제 `hookSpecificOutput.llm_request.model`만 조용히 설정해 실제 모델 요청을 라우팅합니다.
+  - 기본 balanced 라우팅은 alias 대신 `gemini-3.1-pro-preview`, `gemini-3-flash-preview`, `gemini-3.1-flash-lite-preview` 명시 모델명을 사용합니다.
   - 모델 전략 가시성은 `/omg:status`, HUD 미리보기, `/omg:model`에서 계속 확인할 수 있습니다.
 - 더 조용한 `AfterAgent` 사용량 및 learn-signal 훅은 그대로 유지했습니다.
 - 패키지/확장 버전을 `0.8.2`로 올리고 README/한국어 README/랜딩/히스토리를 갱신했습니다.
@@ -92,7 +93,7 @@ gemini extensions list
 | 핵심 구성 요소 | `GEMINI.md`, `agents/`, `commands/`, `skills/`, `context/` |
 | 주요 사용 사례 | 계획 -> 실행 -> 검증 루프가 필요한 복잡한 구현 작업 |
 | 제어 인터페이스 | slash-command-first `/omg:*` 제어면 + 8개 deep-work `$skills`(`omg-plan` 별칭 포함) + 서브 에이전트 위임 |
-| 기본 모델 전략 | `/omg:model`로 구성 가능 (`balanced` 기본 분배는 `pro` / `flash` / `flash-lite` alias 사용, 필요 시 `auto`/`custom` 전환) |
+| 기본 모델 전략 | `/omg:model`로 구성 가능 (`balanced` 기본 분배는 `gemini-3.1-pro-preview` / `gemini-3-flash-preview` / `gemini-3.1-flash-lite-preview` 명시 모델명 사용, 필요 시 `auto`/`custom` 전환) |
 
 ## 왜 OmG인가
 
@@ -353,7 +354,7 @@ export OMG_DISABLED_HOOKS=usage,learn
   - 같은 프로젝트의 shared workflow state는 `.omg/state/session-lock.json` 기반 단일 writer를 전제로 합니다.
   - lock이 없는 병렬 세션은 `.omg/state/sessions/[session-slug]/` 아래 session-local draft를 쓰고 merge 대상으로 넘겨야 합니다.
 - 모델 alias 정책 참고:
-  - Gemini CLI 문서 기준 현재 alias 목록은 `auto`, `pro`, `flash`, `flash-lite`입니다.
+  - OmG balanced 기본값은 `gemini-3.1-pro-preview`, `gemini-3-flash-preview`, `gemini-3.1-flash-lite-preview` 명시 모델명을 사용합니다.
   - OmG는 더 이상 `gemini-3.x` concrete preview 모델명을 기본 권장값으로 고정하지 않고 alias를 사용합니다.
   - preview 모델을 기본 우선 사용하려면 `general.previewFeatures=true`가 필요하며, 이 저장소는 workspace `.gemini/settings.json`에서 이를 기본 활성화합니다.
   - preview/nightly를 추적한다면 Windows skill link 처리, slash registry refresh, 기타 UX 수준 변경은 stable baseline과 별개로 계속 확인하는 편이 안전합니다.
@@ -428,16 +429,16 @@ export OMG_DISABLED_HOOKS=usage,learn
 
 | 에이전트 | 주 책임 | 권장 모델 프로파일 |
 | --- | --- | --- |
-| `omg-architect` | 시스템 경계, 인터페이스, 장기 유지보수성 | `pro` |
-| `omg-planner` | 작업 분해와 순서/의존성 관리 | `pro` |
-| `omg-product` | 범위/비범위와 측정 가능한 수용 기준 고정 | `pro` |
-| `omg-executor` | 빠른 구현 사이클 | `flash` |
-| `omg-reviewer` | 정확성/회귀 리스크 점검 | `pro` |
-| `omg-verifier` | 수용 기준 근거 검증과 릴리스 준비도 판단 | `pro` |
-| `omg-debugger` | 근본 원인 분석과 패치 전략 | `pro` |
-| `omg-consensus` | 옵션 스코어링과 의사결정 수렴 | `pro` |
-| `omg-researcher` | 외부 옵션 분석과 종합 | `pro` |
-| `omg-quick` | 의도된 적은 수정 | `flash-lite` |
+| `omg-architect` | 시스템 경계, 인터페이스, 장기 유지보수성 | `gemini-3.1-pro-preview` |
+| `omg-planner` | 작업 분해와 순서/의존성 관리 | `gemini-3.1-pro-preview` |
+| `omg-product` | 범위/비범위와 측정 가능한 수용 기준 고정 | `gemini-3.1-pro-preview` |
+| `omg-executor` | 빠른 구현 사이클 | `gemini-3-flash-preview` |
+| `omg-reviewer` | 정확성/회귀 리스크 점검 | `gemini-3.1-pro-preview` |
+| `omg-verifier` | 수용 기준 근거 검증과 릴리스 준비도 판단 | `gemini-3.1-pro-preview` |
+| `omg-debugger` | 근본 원인 분석과 패치 전략 | `gemini-3.1-pro-preview` |
+| `omg-consensus` | 옵션 스코어링과 의사결정 수렴 | `gemini-3.1-pro-preview` |
+| `omg-researcher` | 외부 옵션 분석과 종합 | `gemini-3.1-pro-preview` |
+| `omg-quick` | 의도된 적은 수정 | `gemini-3.1-flash-lite-preview` |
 
 ## 컨텍스트 레이어 모델
 
@@ -478,7 +479,7 @@ oh-my-gemini-cli/
 | `/omg:*` 명령을 찾을 수 없음 | 현재 세션에 확장이 로드되지 않음 | `gemini extensions list` 실행 후 CLI 세션 재시작 |
 | 런타임/확장 갱신 후 슬래시 명령 또는 스킬 목록이 오래된 것처럼 보임 | 업데이트 후 대화형 레지스트리가 새로고침되지 않음 | 최신 Gemini CLI에서는 `/skills reload`를 실행하고, 구버전 stable이면 세션을 재시작 |
 | `/plan`이 열리고 OmG 플랜 스킬이 실행되지 않음 | 기본 `/plan`과 스킬 슬래시 호출 이름이 충돌함 | OmG 플랜 스킬은 `/omg-plan`(또는 `$omg-plan`)으로 호출하거나, 단계형 흐름은 `/omg:team-plan` 사용 |
-| 모든 작업에서 하나의 전역 모델(예: `flash`, `pro`, 또는 Gemini Auto)을 쓰고 싶은데 OmG가 예전 고정 모델 정책처럼 동작함 | 오래된 설치본이나 stale extension metadata에 이전 모델 가이드가 남아 있음 | OmG를 업데이트/재설치하고, preview 우선 alias 라우팅이 필요하면 `general.previewFeatures=true`를 켠 뒤 `/omg:model auto` 또는 원하는 런타임 모델 설정을 다시 적용. 현재 에이전트는 고정 모델 대신 Gemini CLI의 활성 모델 설정을 상속함 |
+| 모든 작업에서 하나의 전역 모델 또는 Gemini Auto을 쓰고 싶은데 OmG가 예전 고정 모델 정책처럼 동작함 | 오래된 설치본이나 stale extension metadata에 이전 모델 가이드가 남아 있음 | OmG를 업데이트/재설치하고, 명시 preview 라우팅이 필요하면 `/omg:model balanced`, 런타임 auto 선택이 필요하면 `/omg:model auto`를 다시 적용. 현재 에이전트는 고정 모델 대신 Gemini CLI의 활성 모델 설정을 상속함 |
 | 스킬이 트리거되지 않음 | 유지된 deep-work 스킬만 남아 있거나 확장 메타데이터가 오래됨 | README의 유지 스킬 목록 확인 후 확장/세션 재로드 |
 | Windows에서 스킬 링크나 확장 리로드 동작이 머신마다 다름 | Gemini CLI 빌드마다 Windows skill link 처리 방식이 다름 | stable `v0.37.0+`를 우선 권장하고, nightly/preview 추적 시에는 directory junction 기반 변경 여부를 함께 확인 |
 | 병렬 구현이 자꾸 같은 파일에서 충돌하거나 재계획됨 | workspace lane이 명시되지 않음 | `/omg:workspace status`로 확인하거나 `/omg:workspace`로 경로/lane 소유권 설정 |
