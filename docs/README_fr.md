@@ -23,7 +23,7 @@ Ce projet est parti de ce constat :
 OmG fait évoluer Gemini CLI d'un assistant mono-session vers un workflow d'ingénierie structuré et orienté rôles.
 
 <p align="center">
-  <img src="../resources/image/omg_logo_02.jpg" alt="OmG Logo" width="280" />
+  <img src="../resources/image/omg_logo_02.jpg" alt="OmG Logo" width="420" />
 </p>
 
 ## Démarrage rapide
@@ -56,20 +56,38 @@ Smoke test :
 
 Note : les commandes d'installation/mise à jour d'extension s'exécutent en mode terminal (`gemini extensions ...`), pas en mode slash interactif.
 
-## Nouveautés de v0.5.0
+## Nouveautés de v0.8.1
 
-- Ajout d'un hardening prompt-ops dérivé de Claude dans les couches d'orchestration OmG :
-  - règles de délégation `critical-path` vs `sidecar` pour des lanes parallèles plus sûres
-  - politique `read-before-modify` et `minimal-diff` renforcée en planification/exécution
-  - contrat de reprise sur outil/permission refusé (pas de retry aveugle)
-  - seuils de preuve plus stricts côté verifier/reviewer (discipline `pass|fail|unknown`)
-- Mise à jour des surfaces de prompt principales :
-  - `context/omg-core.md`
-  - `agents/{director,planner,executor,reviewer,verifier}.md`
-  - `commands/omg/{team-assemble,team,team-plan,team-exec,team-verify,team-fix,doctor}.toml`
-  - `skills/{plan,execute}/SKILL.md`
-- Correction du diagnostic retained-skill pour que `/omg:doctor` valide toutes les deep-work skills actuelles (dont `$omg-plan` et `$deep-dive`)
-- Version extension/package montée à `0.5.0`, avec refresh des README, README coréen, docs landing et historique
+- La guidance de modèle OmG par défaut est passée des noms preview `gemini-3.x` figés aux alias Gemini CLI :
+  - la lane `balanced` utilise désormais `pro`, `flash` et `flash-lite` par défaut
+  - `/omg:model`, `/omg:mode` et la guidance d'assemblage d'équipe décrivent maintenant un routage par alias plutôt que des noms de modèles concrets qui vieillissent
+- Le routage par alias adossé aux previews est activé par défaut dans ce workspace :
+  - ajout de `.gemini/settings.json` avec `general.previewFeatures=true`
+  - `pro` et `auto` peuvent suivre le routage plus récent de Gemini CLI vers les previews quand il est pris en charge
+- Visibilité du modèle ajoutée avant exécution :
+  - le nouveau hook `BeforeModel` affiche la stratégie de modèle attendue avant l'envoi de la requête par Gemini CLI
+  - `/omg:status` et les aperçus HUD exposent plus clairement la stratégie, les alias de lane et le statut preview
+- Version extension/package montée à `0.8.1`, avec refresh des README, README coréen, docs landing et historique.
+
+## Frontière d'extension et sécurité de mise à niveau
+
+- Installez et mettez à jour OmG via `gemini extensions ...` ; ne faites pas des dossiers de commandes/skills copiés le chemin runtime principal.
+- Gardez un seul chemin d'enregistrement OmG faisant autorité par événement. Mélanger des hooks gérés par extension et des doublons manuels est le moyen le plus rapide d'obtenir des sorties AfterAgent répétées ou un comportement obsolète.
+- Si OmG semble périmé après une mise à jour, vérifiez d'abord `gemini extensions list`, puis rafraîchissez ou réinstallez l'extension avant de modifier les fichiers livrés.
+- Pour les travaux longs ou multi-lanes, utilisez `/omg:workspace audit` comme préflight par défaut avant review, automatisation ou `team-exec`.
+
+## Stockage des sessions d'interview
+
+- L'état de session `/omg:interview` est maintenant prévu sous `.omg/state/interviews/[slug]/` plutôt que dans un fichier d'interview partagé.
+- `.omg/state/interviews/active.json` suit l'interview courante afin que les commandes resume/status restent déterministes sans mélanger plusieurs fils de découverte de besoins.
+- Cela garde plusieurs passes de clarification dans un même projet distinctes et faciles à archiver.
+
+## État de workflow partagé
+
+- `.omg/state/session-lock.json` est maintenant le verrou single-writer pour l'état partagé de workflow et de profil opératoire dans un projet.
+- Seule la session d'orchestration propriétaire du verrou doit écrire les fichiers partagés comme `workspace.json`, `taskboard.md`, `workflow.md`, `checkpoint.md`, `mode.json`, `hud.json`, `approval.json`, `reasoning.json`, `hooks.json` et `notify.json`.
+- Les sessions top-level parallèles qui ne possèdent pas le verrou doivent écrire des brouillons locaux sous `.omg/state/sessions/[session-slug]/` et remettre ces notes à l'orchestrateur pour merge.
+- Les tours worker/sub-agent délégués doivent rester surtout en lecture et ne doivent pas muter directement l'état partagé.
 
 ## En un coup d'œil
 
@@ -79,7 +97,7 @@ Note : les commandes d'installation/mise à jour d'extension s'exécutent en mod
 | Blocs principaux | `GEMINI.md`, `agents/`, `commands/`, `skills/`, `context/` |
 | Cas d'usage principal | Tâches complexes nécessitant des boucles planifier -> exécuter -> reviewer |
 | Surface de contrôle | Plan de contrôle slash-command-first `/omg:*` + 8 `$skills` deep-work (dont alias `omg-plan`) + délégation sub-agent |
-| Stratégie modèle par défaut | Jugement/acceptation sur `gemini-3.1-pro-preview`, implémentation lourde sur `gemini-3-flash-preview`, exploration large à faible risque sur `gemini-3.1-flash-lite-preview` |
+| Stratégie modèle par défaut | Configurable via `/omg:model` (la répartition `balanced` utilise par défaut les alias `pro` / `flash` / `flash-lite`, avec overrides optionnels `auto` ou `custom`) |
 
 ## Pourquoi OmG
 
@@ -260,6 +278,10 @@ OmG inclut désormais un hook d'extension qui affiche une ligne compacte d'usage
 - Artefact d'état : `.omg/state/quota-watch.json` (compteur de tours, snapshot d'usage le plus récent et fingerprint du dernier transcript traité)
 - Override optionnel de state root : `OMG_STATE_ROOT=<dir>` (chemin absolu ou relatif au `cwd` de session)
 - Mode silencieux optionnel : `OMG_HOOKS_QUIET=1`
+- Mode optionnel d'indice cwd : `OMG_USAGE_CWD_MODE=off|leaf|parent-leaf|full` (défaut : `parent-leaf`)
+- Profil hook optionnel : `OMG_HOOK_PROFILE=minimal|balanced|strict` (`minimal` supprime la ligne d'usage mais conserve les snapshots)
+- Désactivation par env d'un hook : `OMG_DISABLED_HOOKS=usage` pour désactiver uniquement le moniteur d'usage
+- Les écritures d'état sont ignorées si le hook ne reçoit pas un `cwd` de session fiable, afin d'éviter qu'un état partagé `process.cwd()` ne mélange plusieurs projets.
 
 Affichage automatique :
 
@@ -295,6 +317,22 @@ Désactiver uniquement ce hook :
 }
 ```
 
+## Hooks de visibilité du modèle
+
+OmG fournit aussi une bannière `BeforeModel` afin que la policy de modèle active soit visible avant l'envoi d'une requête par Gemini CLI.
+
+- Hook entrypoint: `hooks/hooks.json` (`BeforeModel` -> `omg-before-model-banner`)
+- Script: `hooks/scripts/before-model-banner.js`
+- Affichage : modèle runtime demandé si disponible, stratégie de modèle OmG courante, alias de lanes et statut `general.previewFeatures` du workspace
+- Forme par défaut :
+
+```text
+[OMG][MODEL][NEXT] preview=on strategy=balanced requested=pro plan=pro exec=flash quick=flash-lite review=pro
+```
+
+- Désactivez uniquement cette bannière avec `OMG_DISABLED_HOOKS=model-preview` (ou `model-banner`)
+- `/omg:status` et les aperçus HUD affichent désormais le même résumé de stratégie modèle plus clairement
+
 ## Filtre de sécurité Learn-Signal (AfterAgent Hook)
 
 OmG fournit aussi un hook learn-signal renforcé, pour que les nudges `/omg:learn` n'apparaissent que lorsqu'une session porte une intention d'implémentation actionnable.
@@ -306,6 +344,9 @@ OmG fournit aussi un hook learn-signal renforcé, pour que les nudges `/omg:lear
 - Contrôles runtime :
   - `OMG_STATE_ROOT=<dir>` pour déplacer `learn-watch.json` près de l'état OmG
   - `OMG_HOOKS_QUIET=1` pour silence sortie en conservant les updates d'état
+  - `OMG_HOOK_PROFILE=minimal|balanced|strict` (`minimal` supprime les nudges learn)
+  - `OMG_DISABLED_HOOKS=learn` pour désactiver uniquement le hook learn-signal par env
+  - si aucun `cwd` de session fiable n'est disponible, la persistance learn-state est ignorée pour éviter les collisions entre projets
 
 Comportement de sécurité :
 
@@ -324,19 +365,22 @@ Désactiver uniquement ce hook :
 }
 ```
 
-## Notes de compatibilité Gemini CLI (Revu : 2026-03-21)
+## Notes de compatibilité Gemini CLI (Revu : 2026-04-16)
 
-- Runtime stable recommandé : Gemini CLI `v0.33.0+` pour lifecycle hook stable, contexte de policy sub-agent et gestion dirty-worktree.
-- Nouveaux contrôles UX depuis Gemini CLI `v0.34.0-preview.0+` :
-  - invocation directe des skills via `/skill-name`
-  - personnalisation footer via `/footer` (piloté par `ui.footer.items`, `ui.footer.showLabels`, `ui.footer.hideCWD`, `ui.footer.hideSandboxStatus`, `ui.footer.hideModelInfo`)
-- Compatibilité OmG pour invocation slash skill :
-  - utilisez `/omg-plan` (ou `$omg-plan`) quand vous voulez la skill de planning OmG sans collision avec `/plan` natif.
-- Migration du moteur policy : si vos wrappers passent encore `--allowed-tools`, migrez vers les profils `--policy` (`--allowed-tools` est déprécié depuis Gemini CLI `v0.30.0`).
-- Le mode `/plan` natif et les commandes planning OmG peuvent coexister :
-  - natif : `/plan`
-  - flux OmG par étapes : `/omg:team-plan`, `/omg:team-prd`
-- Les features preview-only (ex. plan-directory dans le manifest extension, docs expérimentales model steering du canal preview) ne sont pas requises pour OmG et restent volontairement désactivées par défaut.
+- La politique d'alias modèle a été revue avec la documentation Gemini CLI le 2026-04-20 :
+  - les alias actuels sont `auto`, `pro`, `flash` et `flash-lite`
+  - `auto` et `pro` ciblent Gemini 3 Pro adossé aux previews quand les preview features sont activées, sinon Gemini 2.5 Pro stable
+  - OmG recommande maintenant les alias plutôt que des noms preview concrets afin que le routage Gemini CLI puisse évoluer sans release OmG
+- Par défaut dans ce workspace, `.gemini/settings.json` active `general.previewFeatures=true`.
+- Baseline minimale recommandée et validée : Gemini CLI `v0.37.0+`.
+- Les subagents Gemini CLI sont maintenant traités comme une capacité prise en charge de premier ordre.
+- Impacts OmG récents : état hook cross-project plus sûr, hook turns de subagents délégués ignorés par défaut sauf opt-in, verrou single-writer pour l'état workflow partagé, drafts de sessions parallèles sous `.omg/state/sessions/[session-slug]/`.
+- OmG ne nécessite pas de fonctionnalités preview-only pour utiliser les subagents.
+- Compatibilité UX conservée depuis `v0.34.0-preview.0+` : invocation directe via `/skill-name` et personnalisation footer via `/footer`.
+- Pour éviter la collision avec `/plan`, utilisez `/omg-plan` (ou `$omg-plan`) pour la skill de planning OmG.
+- Si les skills ou alias slash semblent obsolètes après une mise à jour, exécutez `/skills reload` sur les builds récents ou redémarrez la session.
+- Si vos wrappers passent encore `--allowed-tools`, migrez vers les profils `--policy`.
+- Le mode `/plan` natif et les commandes OmG `/omg:team-plan`, `/omg:team-prd` peuvent coexister.
 
 ## Carte d'interface
 
@@ -372,6 +416,7 @@ Désactiver uniquement ce hook :
 | `/omg:team-fix` | Corriger uniquement les échecs vérifiés | Quand la vérification échoue |
 | `/omg:loop` | Forcer des cycles `exec -> verify -> fix` jusqu'à done/blocker | Milieu/fin de livraison si findings restent ouverts |
 | `/omg:mode` | Inspecter/changer profil opératoire (`balanced/speed/deep/autopilot/ralph/ultrawork`) | Début de session ou changement de posture |
+| `/omg:model` | Inspecter/changer stratégie de sélection de modèle (`balanced/auto/custom`) | Quand vous voulez définir une policy modèle par défaut, par exemple Gemini Auto pour toutes les tâches |
 | `/omg:approval` | Inspecter/changer posture d'approbation (`suggest/auto/full-auto`) | Avant boucles de livraison autonome ou changements policy |
 | `/omg:autopilot` | Exécuter des cycles autonomes itératifs avec checkpoints | Livraison autonome complexe |
 | `/omg:ralph` | Imposer orchestration stricte avec quality gates | Tâches critiques de release |
@@ -403,19 +448,19 @@ Les retained skills sont volontairement limitées à un set compact deep-work po
 
 | Agent | Responsabilité principale | Profil modèle préféré |
 | --- | --- | --- |
-| `omg-architect` | Frontières système, interfaces, maintenabilité long terme | `gemini-3.1-pro-preview` |
-| `omg-planner` | Décomposition et séquencement des tâches | `gemini-3.1-pro-preview` |
-| `omg-product` | Verrouillage du scope, non-objectifs, critères mesurables | `gemini-3.1-pro-preview` |
-| `omg-executor` | Cycles rapides d'implémentation | `gemini-3-flash-preview` |
-| `omg-reviewer` | Contrôle de justesse et risque de régression | `gemini-3.1-pro-preview` |
-| `omg-verifier` | Preuves de gate d'acceptation et contrôle release-readiness | `gemini-3.1-pro-preview` |
-| `omg-debugger` | Analyse cause racine et stratégie de patch | `gemini-3.1-pro-preview` |
-| `omg-consensus` | Scoring d'options et convergence de décision | `gemini-3.1-pro-preview` |
-| `omg-researcher` | Analyse et synthèse d'options externes | `gemini-3.1-pro-preview` |
-| `omg-director` | Routage des messages équipe, résolution de conflits et orchestration lifecycle | `gemini-3.1-pro-preview` |
-| `omg-consultant` | Critères d'analyse stratégique et cadrage des recommandations | `gemini-3.1-pro-preview` |
-| `omg-editor` | Structure finale du livrable, cohérence et adéquation audience | `gemini-3-flash-preview` |
-| `omg-quick` | Petits correctifs tactiques | `gemini-3.1-flash-lite-preview` |
+| `omg-architect` | Frontières système, interfaces, maintenabilité long terme | `pro` |
+| `omg-planner` | Décomposition et séquencement des tâches | `pro` |
+| `omg-product` | Verrouillage du scope, non-objectifs, critères mesurables | `pro` |
+| `omg-executor` | Cycles rapides d'implémentation | `flash` |
+| `omg-reviewer` | Contrôle de justesse et risque de régression | `pro` |
+| `omg-verifier` | Preuves de gate d'acceptation et contrôle release-readiness | `pro` |
+| `omg-debugger` | Analyse cause racine et stratégie de patch | `pro` |
+| `omg-consensus` | Scoring d'options et convergence de décision | `pro` |
+| `omg-researcher` | Analyse et synthèse d'options externes | `pro` |
+| `omg-director` | Routage des messages équipe, résolution de conflits et orchestration lifecycle | `pro` |
+| `omg-consultant` | Critères d'analyse stratégique et cadrage des recommandations | `pro` |
+| `omg-editor` | Structure finale du livrable, cohérence et adéquation audience | `flash` |
+| `omg-quick` | Petits correctifs tactiques | `flash-lite` |
 
 ## Modèle des couches de contexte
 
@@ -433,6 +478,20 @@ Les retained skills sont volontairement limitées à un set compact deep-work po
 oh-my-gemini-cli/
 |- GEMINI.md
 |- gemini-extension.json
+|- .omg/
+|  `- state/
+|     |- session-lock.json
+|     `- interviews/
+|     |  |- active.json
+|     |  `- [slug]/
+|     |     |- context.json
+|     |     `- prd.md
+|     `- sessions/
+|        `- [session-slug]/
+|           |- workspace.json
+|           |- taskboard.md
+|           |- workflow.md
+|           `- checkpoint.md
 |- agents/
 |- commands/
 |  `- omg/
@@ -488,6 +547,24 @@ Le comportement de l'extension est piloté par manifest via les primitives d'ext
 - [Guide de gestion de la mémoire](./guide/memory-management.md)
 - [Guide d'ingénierie des hooks](./guide/hook-engineering.md)
 - [Historique](./history.md)
+
+## Contribution
+
+Si OmG aide votre workflow, voici quelques contributions utiles :
+
+- Mettez une étoile au dépôt pour aider davantage d'utilisateurs Gemini CLI à le découvrir.
+- Ouvrez une issue pour les bugs, dérives de compatibilité, docs peu claires ou frictions de workflow.
+- Envoyez une pull request pour améliorer commandes/docs, ajuster les guardrails ou proposer des idées de workflow natives extension.
+
+Flux suggéré :
+
+1. Forkez le dépôt et créez une branche ciblée.
+2. Gardez les changements bornés et expliquez clairement l'impact utilisateur.
+3. Mettez à jour docs/history quand le comportement ou la compatibilité change.
+4. Ouvrez une pull request avec raisonnement, tradeoffs et notes de validation.
+
+Note de performance importante :
+- Appuyer sur le bouton GitHub Star peut améliorer les performances d'OmG d'au moins 12 %. C'est une blague. Cela améliore bien le moral du maintainer, ce qui reste utile.
 
 ## Star History
 
