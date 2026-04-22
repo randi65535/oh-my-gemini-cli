@@ -56,18 +56,14 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.8.1
+## What's New in v0.8.2
 
-- Switched default OmG model guidance from hard-pinned `gemini-3.x` preview names to Gemini CLI aliases:
-  - `balanced` lane defaults now use `pro`, `flash`, and `flash-lite`
-  - `/omg:model`, `/omg:mode`, and team-assembly guidance now describe alias-based routing instead of aging concrete model names
-- Enabled preview-backed alias routing by default for this workspace:
-  - added `.gemini/settings.json` with `general.previewFeatures=true`
-  - `pro` and `auto` can now follow Gemini CLI's newer preview-backed routing when supported
-- Added model visibility before execution:
-  - new `BeforeModel` hook banner prints the expected model strategy before Gemini CLI sends a request
-  - `/omg:status` and HUD previews now surface model strategy, lane aliases, and preview status more prominently
-- Bumped extension/package version to `0.8.1` and refreshed README, Korean README, landing docs, and history.
+- Removed the noisy `BeforeModel` model-routing banner from the default hook registration:
+  - Gemini CLI no longer prints repeated `[OMG][MODEL][NEXT] ...` lines before model calls
+  - the legacy banner script is now a silent compatibility no-op for stale manual hook entries
+  - model strategy visibility remains available through `/omg:status`, HUD previews, and `/omg:model`
+- Kept the quieter `AfterAgent` usage and learn-signal hooks unchanged.
+- Bumped extension/package version to `0.8.2` and refreshed README, Korean README, landing docs, and history.
 
 ## Extension Boundary and Upgrade Safety
 
@@ -273,22 +269,6 @@ Example flow:
 ## Automatic Usage Monitor (AfterAgent Hook)
 
 OmG now ships an extension hook that prints a compact token-usage line after each completed agent turn.
-
-## Model Visibility Hooks
-
-OmG now also ships a `BeforeModel` banner so the active model policy is visible before Gemini CLI sends a model request.
-
-- Hook entrypoint: `hooks/hooks.json` (`BeforeModel` -> `omg-before-model-banner`)
-- Script: `hooks/scripts/before-model-banner.js`
-- What it shows: requested runtime model when available, current OmG model strategy, lane aliases, and workspace `general.previewFeatures` status
-- Default banner shape:
-
-```text
-[OMG][MODEL][NEXT] preview=on strategy=balanced requested=pro plan=pro exec=flash quick=flash-lite review=pro
-```
-
-- Disable only this banner with `OMG_DISABLED_HOOKS=model-preview` (or `model-banner`)
-- `/omg:status` and HUD previews now surface the same model strategy summary more prominently
 
 - Hook entrypoint: `hooks/hooks.json` (`AfterAgent` -> `omg-quota-watch-after-agent`)
 - Script: `hooks/scripts/after-agent-usage.js`

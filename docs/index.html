@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.8.1</span>
+        <span class="badge">Latest Update v0.8.2</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (Model Alias Routing and Visibility)</h2>
-      <p class="sub">OmG v0.8.1 switches default model guidance to Gemini CLI aliases, enables preview-backed alias routing in the workspace by default, and adds a visible BeforeModel banner plus stronger HUD model visibility.</p>
+      <h2>Latest Update (Quiet Model Hook Defaults)</h2>
+      <p class="sub">OmG v0.8.2 removes the noisy BeforeModel routing banner from the default hook registration while keeping model strategy visibility in status, HUD, and model commands.</p>
       <table>
         <thead>
           <tr>
@@ -558,8 +558,8 @@
             <td>Workspace <code>.gemini/settings.json</code> now enables <code>general.previewFeatures=true</code> so preview-backed alias routing is available by default in this repository.</td>
           </tr>
           <tr>
-            <td>BeforeModel visibility</td>
-            <td>A new <code>BeforeModel</code> hook prints a prominent model banner before Gemini CLI sends a request, making the expected runtime route visible up front.</td>
+            <td>Quiet model calls</td>
+            <td>The default hook registration no longer emits repeated <code>[OMG][MODEL][NEXT]</code> banners before Gemini CLI sends model requests, and the legacy script is now a silent compatibility no-op.</td>
           </tr>
           <tr>
             <td>HUD/status visibility</td>
@@ -571,7 +571,7 @@
           </tr>
           <tr>
             <td>Release metadata refresh</td>
-            <td>README, Korean README, landing page, changelog, package metadata, and extension metadata were updated together for <code>v0.8.1</code>.</td>
+            <td>README, Korean README, landing page, changelog, package metadata, and extension metadata were updated together for <code>v0.8.2</code>.</td>
           </tr>
           <tr>
             <td>Scope boundary</td>
@@ -861,14 +861,13 @@ Structured Result
       </div>
       <div>
         <h2>Sample Output</h2>
-        <p class="sub">Printed before model calls and after each completed agent turn.</p>
-        <pre class="diagram">[OMG][MODEL][NEXT] preview=on strategy=balanced requested=pro plan=pro exec=flash quick=flash-lite review=pro
-[OMG][USAGE][TURN 12] turn=9,703 tok (in 9,487 / out 48 / cache 3,195)
+        <p class="sub">Printed after each completed agent turn.</p>
+        <pre class="diagram">[OMG][USAGE][TURN 12] turn=9,703 tok (in 9,487 / out 48 / cache 3,195)
 session=18,859 tok model=flash 18,859 tok remaining=/stats model(~0.37.2) or /model(^0.38.0)
 (actionable session only) [OMG][Learn] Actionable session signals detected (4/11). Run '/omg:learn'
 (deep-interview lock active) learn nudge suppressed
 (duplicate retries against the same transcript snapshot are suppressed)</pre>
-        <p class="sub" style="margin-top:10px;">Disable per hook with <code>hooksConfig.disabled = ["omg-before-model-banner"]</code>, <code>["omg-quota-watch-after-agent"]</code>, or <code>["omg-learn-signal-after-agent"]</code>.</p>
+        <p class="sub" style="margin-top:10px;">Disable per hook with <code>hooksConfig.disabled = ["omg-quota-watch-after-agent"]</code> or <code>["omg-learn-signal-after-agent"]</code>.</p>
       </div>
     </div>
   </section>
@@ -1223,7 +1222,7 @@ session=18,859 tok model=flash 18,859 tok remaining=/stats model(~0.37.2) or /mo
         <a href="./guide/agent-team-assembly.md">Team Assembly Guide</a>
         <a href="./guide/hook-engineering.md">Hook Engineering Guide</a>
       </div>
-      <div>Built for official Gemini CLI Extensions workflow. Model alias routing and visibility refreshed through v0.8.1.</div>
+      <div>Built for official Gemini CLI Extensions workflow. Quiet model hook defaults refreshed through v0.8.2.</div>
     </div>
   </footer>
 

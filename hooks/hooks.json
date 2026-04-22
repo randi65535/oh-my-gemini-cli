@@ -1,17 +1,5 @@
 {
   "hooks": {
-    "BeforeModel": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "name": "omg-before-model-banner",
-            "command": "node \"${extensionPath}/hooks/scripts/hook-bootstrap.js\" \"${extensionPath}/hooks/scripts/before-model-banner.js\"",
-            "timeout": 5000
-          }
-        ]
-      }
-    ],
     "AfterAgent": [
       {
         "hooks": [
