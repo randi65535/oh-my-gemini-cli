@@ -2,12 +2,12 @@
 
 All notable changes to oh-my-gemini-cli are documented here.
 
-## v0.8.2 - Quiet Model Hook Defaults (2026-04-22)
+## v0.8.2 - Quiet Model Routing Defaults (2026-04-22)
 
 ### Changed
 
-- Removed the default `BeforeModel` model-routing banner registration so Gemini CLI no longer prints repeated `[OMG][MODEL][NEXT] ...` lines before model calls.
-- Converted the legacy banner script into a silent compatibility no-op so stale manual hook entries do not keep printing the banner.
+- Replaced the noisy `BeforeModel` model-routing banner with a silent router that updates `hookSpecificOutput.llm_request.model`.
+- Kept balanced lane routing functional: planning/review routes to `pro`, execution to `flash`, and quick edits to `flash-lite`.
 - Kept model strategy visibility in `/omg:status`, HUD previews, and `/omg:model` instead of emitting a per-request banner.
 - Refreshed `README.md`, `docs/README_ko.md`, `docs/index.html`, package metadata, and extension metadata for `v0.8.2`.
 
@@ -25,7 +25,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
-| `v0.8.2` | 2026-04-22 | Quiet model hook defaults | Removed the default BeforeModel model banner so repeated model-routing lines no longer appear during execution while status/HUD model visibility remains available |
+| `v0.8.2` | 2026-04-22 | Quiet model routing defaults | Replaced the visible BeforeModel model banner with silent request routing so repeated model-routing lines no longer appear while lane-specific model selection remains active |
 | `v0.8.1` | 2026-04-20 | Model alias routing and visibility | Switched OmG guidance to Gemini CLI model aliases, enabled workspace preview features by default, and added a BeforeModel visibility banner plus stronger HUD model visibility |
 | `v0.8.0` | 2026-04-16 | Shared workflow single-writer safety | Added session-lock based ownership for shared workflow and operating-profile state, routed non-owning sessions into session-local drafts, and documented the safer same-project parallel-session model |
 | `v0.7.9` | 2026-04-16 | Hook state collision hardening | Stopped quota-watch and learn-state hooks from falling back to shared `process.cwd()` state paths, added atomic state writes, and documented the safer cross-project behavior |

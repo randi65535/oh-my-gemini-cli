@@ -60,7 +60,7 @@ Note: extension install/update commands run in terminal mode (`gemini extensions
 
 - Removed the noisy `BeforeModel` model-routing banner from the default hook registration:
   - Gemini CLI no longer prints repeated `[OMG][MODEL][NEXT] ...` lines before model calls
-  - the legacy banner script is now a silent compatibility no-op for stale manual hook entries
+  - the hook now silently routes outgoing model requests with `hookSpecificOutput.llm_request.model`
   - model strategy visibility remains available through `/omg:status`, HUD previews, and `/omg:model`
 - Kept the quieter `AfterAgent` usage and learn-signal hooks unchanged.
 - Bumped extension/package version to `0.8.2` and refreshed README, Korean README, landing docs, and history.
@@ -269,6 +269,12 @@ Example flow:
 ## Automatic Usage Monitor (AfterAgent Hook)
 
 OmG now ships an extension hook that prints a compact token-usage line after each completed agent turn.
+
+- Hook entrypoint: `hooks/hooks.json` (`BeforeModel` -> `omg-model-router`)
+- Script: `hooks/scripts/before-model-banner.js`
+- Behavior: silently maps outgoing model requests to the active OmG strategy (`balanced`, `auto`, or `custom`) without printing a model banner
+- Default balanced routing: planning/review -> `pro`, execution -> `flash`, quick edits -> `flash-lite`
+- Optional disable: `OMG_DISABLED_HOOKS=model-routing` or `OMG_MODEL_ROUTING=off`
 
 - Hook entrypoint: `hooks/hooks.json` (`AfterAgent` -> `omg-quota-watch-after-agent`)
 - Script: `hooks/scripts/after-agent-usage.js`

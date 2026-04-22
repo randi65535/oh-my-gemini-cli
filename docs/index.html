@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (Quiet Model Hook Defaults)</h2>
-      <p class="sub">OmG v0.8.2 removes the noisy BeforeModel routing banner from the default hook registration while keeping model strategy visibility in status, HUD, and model commands.</p>
+      <h2>Latest Update (Quiet Model Routing Defaults)</h2>
+      <p class="sub">OmG v0.8.2 replaces the noisy BeforeModel routing banner with silent request routing while keeping model strategy visibility in status, HUD, and model commands.</p>
       <table>
         <thead>
           <tr>
@@ -559,7 +559,7 @@
           </tr>
           <tr>
             <td>Quiet model calls</td>
-            <td>The default hook registration no longer emits repeated <code>[OMG][MODEL][NEXT]</code> banners before Gemini CLI sends model requests, and the legacy script is now a silent compatibility no-op.</td>
+            <td>The <code>BeforeModel</code> hook no longer emits repeated <code>[OMG][MODEL][NEXT]</code> banners. It silently sets <code>hookSpecificOutput.llm_request.model</code> so lane-specific routing remains active.</td>
           </tr>
           <tr>
             <td>HUD/status visibility</td>
@@ -1222,7 +1222,7 @@ session=18,859 tok model=flash 18,859 tok remaining=/stats model(~0.37.2) or /mo
         <a href="./guide/agent-team-assembly.md">Team Assembly Guide</a>
         <a href="./guide/hook-engineering.md">Hook Engineering Guide</a>
       </div>
-      <div>Built for official Gemini CLI Extensions workflow. Quiet model hook defaults refreshed through v0.8.2.</div>
+      <div>Built for official Gemini CLI Extensions workflow. Quiet model routing defaults refreshed through v0.8.2.</div>
     </div>
   </footer>
 

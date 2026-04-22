@@ -61,7 +61,7 @@ gemini extensions list
 
 - 기본 훅 등록에서 시끄러운 `BeforeModel` 모델 라우팅 배너를 제거했습니다.
   - Gemini CLI가 모델 요청을 보내기 전에 반복적으로 `[OMG][MODEL][NEXT] ...` 라인을 출력하지 않습니다.
-  - 오래된 수동 훅 항목이 이 스크립트를 호출해도 배너를 출력하지 않도록 legacy 스크립트를 조용한 호환 no-op으로 바꿨습니다.
+  - 훅은 이제 `hookSpecificOutput.llm_request.model`만 조용히 설정해 실제 모델 요청을 라우팅합니다.
   - 모델 전략 가시성은 `/omg:status`, HUD 미리보기, `/omg:model`에서 계속 확인할 수 있습니다.
 - 더 조용한 `AfterAgent` 사용량 및 learn-signal 훅은 그대로 유지했습니다.
 - 패키지/확장 버전을 `0.8.2`로 올리고 README/한국어 README/랜딩/히스토리를 갱신했습니다.
