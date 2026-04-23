@@ -1,13 +1,13 @@
 description = "Alias to stop autonomous workflow safely and produce a resume-ready handoff."
 prompt = """
-Run OmG cancel flow (alias of `stop` behavior).
+Run OmG cancel flow.
 
 Context:
 $ARGUMENTS
 
 Protocol:
 1. Detect active mode/lifecycle from context or `.omg/state/*` when available.
-2. Stop current autonomous/team loop gracefully without discarding progress.
+2. Stop current autonomous/team loop gracefully without discarding progress (this applies to all modes, including `interview`).
 3. Clear stale active-skill markers and cancellation drift:
    - if no skill is actively running, clear stale `.omg/state/skill-active.*` markers
    - emit/update a compact cancel signal artifact for deterministic resume behavior
