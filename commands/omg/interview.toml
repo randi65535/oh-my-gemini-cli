@@ -8,7 +8,7 @@ $ARGUMENTS
 Protocol:
 1. Initialize or Resume:
    - **Check First**: Use `read_file` to verify the existence of `.omg/state/interviews/active.json`.
-   - **If the file is missing**: **Request the user to start** an active interview via `/omg:intent [depth]`.
+   - **If the file is missing**: **Auto-initialize** a new session folder, create `.omg/state/interviews/active.json` pointing to it, and seed the initial `.omg/state/interviews/[slug]/context.json` with the current user request.
    - **If resuming**: Resolve the active session folder from `.omg/state/interviews/active.json`, then surface the `ready_to_run_prompt` from `.omg/state/interviews/[slug]/context.json`.
 2. Socratic Dialogue:
    - Invoke the `interview` agent.
@@ -17,6 +17,12 @@ Protocol:
    - Ask ONE targeted Socratic question.
 3. Convergence & Scoring:
    - Update `clarity_score`, `facts`, and `questions_asked` in `.omg/state/interviews/[slug]/context.json`.
+   - Scoring Criteria (0-100):
+     - Core objective defined: +20
+     - Target audience/context clear: +20
+     - Tech stack/constraints identified: +20
+     - Edge cases considered: +20
+     - Acceptance criteria set: +20
    - Thresholds:
      - `low`: Score > 65
      - `medium`: Score > 80
