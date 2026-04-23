@@ -297,7 +297,7 @@ What it shows automatically:
 Boundary:
 
 - This hook cannot read authoritative remaining account quota by itself.
-- For true remaining quota/limits, run `/stats model(~0.37.2) or /model(^0.38.0)`.
+- For true remaining quota/limits, run `/stats model(~0.37.2) or /model(0.38.0+)`.
 - If Gemini retries the same transcript snapshot, the hook treats it as already delivered and suppresses duplicate output.
 - State snapshots are written via an atomic temp-file rename to reduce cross-process corruption risk.
 
