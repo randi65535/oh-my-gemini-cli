@@ -12,7 +12,7 @@ Protocol:
      - `help`: Display instructions on how the interview works.
      - `resume`: Read `.omg/state/interviews/active.json`, then load the referenced session context. If the pointer or context file is missing, tell the user no active session exists and they must run `/omg:intent [depth]` first.
      - `stop`: Finalize interview, generate PRD, and transition to ready-to-execute.
-     - `cancel`: Stop session and save checkpoint artifacts.
+     - `cancel`: Invoke OmG cancel flow specifically for the interview session to stop safely and save checkpoint artifacts.
      - `restart`: Clear `.omg/state/interviews/active.json` and start a new session folder.
 
 2. Default Interview Loop (If no subcommand):
@@ -45,7 +45,7 @@ Protocol:
        - Transition the workflow to `ready_to_execute`.
        - Instruct the user to run `/omg:team-plan --intent="[Confirmed Objective]"` or `/omg:team-exec --intent="[Confirmed Objective]"`.
      - Triggered by `cancel`:
-       - Stop session and save checkpoint artifacts (status: stopped, no transition).
+       - Invoke OmG cancel flow specifically for the interview session to stop safely and save checkpoint artifacts (status: stopped, no transition).
 
 Response:
 - Keep it concise and professional.
