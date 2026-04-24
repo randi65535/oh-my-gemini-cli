@@ -37,7 +37,7 @@ Protocol:
      - Termination Criteria:
        - **Always continue until Clarity Score >= 100.**
      - Threshold Gates (for [READY-TO-RUN PROMPT]):
-       - low: 10, medium: 20, high: 30, ultra: 40, extreme: 50
+       - low: 10, medium: 20, high: 30, xhigh: 40, ultra: 50
    - Finalization:
      - Automatically trigger on **Clarity Score >= 100**.
      - Manual Trigger by `done` or `$intent-done`:
