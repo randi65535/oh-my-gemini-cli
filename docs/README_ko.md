@@ -381,7 +381,8 @@ export OMG_DISABLED_HOOKS=usage,learn
   - 래퍼 스크립트가 아직 `--allowed-tools`를 쓴다면 `--policy` 프로필로 옮기는 편이 안전합니다.
 - 네이티브 `/plan` 모드와 OmG planning 명령은 함께 사용할 수 있습니다.
   - native: `/plan`
-  - OmG staged flow: `/omg:team-plan`, `/omg:team-prd`
+  - OmG 자동화 흐름: `/omg:team-assemble` (또는 `/omg:team`)
+  - OmG 수동 단계별 흐름: `/omg:team-plan`, `/omg:team-prd` 등
 ## 인터페이스 맵
 
 ### Commands
@@ -490,7 +491,7 @@ oh-my-gemini-cli/
 | 설치 중 `settings.filter is not a function` | Gemini CLI 런타임 또는 확장 메타데이터 캐시가 오래됨 | Gemini CLI 업데이트 후 확장 제거/재설치 |
 | `/omg:*` 명령을 찾을 수 없음 | 현재 세션에 확장이 로드되지 않음 | `gemini extensions list` 실행 후 CLI 세션 재시작 |
 | 런타임/확장 갱신 후 슬래시 명령 또는 스킬 목록이 오래된 것처럼 보임 | 업데이트 후 대화형 레지스트리가 새로고침되지 않음 | 최신 Gemini CLI에서는 `/skills reload`를 실행하고, 구버전 stable이면 세션을 재시작 |
-| `/plan`이 열리고 OmG 플랜 스킬이 실행되지 않음 | 기본 `/plan`과 스킬 슬래시 호출 이름이 충돌함 | OmG 플랜 스킬은 `/omg-plan`(또는 `$omg-plan`)으로 호출하거나, 단계형 흐름은 `/omg:team-plan` 사용 |
+| `/plan`이 열리고 OmG 플랜 스킬이 실행되지 않음 | 기본 `/plan`과 스킬 슬래시 호출 이름이 충돌함 | OmG 플랜 스킬은 `/omg-plan`(또는 `$omg-plan`)으로 호출하거나, 단계형 흐름은 `/omg:team-assemble` 또는 `/omg:team-plan` 사용 |
 | 모든 작업에서 하나의 전역 모델 또는 Gemini Auto을 쓰고 싶은데 OmG가 예전 고정 모델 정책처럼 동작함 | 오래된 설치본이나 stale extension metadata에 이전 모델 가이드가 남아 있음 | OmG를 업데이트/재설치하고, 명시 preview 라우팅이 필요하면 `/omg:model balanced`, 런타임 auto 선택이 필요하면 `/omg:model auto`를 다시 적용. 현재 에이전트는 고정 모델 대신 Gemini CLI의 활성 모델 설정을 상속함 |
 | 스킬이 트리거되지 않음 | 유지된 deep-work 스킬만 남아 있거나 확장 메타데이터가 오래됨 | README의 유지 스킬 목록 확인 후 확장/세션 재로드 |
 | Windows에서 스킬 링크나 확장 리로드 동작이 머신마다 다름 | Gemini CLI 빌드마다 Windows skill link 처리 방식이 다름 | stable `v0.38.0+`를 우선 권장하고, nightly/preview 추적 시에는 directory junction 기반 변경 여부를 함께 확인 |
