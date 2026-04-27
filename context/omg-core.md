@@ -11,7 +11,9 @@ OmG adds a role-driven workflow layer to Gemini CLI.
 ## Default Flow (Hybrid Routing)
 
 - **Entry**: `intent` -> `workspace` (if dirty lanes or multi-root setup needed) -> `team-assemble` (if role fit is unclear).
-- **Clarification**: `interview` (if depth flags detected or scope is ambiguous) -> `team-plan` -> `team-prd`.
+- **Clarification**: `interview` (if depth flags detected or scope is ambiguous).
+  - *Automated*: -> `team-assemble` (orchestrates plan -> prd -> taskboard -> exec -> verify -> fix).
+  - *Manual*: -> `team-plan` -> `team-prd`.
 - **Execution**: `taskboard` -> `team-exec` -> `team-verify` -> `team-fix`.
 - **Loop**: Repeat `exec -> verify -> fix` until acceptance. Use `loop` for subsequent slices.
 - **Parallel Rule**: Keep immediate blockers on the active lane; delegate only independent sidecar tasks in parallel.
