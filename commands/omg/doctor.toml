@@ -21,12 +21,16 @@ Diagnostic protocol:
 5. Check state artifacts and drift risks under `.omg/state/` when available, including lane health, trust notes, and hook lifecycle policy.
 6. Detect common failure patterns:
    - extension not loaded in current session
-   - Gemini CLI runtime too old for current OmG assumptions (recommend `v0.37.0+`)
+   - Gemini CLI runtime too old for current OmG assumptions (recommend `v0.38.0+`)
    - missing or stale root `GEMINI.md` import chain
    - mixed or stale OmG extension roots (for example: copied assets, duplicate local clones, or stale installed extension contents diverging from the active repository)
    - command discovery mismatch
    - manual hook or skill wiring shadowing extension-managed OmG assets
    - malformed or duplicate skill metadata (`skills/*/SKILL.md` frontmatter)
+   - native `/memory inbox` or skill-patching proposals applied without review or metadata validation
+   - Plan Mode skill activation requested without explicit user confirmation
+   - stale subagent guidance that assumes legacy wrapped subagent tools instead of the current unified invocation handoff
+   - agent MCP server configs using an `auth` block without a documented credential boundary
    - stale/missing state files
    - taskboard entries with missing/null priority causing nondeterministic `next` selection
    - outdated depth flags (`--essential`, `--standard`, `--deep`) used instead of keywords (`low`, `medium`, `high`)
@@ -45,6 +49,7 @@ Diagnostic protocol:
    - hook lifecycle asymmetry (start without terminal outcome, blocked continuation skipping safety re-entry)
    - duplicate OmG hook registration causing repeated AfterAgent output or mixed manual/extension hook paths
    - runtime hook profile/disable env vars producing unexpected silence or reduced hook coverage
+   - hook plans or plan-session state not accounting for `GEMINI_PLANS_DIR` when the runtime provides it
    - repeated learn nudges due missing cooldown policy in `.omg/rules/learn.json`
    - repeated denied tool calls without escalation path
 7. Produce concrete remediation actions in priority order.

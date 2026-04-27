@@ -4,7 +4,7 @@ This guide follows the official Gemini CLI Extensions workflow.
 
 ## Prerequisites
 
-1. Gemini CLI installed (recommended `v0.31.0+`)
+1. Gemini CLI installed (recommended `v0.38.0+`)
 2. Gemini authentication completed
 3. Local clone of this repository
 
@@ -18,7 +18,7 @@ Compatibility note:
 
 - If your existing scripts still use `--allowed-tools`, migrate to `--policy` profiles.
 - OmG does not require preview-channel-only manifest features to run.
-- OmG now assumes `general.previewFeatures=true` so Gemini CLI model aliases like `pro` can resolve to preview-backed models when available.
+- OmG keeps `general.previewFeatures=true` for preview-backed runtime features, while balanced model routing uses explicit preview model IDs by default.
 
 ## Step 1: Clone Repository
 
@@ -51,9 +51,9 @@ gemini extensions list
 
 You should see `oh-my-gemini-cli` in the extension list.
 
-## Step 3.5: Enable Preview Features
+## Step 3.5: Preview Features
 
-OmG now defaults to alias-based model routing and expects Gemini CLI preview features to be enabled:
+OmG defaults to explicit preview model IDs for balanced routing and keeps Gemini CLI preview features enabled for runtime features that still depend on the flag:
 
 ```json
 {

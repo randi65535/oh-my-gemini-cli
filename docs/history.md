@@ -2,6 +2,17 @@
 
 All notable changes to oh-my-gemini-cli are documented here.
 
+## v0.8.3 - Gemini CLI Late-April Compatibility Sync (2026-04-27)
+
+### Changed
+
+- Reviewed upstream Gemini CLI releases from 2026-04-14 through 2026-04-25, including stable `v0.38.x`, stable `v0.39.x`, and preview `v0.40.0-preview.x`.
+- Added Plan Mode safety guidance so OmG does not activate skills, subagents, or implementation lanes from native Plan Mode without explicit user confirmation.
+- Updated team execution and core context guidance for Gemini CLI's unified subagent invocation path instead of legacy wrapped subagent tool assumptions.
+- Treated native `/memory inbox` and skill patching as operator-reviewed inputs; accepted patches still require OmG retained-skill metadata validation.
+- Added diagnostics for `GEMINI_PLANS_DIR`, agent MCP `auth` block credential boundaries, stale subagent guidance, and unreviewed skill-patching changes.
+- Updated README, Korean README, landing page, package metadata, and extension metadata for `v0.8.3`.
+
 ## v0.8.2 - Quiet Model Routing Defaults (2026-04-22)
 
 ### Changed
@@ -25,6 +36,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.8.3` | 2026-04-27 | Gemini CLI late-April compatibility sync | Aligned OmG guidance with Gemini CLI v0.38-v0.40 preview changes around Plan Mode confirmation, unified subagent invocation, memory inbox/skill patching, hook plan env, and MCP auth config boundaries |
 | `v0.8.2` | 2026-04-22 | Quiet model routing defaults | Replaced the visible BeforeModel model banner with silent request routing so repeated model-routing lines no longer appear while lane-specific model selection remains active |
 | `v0.8.1` | 2026-04-20 | Model alias routing and visibility | Switched OmG guidance to Gemini CLI model aliases, enabled workspace preview features by default, and added a BeforeModel visibility banner plus stronger HUD model visibility |
 | `v0.8.0` | 2026-04-16 | Shared workflow single-writer safety | Added session-lock based ownership for shared workflow and operating-profile state, routed non-owning sessions into session-local drafts, and documented the safer same-project parallel-session model |

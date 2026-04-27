@@ -13,7 +13,11 @@ Objectives:
    - `globs` (optional)
    - `alwaysApply` (optional)
 4. Resolve active rules by task and touched paths.
-5. Return memory update actions and next operational checks.
+5. When the runtime exposes native `/memory inbox` or skill patching, treat it as an operator review queue:
+   - summarize proposed extracted skills or patches
+   - do not auto-apply them into OmG `skills/`, `MEMORY.md`, or `.omg/rules/` without explicit approval
+   - run retained-skill metadata checks after any accepted skill patch
+6. Return memory update actions and next operational checks.
 
 Response:
 - Keep it concise and operator-facing.

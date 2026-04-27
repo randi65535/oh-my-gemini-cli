@@ -67,7 +67,8 @@ Recommended behavior:
 
 - `OMG_HOOKS_QUIET=1`: suppresses non-essential hook status lines while keeping fail-open behavior.
 - `OMG_STATE_ROOT=<dir>`: overrides the default `.omg/state` location for `quota-watch.json`.
-- `OMG_DISABLED_HOOKS=model-preview`: disables only the `BeforeModel` model-visibility banner.
+- `OMG_DISABLED_HOOKS=model-routing`: disables only the quiet `BeforeModel` model router.
+- `GEMINI_PLANS_DIR`: when provided by Gemini CLI, can be used by hook/plan policy to reference native plan-session storage without guessing paths.
 
 ## Team Safety Policy
 

@@ -55,6 +55,7 @@ OmG adds a role-driven workflow layer to Gemini CLI.
 ## Execution Discipline
 
 - **Read Before Modify**: Read target files or state first; avoid blind edits.
+- **Plan Mode Boundary**: When running under native Gemini CLI Plan Mode, do not activate OmG skills, subagents, or implementation lanes without explicit user confirmation.
 - **Minimal Diff**: Prefer editing existing files over creating new files unless scope explicitly requires new files.
 - **Critical-Path Focus**: Complete immediate blocking work before adding speculative side tasks.
 - **Deterministic Queue**: For task execution order, prefer dependency-ready + lane-safe tasks first, then priority (`p0` -> `p3`), then stable task ID.
@@ -63,6 +64,8 @@ OmG adds a role-driven workflow layer to Gemini CLI.
 - **Agent Recovery**: If a lane agent is unavailable, reroute once to a mapped fallback lane and record why.
 - **Concise Success Path**: Keep normal-success reporting compact and expand only blocker or early-stop branches.
 - **Session Ownership**: When multiple top-level sessions touch the same project, keep one authoritative orchestration session per shared workflow state and push all parallel session notes into lane/session-local drafts until merged.
+- **Subagent Tooling**: Treat upstream subagent invocation as a single tool-controlled handoff surface; OmG commands should describe the intended role, lane, termination reason, and evidence rather than assuming older wrapped subagent tools exist.
+- **Native Memory Boundary**: Native `/memory inbox` and skill patching are review surfaces. Do not auto-apply extracted skills or memory patches into OmG assets without operator review and normal versioned-file validation.
 
 ## Command Response Contract
 

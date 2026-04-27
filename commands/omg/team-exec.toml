@@ -21,6 +21,7 @@ Protocol:
    - stable task id tie-breaker
 6. Read target files before editing and preserve existing conventions.
 7. Delegate implementation to `omg-executor` with explicit lane/subagent context.
+   - use the current Gemini CLI subagent handoff surface as a unified invocation path; do not assume legacy wrapped subagent tools are available
 8. If the requested implementation agent is unavailable (for example "agent not found"), retry once with fallback routing:
    - low-risk slice -> `omg-quick`
    - architecture-sensitive or high-risk slice -> `omg-director` for reassignment before retry
@@ -32,8 +33,9 @@ Protocol:
 13. If lane health is unsafe for review or automation, call it out and recommend `/omg:workspace audit` or isolated worktree use.
 14. If permissions/tools are denied, stop this slice as blocked and emit explicit approval/fallback needs.
 15. Delegated/worker/subagent turns must not write shared workflow state directly.
-16. Read `.omg/state/session-lock.json` before mutating the shared board.
-17. If filesystem tools are available:
+16. If native Gemini CLI Plan Mode is active, do not activate implementation skills or agent lanes until the user explicitly confirms leaving/readjusting plan-only posture.
+17. Read `.omg/state/session-lock.json` before mutating the shared board.
+18. If filesystem tools are available:
    - if the current orchestration session owns the lock, update `.omg/state/taskboard.md`
    - otherwise write `.omg/state/sessions/[session-slug]/taskboard.md` and explicit handoff notes instead of overwriting the shared board
 

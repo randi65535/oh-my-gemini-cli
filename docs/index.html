@@ -483,7 +483,7 @@
   <header>
     <div class="wrap">
       <div class="hero-top">
-        <span class="badge">Latest Update v0.8.2</span>
+        <span class="badge">Latest Update v0.8.3</span>
         <div class="top-actions">
           <a class="btn btn-link btn-github" href="https://github.com/Joonghyun-Lee-Frieren/oh-my-gemini-cli" target="_blank" rel="noreferrer noopener">
             <svg class="btn-icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -539,8 +539,8 @@
 
   <section>
     <div class="wrap">
-      <h2>Latest Update (Quiet Model Routing Defaults)</h2>
-      <p class="sub">OmG v0.8.2 replaces the noisy BeforeModel routing banner with silent request routing while keeping model strategy visibility in status, HUD, and model commands.</p>
+      <h2>Latest Update (Gemini CLI Late-April Compatibility Sync)</h2>
+      <p class="sub">OmG v0.8.3 aligns extension guidance with recent Gemini CLI changes around Plan Mode confirmation, unified subagent invocation, memory inbox review, hook plan environment, and MCP auth config boundaries.</p>
       <table>
         <thead>
           <tr>
@@ -550,32 +550,32 @@
         </thead>
         <tbody>
           <tr>
-            <td>Explicit preview lane routing</td>
-            <td>Balanced model policy now uses explicit preview model IDs <code>gemini-3.1-pro-preview</code>, <code>gemini-3-flash-preview</code>, and <code>gemini-3.1-flash-lite-preview</code> instead of depending on Gemini CLI alias targets.</td>
+            <td>Upstream review window</td>
+            <td>Reviewed Gemini CLI releases from 2026-04-14 through 2026-04-25, including stable <code>v0.38.x</code>, stable <code>v0.39.x</code>, and preview <code>v0.40.0-preview.x</code>.</td>
           </tr>
           <tr>
-            <td>Preview features default</td>
-            <td>Workspace <code>.gemini/settings.json</code> still enables <code>general.previewFeatures=true</code>, but OmG's balanced default now sends explicit preview model IDs instead of relying on alias resolution.</td>
+            <td>Plan Mode safety</td>
+            <td>OmG now states that native Plan Mode skill, subagent, or implementation-lane activation requires explicit user confirmation before proceeding.</td>
           </tr>
           <tr>
-            <td>Quiet model calls</td>
-            <td>The <code>BeforeModel</code> hook no longer emits repeated <code>[OMG][MODEL][NEXT]</code> banners. It silently sets <code>hookSpecificOutput.llm_request.model</code> so lane-specific routing remains active.</td>
+            <td>Unified subagent handoff</td>
+            <td>Team execution guidance now assumes Gemini CLI's unified subagent invocation path instead of older wrapped subagent tools.</td>
           </tr>
           <tr>
-            <td>HUD/status visibility</td>
-            <td><code>/omg:status</code> and HUD previews now place model strategy, lane model IDs, and preview status near the front so operators can see model routing at a glance.</td>
+            <td>Memory and skill review</td>
+            <td>Native <code>/memory inbox</code> and skill patching are documented as review queues; accepted OmG skill changes still need metadata validation.</td>
           </tr>
           <tr>
-            <td>Command guidance refresh</td>
-            <td><code>/omg:model</code>, <code>/omg:mode</code>, team-assembly guidance, and related docs now align with explicit Gemini preview model IDs.</td>
+            <td>Hook and plan environment</td>
+            <td>Hook/plan guidance now accounts for <code>GEMINI_PLANS_DIR</code> when Gemini CLI exposes native plan-session storage.</td>
+          </tr>
+          <tr>
+            <td>MCP auth config boundary</td>
+            <td><code>/omg:doctor</code> now checks agent MCP configs with <code>auth</code> blocks for an explicit credential boundary.</td>
           </tr>
           <tr>
             <td>Release metadata refresh</td>
-            <td>README, Korean README, landing page, changelog, package metadata, and extension metadata were updated together for <code>v0.8.2</code>.</td>
-          </tr>
-          <tr>
-            <td>Scope boundary</td>
-            <td>Changes stay extension-native: prompt-policy contracts, shipped hook scripts, documentation, and release metadata only.</td>
+            <td>README, Korean README, landing page, changelog, package metadata, and extension metadata were updated together for <code>v0.8.3</code>.</td>
           </tr>
         </tbody>
       </table>
@@ -1114,7 +1114,7 @@ session=18,859 tok model=flash 18,859 tok remaining=/stats model(~0.37.2) or /mo
           <tr>
             <td>Workspace/sandbox behavior differs from docs</td>
             <td>Gemini CLI runtime is older than the current OmG compatibility baseline</td>
-            <td>Upgrade Gemini CLI to stable <code>v0.37.0+</code>, then rerun <code>/omg:doctor</code> and <code>/omg:workspace audit</code></td>
+            <td>Upgrade Gemini CLI to stable <code>v0.38.0+</code>, then rerun <code>/omg:doctor</code> and <code>/omg:workspace audit</code></td>
           </tr>
           <tr>
             <td>Slash command list looks stale after an update</td>
@@ -1206,7 +1206,7 @@ session=18,859 tok model=flash 18,859 tok remaining=/stats model(~0.37.2) or /mo
           <tr>
             <td>Windows skill linking differs across machines</td>
             <td>Gemini CLI builds in the last two weeks changed how Windows skill links are handled</td>
-            <td>Prefer stable <code>v0.37.0+</code>; if you track preview/nightly, note that newer builds moved toward directory-junction based skill linking</td>
+            <td>Prefer stable <code>v0.38.0+</code>; if you track preview/nightly, note that newer builds moved toward directory-junction based skill linking</td>
           </tr>
         </tbody>
       </table>
@@ -1222,7 +1222,7 @@ session=18,859 tok model=flash 18,859 tok remaining=/stats model(~0.37.2) or /mo
         <a href="./guide/agent-team-assembly.md">Team Assembly Guide</a>
         <a href="./guide/hook-engineering.md">Hook Engineering Guide</a>
       </div>
-      <div>Built for official Gemini CLI Extensions workflow. Quiet model routing defaults refreshed through v0.8.2.</div>
+      <div>Built for official Gemini CLI Extensions workflow. Late-April Gemini CLI compatibility refreshed through v0.8.3.</div>
     </div>
   </footer>
 

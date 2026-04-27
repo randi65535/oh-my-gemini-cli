@@ -56,15 +56,14 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.8.2
+## What's New in v0.8.3
 
-- Removed the noisy `BeforeModel` model-routing banner from the default hook registration:
-  - Gemini CLI no longer prints repeated `[OMG][MODEL][NEXT] ...` lines before model calls
-  - the hook now silently routes outgoing model requests with `hookSpecificOutput.llm_request.model`
-  - balanced routing now uses explicit preview model IDs instead of Gemini CLI aliases
-  - model strategy visibility remains available through `/omg:status`, HUD previews, and `/omg:model`
-- Kept the quieter `AfterAgent` usage and learn-signal hooks unchanged.
-- Bumped extension/package version to `0.8.2` and refreshed README, Korean README, landing docs, and history.
+- Reviewed Gemini CLI releases from 2026-04-14 through 2026-04-25 and aligned OmG with the extension-relevant changes in `v0.38.x`, `v0.39.x`, and `v0.40.0-preview.x`.
+- Added Plan Mode safety guidance so OmG does not activate skills, subagents, or implementation lanes from native Plan Mode without explicit user confirmation.
+- Updated subagent guidance for Gemini CLI's unified invocation path and removed assumptions that older wrapped subagent tools are present.
+- Documented native `/memory inbox` and skill patching as operator-reviewed inputs, not automatic OmG asset mutations.
+- Added compatibility notes for `GEMINI_PLANS_DIR`, agent MCP `auth` blocks, the `/skills reload` refresh fix, and recent sandbox/path hardening.
+- Bumped extension/package version to `0.8.3` and refreshed README, Korean README, landing docs, and history.
 
 ## Extension Boundary and Upgrade Safety
 
@@ -373,7 +372,20 @@ Example (disable one or both shipped AfterAgent hooks by env):
 export OMG_DISABLED_HOOKS=usage,learn
 ```
 
-## Gemini CLI Compatibility Notes (Reviewed: 2026-04-16)
+## Gemini CLI Compatibility Notes (Reviewed: 2026-04-27)
+
+- Recent upstream review window: Gemini CLI releases from 2026-04-14 through 2026-04-25.
+- Latest stable observed during review: `v0.39.1` (2026-04-24), with `v0.40.0-preview.4` (2026-04-25) available on the preview channel.
+- Direct OmG actions from this review:
+  - Plan Mode skill/subagent activation now requires explicit user confirmation before OmG proceeds.
+  - Subagent handoff wording now assumes Gemini CLI's unified invocation path instead of legacy wrapped subagent tools.
+  - Native `/memory inbox` and skill patching are treated as review queues; accepted patches still need OmG skill metadata validation.
+  - Hook and plan guidance now accounts for `GEMINI_PLANS_DIR` when Gemini CLI exposes it.
+  - Doctor diagnostics now check agent MCP configs that use `auth` blocks for clear credential boundaries.
+- Recent upstream changes with OmG impact:
+  - `v0.38.0` fixed slash command refresh after `/skills reload`, improved Plan Mode policy for web fetch, added background process monitoring, landed ContextCompressionService, and improved persistent policy approvals.
+  - `v0.39.0` added `/memory inbox`, skill patching, unified subagent invocation, stronger sandbox path handling, `GEMINI_PLANS_DIR` hook exposure, MCP auth blocks in agent configs, and silent Plan Mode model-routing fallback.
+  - `v0.40.0-preview.x` continued plan/session, memory, security, terminal notification, and extension bundling fixes; OmG tracks those as preview-channel compatibility notes rather than stable requirements.
 
 - Model routing policy updated on 2026-04-22:
   - OmG balanced routing now sends explicit preview model IDs instead of relying on Gemini CLI aliases.
@@ -382,8 +394,8 @@ export OMG_DISABLED_HOOKS=usage,learn
 - Preview features default for this workspace:
   - this repository now ships `.gemini/settings.json` with `general.previewFeatures=true`
   - explicit preview model IDs are used for balanced routing; keep the flag enabled for runtime features that still depend on Gemini CLI preview mode
-- Recommended minimum validated baseline: Gemini CLI `v0.37.0+`.
-  - This remains the minimum stable runtime OmG has explicitly aligned to for dynamic Linux worktree sandbox support, Windows sandbox expansion improvements, plan-mode policy relaxations, and stronger skill/subagent instruction propagation.
+- Recommended minimum validated baseline: Gemini CLI `v0.38.0+`.
+  - `v0.38.0` is now the minimum stable runtime OmG recommends because it includes the `/skills reload` refresh fix and the stable baseline after the recent Plan Mode, sandbox, policy, subagent, and extension compatibility changes.
 - Official subagent status update:
   - Google Developers Blog published `Subagents have arrived in Gemini CLI` on 2026-04-15.
   - OmG now treats Gemini CLI subagents as a first-class supported capability rather than an experimental edge path.
@@ -405,7 +417,7 @@ export OMG_DISABLED_HOOKS=usage,learn
 - OmG compatibility for slash skill invocation:
   - use `/omg-plan` (or `$omg-plan`) when you want the OmG planning skill without colliding with native `/plan`.
 - Slash registry refresh guidance:
-  - if OmG skills or slash aliases look stale right after a Gemini CLI/runtime update, run `/skills reload` on newer builds or restart the session before assuming the extension is broken.
+  - if OmG skills or slash aliases look stale right after a Gemini CLI/runtime update, run `/skills reload`; `v0.38.0+` includes the slash command refresh fix for that path.
 - Policy engine migration: if your wrapper scripts still pass `--allowed-tools`, migrate to `--policy` profiles (`--allowed-tools` was deprecated in Gemini CLI `v0.30.0`).
 - Native `/plan` mode and OmG planning commands can coexist:
   - native: `/plan`
@@ -540,7 +552,7 @@ oh-my-gemini-cli/
 | `/plan` opens native plan mode when you wanted OmG planning skill | Name collision between built-in `/plan` and skill-slash invocation | Use `/omg-plan` (or `$omg-plan`) for the OmG planning skill, or use `/omg:team-plan` for staged workflow planning |
 | You want one global model or Gemini Auto but OmG still behaves like an older pinned model policy | Older installs or stale extension metadata may still carry older model guidance or cached command metadata | Update/reinstall OmG, then set `/omg:model balanced` for explicit preview routing or `/omg:model auto` for runtime auto selection |
 | Skill does not trigger | Only the retained deep-work skills are still shipped, or extension metadata is stale | Recheck the retained skill list in the README and reload the extension/session |
-| Windows skill linking or extension reload behaves differently across machines | Different Gemini CLI builds handle skill links differently | Prefer stable `v0.37.0+`; if you track nightly/preview, note that newer builds moved Windows skill linking toward directory junctions |
+| Windows skill linking or extension reload behaves differently across machines | Different Gemini CLI builds handle skill links differently | Prefer stable `v0.38.0+`; if you track nightly/preview, note that newer builds moved Windows skill linking toward directory junctions |
 | Team assembly keeps proposing but does not execute | Approval token missing in request | Reply with explicit approval (`yes`, `approve`, `go`, or `run`) |
 | Parallel execution keeps colliding or re-planning the same files | Workspace lanes are not explicit | Run `/omg:workspace status` or set lane/path ownership with `/omg:workspace` |
 | `taskboard next` keeps jumping between tasks unpredictably | Missing priority values or unstable queue ordering | Run `/omg:taskboard sync` (fills default `p2`), then `/omg:taskboard rebalance` |
