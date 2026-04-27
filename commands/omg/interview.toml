@@ -16,6 +16,9 @@ Protocol:
      - `restart`: Clear `.omg/state/interviews/active.json` and start a new session folder.
 
 2. Default Interview Loop (If no subcommand):
+   - Language Alignment:
+     - Detect the language used by the user in the current session.
+     - All outputs (Confirmed Facts, Socratic Questions, and status updates) MUST be written in the user's detected language.
    - Depth: Default is `low` if no depth keyword is provided; otherwise, use the provided depth keyword (e.g., `medium`, `high`).
    - Initialize or Resume (Strict File-Based Logic):
      - **Check First**: Use `read_file` to verify the existence of `.omg/state/interviews/active.json`.
