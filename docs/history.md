@@ -2,6 +2,20 @@
 
 All notable changes to oh-my-gemini-cli are documented here.
 
+## v0.8.4 - Remove Usage Monitor Hook (2026-04-28)
+
+### Removed
+
+- Removed `omg-quota-watch-after-agent` from `hooks/hooks.json`.
+- Deleted `hooks/scripts/after-agent-usage.js` so OmG no longer emits noisy `usage=unavailable` lines.
+- Stopped documenting `.omg/state/quota-watch.json` as an active OmG state artifact.
+
+### Changed
+
+- Updated hook controls to keep only the quiet `BeforeModel` model router and the `AfterAgent` learn-signal safety filter.
+- Updated README, Korean README, landing page, hook guide, package metadata, and extension metadata for `v0.8.4`.
+- Redirected usage/quota guidance to Gemini CLI native `/model` or `/stats model` output.
+
 ## v0.8.3 - Gemini CLI Late-April Compatibility Sync (2026-04-27)
 
 ### Changed
@@ -36,6 +50,7 @@ All notable changes to oh-my-gemini-cli are documented here.
 
 | Version | Date | Theme | Outcome |
 | --- | --- | --- | --- |
+| `v0.8.4` | 2026-04-28 | Remove usage monitor hook | Removed the quota-watch AfterAgent hook and script so OmG no longer prints `usage=unavailable`; usage/quota visibility now relies on Gemini CLI native `/model` or `/stats model` |
 | `v0.8.3` | 2026-04-27 | Gemini CLI late-April compatibility sync | Aligned OmG guidance with Gemini CLI v0.38-v0.40 preview changes around Plan Mode confirmation, unified subagent invocation, memory inbox/skill patching, hook plan env, and MCP auth config boundaries |
 | `v0.8.2` | 2026-04-22 | Quiet model routing defaults | Replaced the visible BeforeModel model banner with silent request routing so repeated model-routing lines no longer appear while lane-specific model selection remains active |
 | `v0.8.1` | 2026-04-20 | Model alias routing and visibility | Switched OmG guidance to Gemini CLI model aliases, enabled workspace preview features by default, and added a BeforeModel visibility banner plus stronger HUD model visibility |

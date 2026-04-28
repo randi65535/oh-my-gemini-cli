@@ -56,14 +56,13 @@ Run a smoke test:
 
 Note: extension install/update commands run in terminal mode (`gemini extensions ...`), not in interactive slash-command mode.
 
-## What's New in v0.8.3
+## What's New in v0.8.4
 
-- Reviewed Gemini CLI releases from 2026-04-14 through 2026-04-25 and aligned OmG with the extension-relevant changes in `v0.38.x`, `v0.39.x`, and `v0.40.0-preview.x`.
-- Added Plan Mode safety guidance so OmG does not activate skills, subagents, or implementation lanes from native Plan Mode without explicit user confirmation.
-- Updated subagent guidance for Gemini CLI's unified invocation path and removed assumptions that older wrapped subagent tools are present.
-- Documented native `/memory inbox` and skill patching as operator-reviewed inputs, not automatic OmG asset mutations.
-- Added compatibility notes for `GEMINI_PLANS_DIR`, agent MCP `auth` blocks, the `/skills reload` refresh fix, and recent sandbox/path hardening.
-- Bumped extension/package version to `0.8.3` and refreshed README, Korean README, landing docs, and history.
+- Removed the `omg-quota-watch-after-agent` usage monitor from default `AfterAgent` hook registration.
+- Deleted `hooks/scripts/after-agent-usage.js` so OmG no longer prints noisy `usage=unavailable` lines.
+- Kept the silent `BeforeModel` model router and the `omg-learn-signal-after-agent` safety filter.
+- Updated hook controls and docs to rely on Gemini CLI native `/model` or `/stats model` for authoritative usage/quota visibility.
+- Bumped extension/package version to `0.8.4` and refreshed README, Korean README, landing docs, and history.
 
 ## Extension Boundary and Upgrade Safety
 
@@ -266,9 +265,9 @@ Example flow:
 -> persists policy: .omg/state/notify.json
 ```
 
-## Automatic Usage Monitor (AfterAgent Hook)
+## Model Router (BeforeModel Hook)
 
-OmG now ships an extension hook that prints a compact token-usage line after each completed agent turn.
+OmG ships a quiet model-routing hook. The previous `AfterAgent` quota-watch usage monitor was removed in `v0.8.4` because Gemini CLI can report usage as unavailable, which created noisy low-value output.
 
 - Hook entrypoint: `hooks/hooks.json` (`BeforeModel` -> `omg-model-router`)
 - Script: `hooks/scripts/before-model-banner.js`
@@ -276,63 +275,11 @@ OmG now ships an extension hook that prints a compact token-usage line after eac
 - Default balanced routing: planning/review -> `gemini-3.1-pro-preview`, execution -> `gemini-3-flash-preview`, quick edits -> `gemini-3.1-flash-lite-preview`
 - Optional disable: `OMG_DISABLED_HOOKS=model-routing` or `OMG_MODEL_ROUTING=off`
 
-- Hook entrypoint: `hooks/hooks.json` (`AfterAgent` -> `omg-quota-watch-after-agent`)
-- Script: `hooks/scripts/after-agent-usage.js`
-- State artifact: `.omg/state/quota-watch.json` (turn counter, latest usage snapshot, last processed transcript fingerprint, and session totals split by model/provider)
-- Optional state root override: `OMG_STATE_ROOT=<dir>` (absolute path or path relative to session `cwd`)
-- Optional quiet hook output: `OMG_HOOKS_QUIET=1`
-- Optional cwd hint mode: `OMG_USAGE_CWD_MODE=off|leaf|parent-leaf|full` (default: `parent-leaf`)
-- Optional hook profile: `OMG_HOOK_PROFILE=minimal|balanced|strict` (`minimal` suppresses usage line output but keeps state snapshots)
-- Optional per-hook disable: `OMG_DISABLED_HOOKS=usage` to disable only the usage monitor by env
-- State writes are skipped when the hook does not receive a reliable session `cwd`, so different projects do not fall back to one shared `process.cwd()` state file.
+Usage/quota visibility:
 
-What it shows automatically:
-
-- compact cwd/worktree hint (`cwd=<parent/leaf>` by default)
-- latest turn token totals (input/output/cached/total)
-- session cumulative tokens
-- cumulative tokens for the latest active model
-
-Boundary:
-
-- This hook cannot read authoritative remaining account quota by itself.
-- For true remaining quota/limits, run `/stats model(~0.37.2) or /model(0.38.0+)`.
-- If Gemini retries the same transcript snapshot, the hook treats it as already delivered and suppresses duplicate output.
-- State snapshots are written via an atomic temp-file rename to reduce cross-process corruption risk.
-
-Example (silence hook output but keep state snapshots):
-
-```bash
-export OMG_HOOKS_QUIET=1
-```
-
-Example (store monitor state outside default `.omg/state`):
-
-```bash
-export OMG_STATE_ROOT=.omg/state-local
-```
-
-Example (show full cwd path in usage lines):
-
-```bash
-export OMG_USAGE_CWD_MODE=full
-```
-
-Example (keep state snapshots but suppress normal usage output):
-
-```bash
-export OMG_HOOK_PROFILE=minimal
-```
-
-Disable only this hook:
-
-```json
-{
-  "hooksConfig": {
-    "disabled": ["omg-quota-watch-after-agent"]
-  }
-}
-```
+- OmG no longer estimates or prints token usage after each turn.
+- Use Gemini CLI native `/model` or `/stats model` for authoritative usage and quota status.
+- Legacy `.omg/state/quota-watch.json` files can be ignored; new OmG releases no longer update them.
 
 ## Learn-Signal Safety Filter (AfterAgent Hook)
 
@@ -366,10 +313,10 @@ Disable only this hook:
 }
 ```
 
-Example (disable one or both shipped AfterAgent hooks by env):
+Example (disable the shipped AfterAgent learn hook by env):
 
 ```bash
-export OMG_DISABLED_HOOKS=usage,learn
+export OMG_DISABLED_HOOKS=learn
 ```
 
 ## Gemini CLI Compatibility Notes (Reviewed: 2026-04-27)
