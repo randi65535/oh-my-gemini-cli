@@ -368,7 +368,8 @@ export OMG_DISABLED_HOOKS=learn
 - Policy engine migration: if your wrapper scripts still pass `--allowed-tools`, migrate to `--policy` profiles (`--allowed-tools` was deprecated in Gemini CLI `v0.30.0`).
 - Native `/plan` mode and OmG planning commands can coexist:
   - native: `/plan`
-  - OmG staged flow: `/omg:team-plan`, `/omg:team-prd`
+  - OmG automated flow: `/omg:team-assemble` (or `/omg:team`)
+  - OmG manual staged flow: `/omg:team-plan`, `/omg:team-prd`, etc.
 
 ## Interface Map
 
@@ -496,7 +497,7 @@ oh-my-gemini-cli/
 | `settings.filter is not a function` during install | Stale Gemini CLI runtime or stale cached extension metadata | Update Gemini CLI, uninstall extension, then reinstall from repository URL |
 | `/omg:*` command not found | Extension not loaded in current session | Run `gemini extensions list`, then restart Gemini CLI session |
 | Slash command or skill list looks stale after runtime/extension refresh | Interactive registry was not refreshed after update | Run `/skills reload` on newer Gemini CLI builds, or restart the session if the runtime is still on older stable |
-| `/plan` opens native plan mode when you wanted OmG planning skill | Name collision between built-in `/plan` and skill-slash invocation | Use `/omg-plan` (or `$omg-plan`) for the OmG planning skill, or use `/omg:team-plan` for staged workflow planning |
+| `/plan` opens native plan mode when you wanted OmG planning skill | Name collision between built-in `/plan` and skill-slash invocation | Use `/omg-plan` (or `$omg-plan`) for the OmG planning skill, or use `/omg:team-assemble` or `/omg:team-plan` for staged workflow planning |
 | You want one global model or Gemini Auto but OmG still behaves like an older pinned model policy | Older installs or stale extension metadata may still carry older model guidance or cached command metadata | Update/reinstall OmG, then set `/omg:model balanced` for explicit preview routing or `/omg:model auto` for runtime auto selection |
 | Skill does not trigger | Only the retained deep-work skills are still shipped, or extension metadata is stale | Recheck the retained skill list in the README and reload the extension/session |
 | Windows skill linking or extension reload behaves differently across machines | Different Gemini CLI builds handle skill links differently | Prefer stable `v0.38.0+`; if you track nightly/preview, note that newer builds moved Windows skill linking toward directory junctions |
